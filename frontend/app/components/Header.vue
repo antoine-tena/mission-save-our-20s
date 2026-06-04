@@ -15,22 +15,27 @@ const gererClicAlbum = (): void => {
   alert("Album photos cliqué !");
 };
 const gererClicAntoine = (): void => {
-  alert("Antoine le gros caca gay s'est pris une fessé !");
+  alert("Antoine le gros caca amoureux de amani s'est pris une fessé par bascop !");
 };
 </script>
 
 <style scoped>
 header {
   background-color: #ca75d6ff;
-  padding: 20px; 
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 header img {
-  width: 150px; 
+  width: 100px; 
+  height: auto;
 }
 
 header div {
-  margin-top: 10px;
+  display: flex;
+  gap: 12px;
 }
 
 button {
@@ -38,6 +43,8 @@ button {
   color: #c40e75ff;
   border: 1px solid black;
   padding: 5px;
-  margin-right: 10px;
+  
+  
+  
 }
 </style>
