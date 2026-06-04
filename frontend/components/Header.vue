@@ -5,7 +5,7 @@
     </NuxtLink>
     <div> 
     <NuxtLink to="/albumPhoto">
-      <button @click="albumPhoto">Album photos</button>
+      <button>Album Photo</button>
     </NuxtLink>
       <button @click="gererClicAntoine">antoine le caca</button>
     </div>
@@ -13,9 +13,6 @@
 </template>
 
 <script setup lang="ts">
-const gererClicAlbum = (): void => {
-  alert("Album photos cliqué !");
-};
 const gererClicAntoine = (): void => {
   alert("Antoine le gros caca amoureux de amani s'est pris une fessé par bascop puis tabassé par mazingue et bouffé le cul par Yvenat !");
 };
