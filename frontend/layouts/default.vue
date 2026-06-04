@@ -10,10 +10,11 @@
 <style scoped>
 .layout {
 	min-height: 100vh;
-	background: #fafafa;
+	
 }
 
 .content {
-	padding: 24px;
+    flex: 1;
+    padding: 20px;
 }
 </style>
