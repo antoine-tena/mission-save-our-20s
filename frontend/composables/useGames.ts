@@ -3,7 +3,7 @@ import type { GameType, GameSession, ScoreboardStats } from '~/types';
 
 export const useGames = () => {
   const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://127.0.0.1:8001/api';
+  const apiBase = config.public.apiBase || 'http://127.0.0.1:8000/api';
   const { token } = useAuth();
 
   const sessions = ref<GameSession[]>([]);

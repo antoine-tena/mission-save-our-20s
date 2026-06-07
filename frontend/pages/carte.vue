@@ -2,7 +2,11 @@
   <div class="mso-carte">
     <div class="mso-scrapbook-bg"></div>
     <div class="carte-layout">
-      <CartePhotoJournal :photos="localizedPhotos" :photo-count="localizedPhotos.length" @focus-photo="p => mapComponent?.focusOn('photo', p.id)" />
+      <CartePhotoJournal 
+        :photos="localizedPhotos" 
+        :movies="localizedMovies"
+        @focus="item => mapComponent?.focusOn(item.type, item.id)" 
+      />
       <CarteInteractiveMap ref="mapComponent" :photos="localizedPhotos" :movies="localizedMovies" />
     </div>
   </div>
@@ -13,8 +17,8 @@ import { ref, computed, onMounted } from 'vue';
 const { photos, fetchPhotos } = usePhotos();
 const { movies, fetchMovies } = useCinema();
 const mapComponent = ref();
-const localizedPhotos = computed(() => photos.value.filter(p => p.latitude && p.longitude));
-const localizedMovies = computed(() => movies.value.filter(m => m.latitude && m.longitude));
+const localizedPhotos = computed(() => photos.value.filter(p => p.latitude !== null && p.longitude !== null));
+const localizedMovies = computed(() => movies.value.filter(m => m.latitude !== null && m.longitude !== null));
 
 const route = useRoute();
 onMounted(async () => {

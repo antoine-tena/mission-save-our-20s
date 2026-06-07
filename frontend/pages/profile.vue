@@ -35,7 +35,9 @@
     <div v-if="selectedPost" class="post-modal" @click.self="selectedPost = null">
       <div class="modal-card glass-card">
         <SocialPostCard :post="selectedPost" :avatar="profile?.avatar_url" @like="likePost" />
-        <button class="close-modal" @click="selectedPost = null">×</button>
+        <button class="close-modal" @click="selectedPost = null">
+          <Icon name="lucide:x" />
+        </button>
       </div>
     </div>
   </div>

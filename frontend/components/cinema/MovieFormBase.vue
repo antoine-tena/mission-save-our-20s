@@ -44,20 +44,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import type { TMDBSuggestion } from '~/types';
 
-const props = defineProps<{ dateSeen: string; location: string; latitude?: number | null; longitude?: number | null }>();
+const props = defineProps<{ 
+  dateSeen: string; 
+  location: string; 
+  title?: string;
+  latitude?: number | null; 
+  longitude?: number | null 
+}>();
 const emit = defineEmits(['update:dateSeen', 'update:location', 'update:latitude', 'update:longitude', 'select']);
 
 const { searchMovies } = useCinema();
-const movieQuery = ref('');
+const movieQuery = ref(props.title || '');
 const movieSuggestions = ref<TMDBSuggestion[]>([]);
 let movieTimeout: any = null;
 
 const locationQuery = ref(props.location);
 const locationSuggestions = ref<any[]>([]);
 let locationTimeout: any = null;
+
+watch(() => props.title, (newTitle) => {
+  if (newTitle !== undefined) movieQuery.value = newTitle || '';
+});
+
+watch(() => props.location, (newLoc) => {
+  locationQuery.value = newLoc || '';
+});
 
 const onMovieInput = () => {
   clearTimeout(movieTimeout);

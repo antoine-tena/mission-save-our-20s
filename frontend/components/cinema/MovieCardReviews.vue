@@ -5,7 +5,7 @@
       <p v-if="amaniReview">{{ amaniReview }}</p>
       <p v-else class="placeholder-text">En attente de l'avis de la parisienne...</p>
       <div class="review-rating">
-        <span v-for="i in 5" :key="i" class="star" :class="{ 'filled': amaniRating >= i }">
+        <span v-for="i in 5" :key="i" class="star" :class="{ 'is-filled': amaniRating >= i }">
           <Icon name="lucide:star" />
         </span>
       </div>
@@ -15,7 +15,7 @@
       <p v-if="antoineReview">{{ antoineReview }}</p>
       <p v-else class="placeholder-text">En attente de l'avis du lyonnais...</p>
       <div class="review-rating">
-        <span v-for="i in 5" :key="i" class="star" :class="{ 'filled': antoineRating >= i }">
+        <span v-for="i in 5" :key="i" class="star" :class="{ 'is-filled': antoineRating >= i }">
           <Icon name="lucide:star" />
         </span>
       </div>
@@ -29,13 +29,14 @@ defineProps<{ amaniReview?: string; amaniRating: number; antoineReview?: string;
 
 <style scoped>
 .reviews-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; flex-grow: 1; }
-.review-bubble { padding: 1.2rem; border-radius: 18px; position: relative; font-size: 0.95rem; line-height: 1.6; }
+.review-bubble { padding: 1.2rem; border-radius: 18px; position: relative; font-size: 0.95rem; line-height: 1.6; display: flex; flex-direction: column; }
 .review-author { font-weight: 900; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.5rem; }
 .review-bubble--amani { background: #fff0f9; color: #c40e75ff; border-left: 4px solid #c40e75ff; }
 .review-bubble--antoine { background: #f4fafe; color: #1d4ed8; border-left: 4px solid #1d4ed8; }
 .review-bubble.empty { background: #f8fafc; color: #94a3b8; border-left: 4px solid #e2e8f0; font-style: italic; }
-.review-rating { margin-top: auto; padding-top: 1rem; display: flex; gap: 2px; }
-.star { color: #cbd5e0; font-size: 1.2rem; }
-.star.filled { color: #f6ad55; }
+.review-rating { margin-top: auto; padding-top: 1rem; display: flex; gap: 4px; }
+.star { color: #cbd5e0; font-size: 1.2rem; display: flex; transition: all 0.2s; }
+.star.is-filled { color: #fbbf24; }
+.star.is-filled :deep(svg) { fill: #fbbf24 !important; }
 @media (max-width: 900px) { .reviews-container { grid-template-columns: 1fr; } }
 </style>

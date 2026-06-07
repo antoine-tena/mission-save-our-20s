@@ -1,9 +1,13 @@
 <template>
   <div class="calendar-container glass-card">
     <header class="calendar-header">
-      <button @click="prevMonth">◀</button>
+      <button @click="prevMonth">
+        <Icon name="lucide:chevron-left" />
+      </button>
       <h2>{{ monthName }} {{ currentYear }}</h2>
-      <button @click="nextMonth">▶</button>
+      <button @click="nextMonth">
+        <Icon name="lucide:chevron-right" />
+      </button>
     </header>
 
     <div class="calendar-grid">

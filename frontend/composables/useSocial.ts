@@ -12,7 +12,8 @@ export const useSocial = () => {
   const fetchProfile = async () => {
     try {
       profile.value = await $fetch<Profile>(`${apiBase}/social/profile/`, {
-        headers: { Authorization: `Token ${token.value}` }
+        headers: { Authorization: `Token ${token.value}` },
+        credentials: 'include'
       });
     } catch (err) { console.error(err); }
   };

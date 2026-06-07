@@ -3,7 +3,7 @@ import type { StargazingSpot, CelestialBody } from '~/types';
 
 export const useStars = () => {
   const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://127.0.0.1:8001/api';
+  const apiBase = config.public.apiBase || 'http://127.0.0.1:8000/api';
   const { token } = useAuth();
 
   const spots = ref<StargazingSpot[]>([]);
