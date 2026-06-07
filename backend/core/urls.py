@@ -1,36 +1,63 @@
 """
 URL configuration for core project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from photos.views import photo_list_create, health_check, photo_detail_delete
+from photos.views import (
+    PhotoListCreateView, PhotoDetailDeleteView, 
+    PhotoMemoriesView, HealthCheckView
+)
 from . import auth_views
+from cinema.views import MovieListCreateView, MovieDetailView, MovieTMDBSearchView
+from games.views import GameTypeListView, GameSessionListCreateView, ScoreboardStatsView
+from social.views import (
+    MyProfileView, PublicProfileView, SocialPostListCreateView,
+    LikePostView, UserListView, FriendRequestView, HandleFriendRequestView
+)
+from rest_framework.routers import DefaultRouter
+from wishlist.views import WishlistItemViewSet
+from agenda.views import EventViewSet
+from stars.views import StargazingSpotViewSet
+
+router = DefaultRouter()
+router.register(r'wishlist', WishlistItemViewSet, basename='wishlist')
+router.register(r'agenda', EventViewSet, basename='agenda')
+router.register(r'stargazing', StargazingSpotViewSet, basename='stargazing')
 
 urlpatterns = [
     path('', auth_views.root_view),
     path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
     path('api/auth/register/', auth_views.register),
     path('api/auth/login/', auth_views.login),
     path('api/auth/logout/', auth_views.logout),
     path('api/auth/me/', auth_views.get_user),
-    path('api/photos/', photo_list_create),
-    path('api/photos/<int:pk>/', photo_detail_delete),
-    path('api/health/', health_check),
+    path('api/photos/', PhotoListCreateView.as_view()),
+    path('api/photos/memories/', PhotoMemoriesView.as_view()),
+    path('api/photos/<int:pk>/', PhotoDetailDeleteView.as_view()),
+    path('api/health/', HealthCheckView.as_view()),
+
+    # Social
+    path('api/social/profile/', MyProfileView.as_view()),
+    path('api/social/profile/<str:username>/', PublicProfileView.as_view()),
+    path('api/social/posts/', SocialPostListCreateView.as_view()),
+    path('api/social/posts/<int:pk>/like/', LikePostView.as_view()),
+    path('api/social/users/', UserListView.as_view()),
+    path('api/social/friends/requests/', FriendRequestView.as_view()),
+    path('api/social/friends/requests/send/<int:user_id>/', FriendRequestView.as_view()),
+    path('api/social/friends/requests/<int:request_id>/', HandleFriendRequestView.as_view()),
+
+    # Cinema
+    path('api/cinema/movies/', MovieListCreateView.as_view()),
+    path('api/cinema/movies/<int:pk>/', MovieDetailView.as_view()),
+    path('api/cinema/search/', MovieTMDBSearchView.as_view()),
+
+    # Games
+    path('api/games/types/', GameTypeListView.as_view()),
+    path('api/games/sessions/', GameSessionListCreateView.as_view()),
+    path('api/games/stats/', ScoreboardStatsView.as_view()),
 ]
 
 if settings.DEBUG:
