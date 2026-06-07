@@ -16,7 +16,6 @@
     "vue-router": "^5.0.7"
   },
   "devDependencies": {
-    "@nuxt/icon": "^2.2.3",
     "@types/leaflet": "^1.9.21"
   }
 }
