@@ -22,11 +22,6 @@ const handleScroll = () => {
   isScrolled.value = window.scrollY > 50; 
 };
 
-function handleAntoineClick() {
-  alert("ALERTE : Attention à Bascop, Mazingue et Yvenat ! L'accès à cet espace est hautement sécurisé par la brigade lyonnaise.");
-  navigateTo('/antoine');
-}
-
 onMounted(() => { window.addEventListener('scroll', handleScroll); });
 onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
 </script>

@@ -1,6 +1,8 @@
 <template>
   <div v-if="memories.length > 0" class="mso-flashback">
-    <h3 class="mso-flashback__title">✨ Flashback : Ce mois-ci les années passées</h3>
+    <h3 class="mso-flashback__title">
+      <Icon name="lucide:history" /> Flashback : Ce mois-ci les années passées
+    </h3>
     <div class="mso-flashback__grid">
       <div v-for="memory in memories" :key="memory.id" class="mso-flashback__item">
         <img :src="memory.image_url" :alt="memory.titre" class="mso-flashback__img" />

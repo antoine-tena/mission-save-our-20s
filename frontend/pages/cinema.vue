@@ -14,26 +14,108 @@
           @cancel="handleCancelEdit"
         />
       </Transition>
+
+      <CinemaMovieFilters 
+        v-model:search="filters.search"
+        v-model:genre="filters.genre"
+        v-model:ratingAmani="filters.ratingAmani"
+        v-model:ratingAntoine="filters.ratingAntoine"
+        v-model:ratingGlobal="filters.ratingGlobal"
+        v-model:year="filters.year"
+        v-model:sortBy="filters.sortBy"
+        :available-genres="availableGenres"
+        :available-years="availableYears"
+        :total-results="filteredMovies.length"
+        @reset="resetFilters"
+      />
+
       <div class="movies-timeline">
         <CinemaMovieCard 
-          v-for="movie in sortedMovies" 
+          v-for="movie in filteredMovies" 
           :key="movie.id" 
+          :id="'movie-' + movie.id"
           :movie="movie" 
           @edit="handleEditStart"
           @delete="handleDeleteMovie"
         />
+        <div v-if="filteredMovies.length === 0" class="empty-state">
+          <Icon name="lucide:search-x" class="empty-icon" />
+          <p>Aucun film ne correspond à tes critères...</p>
+          <button @click="resetFilters" class="btn-reset">Réinitialiser les filtres</button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useCinema } from '~/composables/useCinema';
 
 const { movies, isSubmitting, fetchMovies, createMovie, updateMovie, deleteMovie } = useCinema();
 const showAddForm = ref(false);
 const editingId = ref<number | null>(null);
+const route = useRoute();
+
+const filters = ref({
+  search: '',
+  genre: '',
+  ratingAmani: 0,
+  ratingAntoine: 0,
+  ratingGlobal: 0,
+  year: '',
+  sortBy: 'date-desc'
+});
+
+const availableGenres = computed(() => {
+  const genres = new Set<string>();
+  movies.value.forEach(m => {
+    if (m.genres) {
+      m.genres.split(', ').forEach(g => genres.add(g));
+    }
+  });
+  return Array.from(genres).sort();
+});
+
+const availableYears = computed(() => {
+  const years = new Set<string>();
+  movies.value.forEach(m => {
+    years.add(new Date(m.date_seen).getFullYear().toString());
+  });
+  return Array.from(years).sort((a, b) => b.localeCompare(a));
+});
+
+const filteredMovies = computed(() => {
+  return movies.value
+    .filter(m => {
+      const searchTerm = filters.value.search.toLowerCase();
+      const matchSearch = 
+        m.title.toLowerCase().includes(searchTerm) || 
+        (m.director && m.director.toLowerCase().includes(searchTerm)) ||
+        (m.cast && m.cast.toLowerCase().includes(searchTerm));
+        
+      const matchGenre = !filters.value.genre || (m.genres && m.genres.includes(filters.value.genre));
+      const matchRatingAmani = m.amani_rating >= filters.value.ratingAmani;
+      const matchRatingAntoine = m.antoine_rating >= filters.value.ratingAntoine;
+      
+      const avgRating = ((m.amani_rating || 0) + (m.antoine_rating || 0)) / 2;
+      const matchRatingGlobal = avgRating >= filters.value.ratingGlobal;
+      
+      const matchYear = !filters.value.year || new Date(m.date_seen).getFullYear().toString() === filters.value.year;
+      
+      return matchSearch && matchGenre && matchRatingAmani && matchRatingAntoine && matchRatingGlobal && matchYear;
+    })
+    .sort((a, b) => {
+      if (filters.value.sortBy === 'date-desc') return new Date(b.date_seen).getTime() - new Date(a.date_seen).getTime();
+      if (filters.value.sortBy === 'date-asc') return new Date(a.date_seen).getTime() - new Date(b.date_seen).getTime();
+      if (filters.value.sortBy === 'title-asc') return a.title.localeCompare(b.title);
+      return 0;
+    });
+});
+
+const resetFilters = () => {
+  filters.value = { search: '', genre: '', ratingAmani: 0, ratingAntoine: 0, ratingGlobal: 0, year: '', sortBy: 'date-desc' };
+};
 
 const newMovie = ref({
   tmdb_id: null as number | null,
@@ -46,10 +128,6 @@ const newMovie = ref({
   antoine_rating: 0,
   amani_review: '',
   amani_rating: 0
-});
-
-const sortedMovies = computed(() => {
-  return [...movies.value].sort((a, b) => new Date(b.date_seen).getTime() - new Date(a.date_seen).getTime());
 });
 
 const handleAddMovie = async () => {
@@ -98,7 +176,19 @@ const resetForm = () => {
   newMovie.value = { tmdb_id: null, title: '', date_seen: new Date().toISOString().slice(0, 16), location: '', latitude: null, longitude: null, antoine_review: '', antoine_rating: 0, amani_review: '', amani_rating: 0 };
 };
 
-onMounted(fetchMovies);
+onMounted(async () => {
+  await fetchMovies();
+  if (route.query.id) {
+    setTimeout(() => {
+      const element = document.getElementById('movie-' + route.query.id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.classList.add('highlight-movie');
+      }
+    }, 500);
+  }
+});
+
 useSeoMeta({ title: 'Ciné-Journal — MSO20s' });
 </script>
 
@@ -109,4 +199,9 @@ useSeoMeta({ title: 'Ciné-Journal — MSO20s' });
 .slide-fade-enter-active { transition: all 0.4s ease-out; }
 .slide-fade-leave-active { transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1); }
 .slide-fade-enter-from, .slide-fade-leave-to { transform: translateY(-20px); opacity: 0; }
+.empty-state { text-align: center; padding: 5rem 2rem; color: #94a3b8; }
+.empty-icon { font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3; }
+.btn-reset { background: #1a1a1a; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 1rem; }
+:deep(.highlight-movie) { outline: 3px solid #ca75d6; outline-offset: 10px; animation: pulse-highlight 2s infinite; }
+@keyframes pulse-highlight { 0% { outline-color: rgba(202, 117, 214, 0.8); } 50% { outline-color: rgba(202, 117, 214, 0.2); } 100% { outline-color: rgba(202, 117, 214, 0.8); } }
 </style>

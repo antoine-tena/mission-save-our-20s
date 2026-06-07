@@ -1,7 +1,7 @@
 <template>
   <div class="map-overlay-legend glass-card">
     <div class="legend-item"><span class="dot dot--photo"></span><span>Souvenir Photo</span></div>
-    <div class="legend-item"><span class="dot dot--manual"></span><span>Lieu Mémorable</span></div>
+    <div class="legend-item"><span class="dot dot--movie"></span><span>Séance Cinéma</span></div>
   </div>
 </template>
 
@@ -10,5 +10,5 @@
 .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; font-weight: 800; color: #444; }
 .dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 .dot--photo { background: #3b82f6; }
-.dot--manual { background: #ca75d6; }
+.dot--movie { background: #1a1a1a; }
 </style>

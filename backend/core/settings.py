@@ -2,11 +2,15 @@ from pathlib import Path
 from decouple import config, Csv
 import os
 
+print("--- LOADING SETTINGS ---")
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-replace-me')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = ['*']
+
+# Security & Origins
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
 # Application definition
 DJANGO_APPS = [
@@ -94,22 +98,23 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+# CORS Configuration
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-# CSRF
+# CSRF Configuration
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_HTTPONLY = False  # Permettre au JS de lire le token si besoin
+CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_HTTPONLY = True
+CSRF_USE_SESSIONS = False
+CSRF_COOKIE_SECURE = False
+
+# Standardize allowed methods and headers for modern frontend frameworks
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",
@@ -118,6 +123,7 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
+
 CORS_ALLOW_HEADERS = [
     "accept",
     "accept-encoding",
@@ -134,7 +140,6 @@ CORS_ALLOW_HEADERS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',

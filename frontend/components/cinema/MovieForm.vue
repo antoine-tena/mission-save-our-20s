@@ -4,15 +4,26 @@
     <h2 class="card-title">{{ isEditing ? 'Modifier la Séance' : 'Nouvelle Séance' }}</h2>
     <form @submit.prevent="$emit('submit')" class="movie-form">
       <CinemaMovieFormBase
-        v-model:dateSeen="modelValue.date_seen"
-        v-model:location="modelValue.location"
-        v-model:latitude="modelValue.latitude"
-        v-model:longitude="modelValue.longitude"
+        :date-seen="modelValue.date_seen"
+        @update:date-seen="val => updateField('date_seen', val)"
+        :location="modelValue.location"
+        @update:location="val => updateField('location', val)"
+        :latitude="modelValue.latitude"
+        @update:latitude="val => updateField('latitude', val)"
+        :longitude="modelValue.longitude"
+        @update:longitude="val => updateField('longitude', val)"
+        :title="modelValue.title"
         @select="onMovieSelect"
       />
       <CinemaMovieFormReviews
-        v-model:amaniReview="modelValue.amani_review" v-model:amaniRating="modelValue.amani_rating"
-        v-model:antoineReview="modelValue.antoine_review" v-model:antoineRating="modelValue.antoine_rating"
+        :amani-review="modelValue.amani_review"
+        @update:amani-review="val => updateField('amani_review', val)"
+        :amani-rating="modelValue.amani_rating"
+        @update:amani-rating="val => updateField('amani_rating', val)"
+        :antoine-review="modelValue.antoine_review"
+        @update:antoine-review="val => updateField('antoine_review', val)"
+        :antoine-rating="modelValue.antoine_rating"
+        @update:antoine-rating="val => updateField('antoine_rating', val)"
       />
       <div class="form-actions">
         <button type="submit" class="mso-btn-primary" :disabled="isSubmitting || !modelValue.tmdb_id">
@@ -30,6 +41,11 @@
 import type { TMDBSuggestion } from '~/types';
 const props = defineProps<{ modelValue: any; isSubmitting: boolean; isEditing?: boolean }>();
 const emit = defineEmits(['submit', 'update:modelValue', 'cancel']);
+
+const updateField = (field: string, value: any) => {
+  emit('update:modelValue', { ...props.modelValue, [field]: value });
+};
+
 const onMovieSelect = (s: TMDBSuggestion) => {
   emit('update:modelValue', { ...props.modelValue, tmdb_id: s.id, title: s.title });
 };

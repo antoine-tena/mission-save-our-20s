@@ -21,7 +21,9 @@
       </div>
 
       <footer class="scrapbook-footer">
-        <NuxtLink to="/profile" class="btn-text">Modifier mon profil →</NuxtLink>
+        <NuxtLink to="/profile" class="btn-text">
+          Modifier mon profil <Icon name="lucide:arrow-right" />
+        </NuxtLink>
       </footer>
     </div>
   </div>

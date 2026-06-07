@@ -3,7 +3,7 @@ import type { User, AuthResponse } from '~/types';
 
 export const useAuth = () => {
   const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase;
+  const apiBase = config.public.apiBase || 'http://127.0.0.1:8000/api';
 
   const user = useState<User | null>('auth_user', () => null);
   const token = useCookie<string | null>('auth_token', {
@@ -17,7 +17,8 @@ export const useAuth = () => {
     try {
       const response = await $fetch<AuthResponse>(`${apiBase}/auth/register/`, {
         method: 'POST',
-        body: { username, password, email }
+        body: { username, password, email },
+        credentials: 'include'
       });
       token.value = response.token;
       user.value = response.user;
@@ -32,7 +33,8 @@ export const useAuth = () => {
     try {
       const response = await $fetch<AuthResponse>(`${apiBase}/auth/login/`, {
         method: 'POST',
-        body: { username, password }
+        body: { username, password },
+        credentials: 'include'
       });
       token.value = response.token;
       user.value = response.user;
@@ -50,7 +52,8 @@ export const useAuth = () => {
           method: 'POST',
           headers: {
             'Authorization': `Token ${token.value}`
-          }
+          },
+          credentials: 'include'
         });
       } catch (err) {
         console.error('Logout error:', err);
@@ -67,7 +70,8 @@ export const useAuth = () => {
       const data = await $fetch<User>(`${apiBase}/auth/me/`, {
         headers: {
           'Authorization': `Token ${token.value}`
-        }
+        },
+        credentials: 'include'
       });
       user.value = data;
     } catch (err) {

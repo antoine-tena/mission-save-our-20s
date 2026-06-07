@@ -21,7 +21,9 @@
       </div>
 
       <footer class="scrapbook-footer">
-        <NuxtLink to="/profile" class="btn-text">Accéder aux paramètres système →</NuxtLink>
+        <NuxtLink to="/profile" class="btn-text">
+          Accéder aux paramètres système <Icon name="lucide:arrow-right" />
+        </NuxtLink>
       </footer>
     </div>
   </div>

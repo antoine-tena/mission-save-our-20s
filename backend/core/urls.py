@@ -27,13 +27,15 @@ router.register(r'agenda', EventViewSet, basename='agenda')
 router.register(r'stargazing', StargazingSpotViewSet, basename='stargazing')
 
 urlpatterns = [
-    path('', auth_views.root_view),
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
+    
+    # Auth routes
     path('api/auth/register/', auth_views.register),
     path('api/auth/login/', auth_views.login),
     path('api/auth/logout/', auth_views.logout),
     path('api/auth/me/', auth_views.get_user),
+    
+    # App-specific routes
     path('api/photos/', PhotoListCreateView.as_view()),
     path('api/photos/memories/', PhotoMemoriesView.as_view()),
     path('api/photos/<int:pk>/', PhotoDetailDeleteView.as_view()),
@@ -58,6 +60,12 @@ urlpatterns = [
     path('api/games/types/', GameTypeListView.as_view()),
     path('api/games/sessions/', GameSessionListCreateView.as_view()),
     path('api/games/stats/', ScoreboardStatsView.as_view()),
+
+    # Router
+    path('api/', include(router.urls)),
+
+    # Root
+    path('', auth_views.root_view),
 ]
 
 if settings.DEBUG:
