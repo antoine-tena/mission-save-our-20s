@@ -1,68 +1,59 @@
 <template>
-  <div class="home-page">
-    <section class="hero">
-      <div class="container hero__inner">
-        <h1 class="hero__title">Mission Save Our 20s</h1>
-        <p class="hero__subtitle">Rejoignez l'aventure collective pour sauver nos plus belles années.</p>
-        <div class="hero__actions">
-          <NuxtLink to="/albumPhoto" class="btn btn--primary">Voir l'album</NuxtLink>
-        </div>
+  <main class="mso-scrapbook">
+    <HomeFloatingStickers />
+    <HomeHero>
+      <HomeJournalCard />
+      <HomeFlashback :memories="memories" />
+      
+      <div class="mso-quick-links">
+        <NuxtLink v-for="link in quickLinks" :key="link.to" :to="link.to" class="quick-link-card glass-card">
+          <Icon :name="link.icon" class="icon" />
+          <span>{{ link.label }}</span>
+        </NuxtLink>
       </div>
-    </section>
-  </div>
+
+      <footer class="mso-footer">
+        <p>Archive intime & secrète — MSO20s v4.0</p>
+        <div class="mso-footer__names">Amani & Antoine</div>
+      </footer>
+    </HomeHero>
+  </main>
 </template>
 
 <script setup lang="ts">
-useSeoMeta({
-  title: 'Accueil — Mission Save Our 20s',
-  description: 'Bienvenue sur le site officiel de la Mission Save Our 20s.',
-})
+import { onMounted } from 'vue';
+import { useHome } from '~/composables/useHome';
+const { memories, fetchMemories } = useHome();
+
+const quickLinks = [
+  { to: '/wishlist', label: 'Wishlist', icon: 'lucide:clipboard-list' },
+  { to: '/calendrier', label: 'Agenda', icon: 'lucide:calendar' },
+  { to: '/etoiles', label: 'Étoiles', icon: 'lucide:stars' }
+];
+
+onMounted(fetchMemories);
+useSeoMeta({ title: 'Mission Save Our 20s — Notre Histoire' });
 </script>
 
 <style scoped>
-.hero {
-  padding-block: var(--space-20);
-  background: linear-gradient(135deg, var(--clr-primary-50) 0%, var(--clr-neutral-50) 100%);
-  min-height: 60vh;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  padding-top: calc(var(--header-height) + var(--space-10));
+.mso-scrapbook {
+  min-height: 100vh; background-color: #ffffff;
+  background-image: radial-gradient(#ca75d622 1px, transparent 1px),
+    linear-gradient(to right, #f9f9f9 1px, transparent 1px),
+    linear-gradient(to bottom, #f9f9f9 1px, transparent 1px);
+  background-size: 24px 24px, 48px 48px, 48px 48px;
+  position: relative; overflow: hidden; display: flex; align-items: center;
+  padding-top: calc(var(--header-height) + 4rem); padding-bottom: 6rem;
 }
-
-.hero__title {
-  font-size: clamp(2.5rem, 8vw, 4rem);
-  font-weight: var(--fw-bold);
-  color: var(--clr-neutral-900);
-  margin-bottom: var(--space-4);
+.mso-quick-links {
+  display: flex; gap: 1rem; justify-content: center; margin-top: 3rem; flex-wrap: wrap;
 }
-
-.hero__subtitle {
-  font-size: var(--text-xl);
-  color: var(--clr-neutral-600);
-  max-width: 60ch;
-  margin-inline: auto;
-  margin-bottom: var(--space-8);
+.quick-link-card {
+  display: flex; align-items: center; gap: 10px; padding: 12px 24px;
+  text-decoration: none; color: var(--clr-neutral-700); font-weight: 700;
+  transition: all 0.3s;
 }
-
-.btn {
-  display: inline-block;
-  padding: var(--space-4) var(--space-8);
-  border-radius: var(--radius-full);
-  font-weight: var(--fw-bold);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.btn--primary {
-  background: var(--clr-primary-500);
-  color: var(--clr-neutral-0);
-  box-shadow: var(--shadow-primary);
-}
-
-.btn--primary:hover {
-  background: var(--clr-primary-600);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-primary-lg);
-}
+.quick-link-card:hover { transform: translateY(-3px); color: var(--clr-primary-500); }
+.mso-footer { margin-top: 6rem; text-align: center; color: #bbb; font-size: 0.9rem; }
+.mso-footer__names { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #eee; margin-top: 1rem; letter-spacing: 2px; }
 </style>
-
