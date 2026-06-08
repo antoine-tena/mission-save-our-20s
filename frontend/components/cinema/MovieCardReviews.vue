@@ -6,7 +6,7 @@
       <p v-else class="placeholder-text">En attente de l'avis de la parisienne...</p>
       <div class="review-rating">
         <span v-for="i in 5" :key="i" class="star" :class="{ 'is-filled': amaniRating >= i }">
-          <Icon name="lucide:star" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" :fill="amaniRating >= i ? '#fbbf24' : 'none'" :stroke="amaniRating >= i ? '#fbbf24' : '#cbd5e0'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </span>
       </div>
     </div>
@@ -16,7 +16,7 @@
       <p v-else class="placeholder-text">En attente de l'avis du lyonnais...</p>
       <div class="review-rating">
         <span v-for="i in 5" :key="i" class="star" :class="{ 'is-filled': antoineRating >= i }">
-          <Icon name="lucide:star" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" :fill="antoineRating >= i ? '#fbbf24' : 'none'" :stroke="antoineRating >= i ? '#fbbf24' : '#cbd5e0'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </span>
       </div>
     </div>
@@ -37,6 +37,11 @@ defineProps<{ amaniReview?: string; amaniRating: number; antoineReview?: string;
 .review-rating { margin-top: auto; padding-top: 1rem; display: flex; gap: 4px; }
 .star { color: #cbd5e0; font-size: 1.2rem; display: flex; transition: all 0.2s; }
 .star.is-filled { color: #fbbf24; }
-.star.is-filled :deep(svg) { fill: #fbbf24 !important; }
+.star.is-filled :deep(svg), 
+.star.is-filled :deep(svg path),
+.star.is-filled :deep(svg polygon) { 
+  fill: #fbbf24 !important; 
+  stroke: #fbbf24 !important; 
+}
 @media (max-width: 900px) { .reviews-container { grid-template-columns: 1fr; } }
 </style>

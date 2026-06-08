@@ -3,7 +3,7 @@ import type { Movie, TMDBSuggestion } from '~/types';
 
 export const useCinema = () => {
   const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://127.0.0.1:8000/api';
+  const apiBase = config.public.apiBase || 'http://localhost:8000/api';
   const { token } = useAuth();
 
   const movies = ref<Movie[]>([]);

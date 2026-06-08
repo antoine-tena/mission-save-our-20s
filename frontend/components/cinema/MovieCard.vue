@@ -21,7 +21,7 @@
       <header class="movie-header">
         <h2 class="movie-title">{{ movie.title }}</h2>
         <div class="movie-info-line">
-          <NuxtLink v-if="movie.latitude" :to="\`/carte?type=movie&id=\${movie.id}\`" class="location-link" @click.stop>
+          <NuxtLink v-if="movie.latitude" :to="`/carte?type=movie&id=${movie.id}`" class="location-link" @click.stop>
             <Icon name="lucide:map-pin" /> {{ movie.location || 'Cinéma' }}
           </NuxtLink>
           <span v-else class="location"><Icon name="lucide:map-pin" /> {{ movie.location || 'Cinéma' }}</span>
