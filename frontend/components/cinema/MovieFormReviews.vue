@@ -5,7 +5,7 @@
       <textarea :value="amaniReview" @input="$emit('update:amaniReview', ($event.target as HTMLInputElement).value)" placeholder="Ton avis, Amani..."></textarea>
       <div class="rating-input">
         <span v-for="i in 5" :key="i" @click="$emit('update:amaniRating', i)" class="star" :class="{ 'is-active': amaniRating >= i }">
-          <Icon name="lucide:star" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" :fill="amaniRating >= i ? '#fbbf24' : 'none'" :stroke="amaniRating >= i ? '#fbbf24' : '#cbd5e0'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </span>
       </div>
     </div>
@@ -14,7 +14,7 @@
       <textarea :value="antoineReview" @input="$emit('update:antoineReview', ($event.target as HTMLInputElement).value)" placeholder="Ton avis, Antoine..."></textarea>
       <div class="rating-input">
         <span v-for="i in 5" :key="i" @click="$emit('update:antoineRating', i)" class="star" :class="{ 'is-active': antoineRating >= i }">
-          <Icon name="lucide:star" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" :fill="antoineRating >= i ? '#fbbf24' : 'none'" :stroke="antoineRating >= i ? '#fbbf24' : '#cbd5e0'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </span>
       </div>
     </div>
@@ -36,6 +36,11 @@ defineEmits(['update:amaniReview', 'update:amaniRating', 'update:antoineReview',
 .rating-input { margin-top: 10px; font-size: 1.5rem; cursor: pointer; display: flex; gap: 4px; }
 .star { color: #cbd5e0; transition: all 0.2s; display: flex; }
 .star.is-active { color: #fbbf24; }
-.star.is-active :deep(svg) { fill: #fbbf24 !important; }
+.star.is-active :deep(svg),
+.star.is-active :deep(svg path),
+.star.is-active :deep(svg polygon) { 
+  fill: #fbbf24 !important; 
+  stroke: #fbbf24 !important; 
+}
 @media (max-width: 900px) { .reviews-input-grid { grid-template-columns: 1fr; } }
 </style>

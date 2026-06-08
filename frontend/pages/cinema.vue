@@ -16,6 +16,7 @@
       </Transition>
 
       <CinemaMovieFilters 
+        v-if="!editingId"
         v-model:search="filters.search"
         v-model:genre="filters.genre"
         v-model:ratingAmani="filters.ratingAmani"
@@ -29,7 +30,7 @@
         @reset="resetFilters"
       />
 
-      <div class="movies-timeline">
+      <div v-if="!editingId" class="movies-timeline">
         <CinemaMovieCard 
           v-for="movie in filteredMovies" 
           :key="movie.id" 
