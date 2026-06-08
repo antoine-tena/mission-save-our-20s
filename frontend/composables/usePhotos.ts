@@ -3,7 +3,7 @@ import type { Photo, AsyncStatus } from '~/types';
 
 export const usePhotos = () => {
   const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://127.0.0.1:8000/api';
+  const apiBase = config.public.apiBase || 'http://localhost:8000/api';
   const { token } = useAuth();
 
   const photos = ref<Photo[]>([]);
