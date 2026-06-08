@@ -1,22 +1,28 @@
 <template>
   <div 
-    class="calendar-day" 
-    :class="{ 'has-events': events.length > 0, 'is-today': isToday, 'is-past': isPast }"
+    class="ios-day" 
+    :class="{ 
+      'is-today': isToday, 
+      'is-selected': isSelected,
+      'has-events': events.length > 0 
+    }"
     @click="$emit('click')"
   >
-    <span class="day-number">{{ date.getDate() }}</span>
-    <div v-if="events.length > 0" class="event-dots">
-      <span v-for="e in events.slice(0, 3)" :key="e.id" class="dot"></span>
+    <div class="day-circle">
+      <span class="day-number">{{ date.getDate() }}</span>
     </div>
+    <div v-if="events.length > 0" class="event-indicator"></div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { MSOEvent } from '~/types';
 
 const props = defineProps<{
   date: Date;
   events: MSOEvent[];
+  isSelected: boolean;
 }>();
 
 defineEmits(['click']);
@@ -25,25 +31,75 @@ const isToday = computed(() => {
   const today = new Date();
   return props.date.toDateString() === today.toDateString();
 });
-
-const isPast = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return props.date < today;
-});
 </script>
 
 <style scoped>
-.calendar-day {
-  aspect-ratio: 1; border-radius: 12px; border: 1px solid #edf2f7;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  cursor: pointer; transition: all 0.2s; position: relative;
+.ios-day {
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
 }
-.calendar-day:hover { background: #fff0f9; border-color: #ca75d644; transform: scale(1.05); }
-.is-today { border: 2px solid var(--clr-primary-500); font-weight: 900; }
-.has-events { background: #fdf2f8; }
-.is-past { opacity: 0.8; }
-.day-number { font-size: 1rem; color: #4a5568; }
-.event-dots { display: flex; gap: 2px; margin-top: 4px; }
-.dot { width: 4px; height: 4px; background: var(--clr-primary-500); border-radius: 50%; }
+
+.day-circle {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.day-number {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1c1c1e;
+}
+
+/* Today: Solid Theme Circle, White Text */
+.is-today .day-circle {
+  background-color: var(--clr-primary-500);
+}
+.is-today .day-number {
+  color: white;
+  font-weight: 700;
+}
+
+/* Selected (not today): Gray Circle, White Text */
+.is-selected:not(.is-today) .day-circle {
+  background-color: #1c1c1e;
+}
+.is-selected:not(.is-today) .day-number {
+  color: white;
+}
+
+/* Hover effect */
+.ios-day:hover:not(.is-selected):not(.is-today) .day-circle {
+  background-color: #f2f2f7;
+}
+
+/* Event Dot */
+.event-indicator {
+  width: 4px;
+  height: 4px;
+  background-color: #8e8e93;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 2px;
+}
+
+.is-selected .event-indicator,
+.is-today .event-indicator {
+  background-color: #1c1c1e; /* Contrast on circle background if needed, but here it's below */
+}
+
+/* If selected or today, make dot lighter/different if it overlaps? 
+   Actually iOS dots stay below the number even on today. */
+.is-today .event-indicator {
+  background-color: var(--clr-primary-500);
+}
 </style>
