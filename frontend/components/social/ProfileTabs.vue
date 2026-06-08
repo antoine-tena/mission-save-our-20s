@@ -18,6 +18,7 @@ defineProps<{ activeTab: string }>();
 defineEmits(['update:activeTab']);
 
 const tabs = [
+  { id: 'scrapbook', label: 'Espace Perso', icon: 'lucide:book-open' },
   { id: 'posts', label: 'Publications', icon: 'lucide:smartphone' },
   { id: 'info', label: 'À propos', icon: 'lucide:user' }
 ];

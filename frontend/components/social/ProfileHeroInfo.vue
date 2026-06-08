@@ -2,14 +2,14 @@
   <div class="hero-main-group">
     <div class="avatar-container">
       <img :src="avatarUrl || '/default-avatar.png'" alt="Avatar" class="main-avatar" />
-      <button class="avatar-edit-badge" @click="$emit('editAvatar')">
+      <button v-if="isOwnProfile" class="avatar-edit-badge" @click="$emit('editAvatar')">
         <Icon name="lucide:camera" />
       </button>
     </div>
     <div class="user-meta-info">
       <div class="name-badge-row">
         <h1 class="user-display-name">{{ username }}</h1>
-        <button class="btn-edit-profile" @click="$emit('editProfile')">Modifier profil</button>
+        <button v-if="isOwnProfile" class="btn-edit-profile" @click="$emit('editProfile')">Modifier profil</button>
       </div>
       <div class="stats-row">
         <div class="stat-item"><strong>{{ postsCount }}</strong> publications</div>
@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ avatarUrl?: string | null; username?: string; status?: string; friendsCount: number; postsCount: number; points: number; }>();
+defineProps<{ avatarUrl?: string | null; username?: string; status?: string; friendsCount: number; postsCount: number; points: number; isOwnProfile: boolean; }>();
 defineEmits(['editAvatar', 'editProfile']);
 </script>
 

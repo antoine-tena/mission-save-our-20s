@@ -9,9 +9,10 @@ export const useSocial = () => {
   const profile = ref<Profile | null>(null);
   const status = ref<AsyncStatus>('idle');
 
-  const fetchProfile = async () => {
+  const fetchProfile = async (username?: string) => {
     try {
-      profile.value = await $fetch<Profile>(`${apiBase}/social/profile/`, {
+      const url = username ? `${apiBase}/social/profile/${username}/` : `${apiBase}/social/profile/`;
+      profile.value = await $fetch<Profile>(url, {
         headers: { Authorization: `Token ${token.value}` },
         credentials: 'include'
       });

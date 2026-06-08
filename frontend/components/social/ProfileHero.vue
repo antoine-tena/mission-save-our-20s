@@ -1,6 +1,6 @@
 <template>
   <section class="profile-hero">
-    <SocialProfileHeroCover :cover-url="profile?.cover_url" @edit="$emit('editCover')" />
+    <SocialProfileHeroCover :cover-url="profile?.cover_url" :is-own-profile="isOwnProfile" @edit="$emit('editCover')" />
 
     <div class="container hero-content-wrapper">
       <SocialProfileHeroInfo 
@@ -10,6 +10,7 @@
         :friends-count="profile?.friends_count || 0" 
         :posts-count="postsCount" 
         :points="profile?.points || 0"
+        :is-own-profile="isOwnProfile"
         @edit-avatar="$emit('editAvatar')" 
         @edit-profile="$emit('editProfile')"
       />
@@ -19,7 +20,7 @@
 
 <script setup lang="ts">
 import type { Profile } from '~/types';
-defineProps<{ profile: Profile | null; username: string | undefined; postsCount: number; }>();
+defineProps<{ profile: Profile | null; username: string | undefined; postsCount: number; isOwnProfile: boolean; }>();
 defineEmits(['editCover', 'editAvatar', 'editProfile']);
 </script>
 
