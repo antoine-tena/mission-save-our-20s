@@ -3,7 +3,7 @@ import type { User, AuthResponse } from '~/types';
 
 export const useAuth = () => {
   const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://127.0.0.1:8000/api';
+  const apiBase = config.public.apiBase || 'http://localhost:8000/api';
 
   const user = useState<User | null>('auth_user', () => null);
   const token = useCookie<string | null>('auth_token', {
