@@ -3,7 +3,7 @@
     <h3 class="sidebar-title">À propos</h3>
     <div v-if="!isEditing" class="bio-display">
       <p class="bio-text">{{ bio || "Cet aventurier n'a pas encore écrit sa légende..." }}</p>
-      <button class="btn-text-only" @click="$emit('startEdit')">Modifier la bio</button>
+      <button v-if="isOwnProfile" class="btn-text-only" @click="$emit('startEdit')">Modifier la bio</button>
     </div>
     <div v-else class="bio-editor">
       <textarea v-model="localBio" class="bio-edit-input" maxlength="500"></textarea>
@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-const props = defineProps<{ bio: string; isEditing: boolean }>();
+const props = defineProps<{ bio: string; isEditing: boolean; isOwnProfile: boolean }>();
 const emit = defineEmits(['startEdit', 'save']);
 const localBio = ref(props.bio);
 watch(() => props.bio, (n) => localBio.value = n);
