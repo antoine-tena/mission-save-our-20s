@@ -8,7 +8,7 @@
       </header>
       <HomeJournalCardBody />
       <div class="mso-journal-card__actions">
-        <NuxtLink to="/albumPhoto" class="mso-btn-primary">
+        <NuxtLink to="/album" class="mso-btn-primary">
           Ouvrir l'Album Photo
           <Icon name="lucide:chevron-right" />
         </NuxtLink>
