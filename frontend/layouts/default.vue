@@ -4,13 +4,18 @@
     <main class="main-content">
       <slot />
     </main>
-    <footer class="main-footer">
+    <footer v-if="!hideFooter" class="main-footer">
       <div class="container">
         <p>&copy; {{ new Date().getFullYear() }} Mission Save Our 20s. Tous droits réservés.</p>
       </div>
     </footer>
   </div>
 </template>
+
+<script setup lang="ts">
+const route = useRoute();
+const hideFooter = computed(() => ['/etoiles', '/carte', '/calendrier'].includes(route.path));
+</script>
 
 <style scoped>
 .app-layout {
