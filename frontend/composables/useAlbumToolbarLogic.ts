@@ -45,12 +45,15 @@ export function useAlbumToolbarLogic(props: { page: any }) {
   };
 
   const updateColor = async (c: string) => {
+    await updatePageField(props.page.id, 'is_auto_color', false);
     await updatePageField(props.page.id, 'background_color', c);
   };
 
   const triggerHexPicker = () => { hexInput.value?.click(); };
   const onHexColorInput = async (e: Event) => {
-    await updatePageField(props.page.id, 'background_color', (e.target as HTMLInputElement).value);
+    const val = (e.target as HTMLInputElement).value;
+    await updatePageField(props.page.id, 'is_auto_color', false);
+    await updatePageField(props.page.id, 'background_color', val);
   };
 
   const updateIcon = async (iconName: string | null) => {
@@ -61,6 +64,7 @@ export function useAlbumToolbarLogic(props: { page: any }) {
     const color = props.page.background_color || '#ffffff';
     if (confirm(`Appliquer la couleur ${color} à absolument TOUTES les pages de l'album ?`) && activeAlbum.value) {
       for (const p of activeAlbum.value.pages) {
+        await updatePageField(p.id, 'is_auto_color', false);
         await updatePageField(p.id, 'background_color', color);
       }
     }
