@@ -8,22 +8,27 @@ export function useBookSpreadLogic(props: { activePageIdx: number }, emit: any) 
   const flipDirection = ref<'next' | 'prev'>('next');
   const isCoverDragOver = ref(false);
   const isBackCoverDragOver = ref(false);
+  const isAnalyzing = ref(false);
 
   const spreadsList = computed(() => {
     if (!activeAlbum.value) return [];
     const pages = activeAlbum.value.pages;
     const spreads = [];
+    // 1. Cover Spread (Beginning): Left is Back Cover, Right is Front Cover
     spreads.push({ leftPage: null, rightPage: null });
+    // 2. Interior spreads
     for (let i = 0; i < pages.length; i += 2) {
       spreads.push({ leftPage: pages[i] || null, rightPage: pages[i + 1] || null });
     }
+    // 3. Cover Spread (End): Left is Back Cover, Right is Front Cover
+    spreads.push({ leftPage: null, rightPage: null });
     return spreads;
   });
 
   const isFullWrapCover = computed(() => activeAlbum.value?.is_full_wrap === true);
-  const leftPage = computed(() => props.activePageIdx === 0 ? null : activeAlbum.value?.pages[props.activePageIdx - 2] || null);
-  const rightPage = computed(() => props.activePageIdx === 0 ? null : activeAlbum.value?.pages[props.activePageIdx - 1] || null);
   const maxPageIdx = computed(() => (spreadsList.value.length - 1) * 2);
+  const leftPage = computed(() => (props.activePageIdx === 0 || props.activePageIdx === maxPageIdx.value) ? null : activeAlbum.value?.pages[props.activePageIdx - 2] || null);
+  const rightPage = computed(() => (props.activePageIdx === 0 || props.activePageIdx === maxPageIdx.value) ? null : activeAlbum.value?.pages[props.activePageIdx - 1] || null);
 
   const onTurnPage = async (direction: 'next' | 'prev') => {
     if ((direction === 'next' && props.activePageIdx >= maxPageIdx.value) || (direction === 'prev' && props.activePageIdx <= 0)) return;
@@ -50,6 +55,7 @@ export function useBookSpreadLogic(props: { activePageIdx: number }, emit: any) 
   const retirePageStyle = async (page: any) => {
     if (!page) return;
     try {
+      await updatePageField(page.id, 'is_auto_color', false);
       await updatePageField(page.id, 'background_color', '#ffffff');
       await updatePageField(page.id, 'sticker', null);
       await fetchAlbumDetail(page.album, true);
@@ -59,10 +65,57 @@ export function useBookSpreadLogic(props: { activePageIdx: number }, emit: any) 
   const propagateEnveloping = async (sourcePage: any, targetPage: any) => {
     if (!sourcePage || !targetPage) return;
     try {
+      await updatePageField(targetPage.id, 'is_auto_color', false);
       await updatePageField(targetPage.id, 'background_color', sourcePage.background_color || '#ffffff');
       await updatePageField(targetPage.id, 'sticker', sourcePage.sticker || null);
       await fetchAlbumDetail(sourcePage.album, true);
     } catch (err) { console.error('Failed to propagate enveloping style:', err); }
+  };
+
+  // --- ONE-SHOT AUTO COLOR LOGIC FOR DOUBLE PAGE (SPREAD) ---
+  const applySuggestedColor = async () => {
+    if (isAnalyzing.value) return;
+    
+    // Collect all photo urls on this spread
+    const urls: string[] = [];
+    if (leftPage.value?.photos) {
+      for (const p of leftPage.value.photos) {
+        if (p.image_url) urls.push(p.image_url);
+      }
+    }
+    if (rightPage.value?.photos) {
+      for (const p of rightPage.value.photos) {
+        if (p.image_url) urls.push(p.image_url);
+      }
+    }
+
+    if (urls.length === 0) {
+      alert("Ajoutez d'abord des photos sur cette double-page pour pouvoir suggérer automatiquement une couleur de fond !");
+      return;
+    }
+
+    isAnalyzing.value = true;
+    try {
+      const { getBestBackgroundForImages } = await import('~/utils/colorExtractor');
+      const bestColor = await getBestBackgroundForImages(urls);
+
+      if (leftPage.value) {
+        await updatePageField(leftPage.value.id, 'background_color', bestColor);
+      }
+      if (rightPage.value) {
+        await updatePageField(rightPage.value.id, 'background_color', bestColor);
+      }
+
+      if (activeAlbum.value) {
+        await fetchAlbumDetail(activeAlbum.value.id, true);
+      }
+    } catch (err) {
+      console.error('Failed to apply suggested color:', err);
+    } finally {
+      // Artificial delay of 450ms for premium fluid visual feedback
+      await new Promise(r => setTimeout(r, 450));
+      isAnalyzing.value = false;
+    }
   };
 
   return {
@@ -82,6 +135,8 @@ export function useBookSpreadLogic(props: { activePageIdx: number }, emit: any) 
     draggedSourcePageId,
     fetchAlbumDetail,
     retirePageStyle,
-    propagateEnveloping
+    propagateEnveloping,
+    isAnalyzing,
+    applySuggestedColor
   };
 }
