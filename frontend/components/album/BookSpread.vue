@@ -88,15 +88,6 @@
           </div>
         </div>
 
-        <!-- NEW: Extracted Global Pages Controls Row -->
-        <div class="global-book-controls-row">
-          <div class="page-controls-column">
-            <AlbumToolbar v-if="leftPage && activePageIdx !== 0" :page="leftPage" />
-          </div>
-          <div class="page-controls-column">
-            <AlbumToolbar v-if="rightPage && activePageIdx !== 0" :page="rightPage" />
-          </div>
-        </div>
       </div>
 
       <!-- Next page arrow -->
@@ -105,94 +96,109 @@
       </button>
     </div>
 
-    <!-- Right Side Spread Control Toolbar -->
-    <aside class="spread-right-toolbar">
-      <div class="flex items-center gap-2 border-b border-gray-100 pb-2 mb-1">
-        <Icon name="lucide:sliders" class="text-indigo-500 text-sm" />
-        <h4 class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider font-sans">Mise en page</h4>
+    <!-- Right Sidebar Column containing all page design toolbars & spread controls -->
+    <aside class="right-spread-sidebar-col">
+      <!-- Spread Actions (Retirer, Rendre Enveloppante) -->
+      <div class="spread-right-toolbar">
+        <div class="flex items-center gap-2 border-b border-gray-100 pb-2 mb-1">
+          <Icon name="lucide:sliders" class="text-indigo-500 text-sm" />
+          <h4 class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider font-sans">Mise en page</h4>
+        </div>
+
+        <!-- FULL WRAP COVER MODE -->
+        <div v-if="activePageIdx === 0 && isFullWrapCover" class="flex flex-col gap-3">
+          <div class="page-section-header">
+            <span class="text-xs font-bold text-gray-700">Couverture Enveloppante</span>
+          </div>
+          <div class="flex flex-col gap-2">
+            <button type="button" class="right-tb-btn btn-retirer flex items-center gap-2 text-left" @click="onDeleteCover">
+              <Icon name="lucide:trash-2" class="text-red-500" />
+              <span>Retirer le style</span>
+            </button>
+            <button type="button" class="right-tb-btn btn-wrap flex items-center gap-2 text-left" @click="toggleFullWrap(false)">
+              <Icon name="lucide:columns" class="text-indigo-500" />
+              <span>Séparer en 2</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SPLIT COVER OR REGULAR SPREAD MODE -->
+        <template v-else>
+          <!-- LEFT PAGE SECTION -->
+          <div class="flex flex-col gap-2">
+            <div class="page-section-header flex items-center justify-between border-b border-gray-50 pb-1">
+              <span class="text-[11px] font-bold text-gray-600 font-serif">
+                {{ activePageIdx === 0 ? 'Couverture Fin (Gauche)' : `Page de Gauche (${activePageIdx - 1})` }}
+              </span>
+            </div>
+            
+            <div class="flex flex-col gap-1.5" v-if="activePageIdx === 0 || leftPage">
+              <button 
+                type="button" 
+                class="right-tb-btn btn-retirer flex items-center gap-2 text-left" 
+                @click="activePageIdx === 0 ? onDeleteBackCover() : retirePageStyle(leftPage)"
+              >
+                <Icon name="lucide:trash-2" class="text-red-500 text-xs" />
+                <span class="text-[11px] text-gray-700 font-medium">Retirer le style</span>
+              </button>
+              <button 
+                type="button" 
+                class="right-tb-btn btn-wrap flex items-center gap-2 text-left" 
+                @click="activePageIdx === 0 ? toggleFullWrap(true) : propagateEnveloping(leftPage, rightPage)"
+                :disabled="activePageIdx !== 0 && !rightPage"
+              >
+                <Icon name="lucide:book-open" class="text-indigo-500 text-xs" />
+                <span class="text-[11px] text-gray-700 font-medium">Rendre Enveloppante</span>
+              </button>
+            </div>
+            <div v-else class="text-[10px] text-gray-400 italic">Page vide</div>
+          </div>
+
+          <div class="h-[1px] bg-gray-100 my-1"></div>
+
+          <!-- RIGHT PAGE SECTION -->
+          <div class="flex flex-col gap-2">
+            <div class="page-section-header flex items-center justify-between border-b border-gray-50 pb-1">
+              <span class="text-[11px] font-bold text-gray-600 font-serif">
+                {{ activePageIdx === 0 ? 'Couverture Début (Droite)' : `Page de Droite (${activePageIdx})` }}
+              </span>
+            </div>
+            
+            <div class="flex flex-col gap-1.5" v-if="activePageIdx === 0 || rightPage">
+              <button 
+                type="button" 
+                class="right-tb-btn btn-retirer flex items-center gap-2 text-left" 
+                @click="activePageIdx === 0 ? onDeleteCover() : retirePageStyle(rightPage)"
+              >
+                <Icon name="lucide:trash-2" class="text-red-500 text-xs" />
+                <span class="text-[11px] text-gray-700 font-medium">Retirer le style</span>
+              </button>
+              <button 
+                type="button" 
+                class="right-tb-btn btn-wrap flex items-center gap-2 text-left" 
+                @click="activePageIdx === 0 ? toggleFullWrap(true) : propagateEnveloping(rightPage, leftPage)"
+                :disabled="activePageIdx !== 0 && !leftPage"
+              >
+                <Icon name="lucide:book-open" class="text-indigo-500 text-xs" />
+                <span class="text-[11px] text-gray-700 font-medium">Rendre Enveloppante</span>
+              </button>
+            </div>
+            <div v-else class="text-[10px] text-gray-400 italic">Page vide</div>
+          </div>
+        </template>
       </div>
 
-      <!-- FULL WRAP COVER MODE -->
-      <div v-if="activePageIdx === 0 && isFullWrapCover" class="flex flex-col gap-3">
-        <div class="page-section-header">
-          <span class="text-xs font-bold text-gray-700">Couverture Enveloppante</span>
-        </div>
-        <div class="flex flex-col gap-2">
-          <button type="button" class="right-tb-btn btn-retirer flex items-center gap-2 text-left" @click="onDeleteCover">
-            <Icon name="lucide:trash-2" class="text-red-500" />
-            <span>Retirer le style</span>
-          </button>
-          <button type="button" class="right-tb-btn btn-wrap flex items-center gap-2 text-left" @click="toggleFullWrap(false)">
-            <Icon name="lucide:columns" class="text-indigo-500" />
-            <span>Séparer en 2</span>
-          </button>
-        </div>
+      <!-- Left Page Design Toolbar (AlbumToolbar) -->
+      <div v-if="leftPage && activePageIdx !== 0" class="flex flex-col gap-1.5">
+        <span class="text-[9px] font-extrabold text-gray-400 uppercase tracking-wider pl-1">Outils Page Gauche</span>
+        <AlbumToolbar :page="leftPage" class="w-full" />
       </div>
 
-      <!-- SPLIT COVER OR REGULAR SPREAD MODE -->
-      <template v-else>
-        <!-- LEFT PAGE SECTION -->
-        <div class="flex flex-col gap-2">
-          <div class="page-section-header flex items-center justify-between border-b border-gray-50 pb-1">
-            <span class="text-[11px] font-bold text-gray-600 font-serif">
-              {{ activePageIdx === 0 ? 'Couverture Fin (Gauche)' : `Page de Gauche (${activePageIdx - 1})` }}
-            </span>
-          </div>
-          
-          <div class="flex flex-col gap-1.5" v-if="activePageIdx === 0 || leftPage">
-            <button 
-              type="button" 
-              class="right-tb-btn btn-retirer flex items-center gap-2 text-left" 
-              @click="activePageIdx === 0 ? onDeleteBackCover() : retirePageStyle(leftPage)"
-            >
-              <Icon name="lucide:trash-2" class="text-red-500 text-xs" />
-              <span class="text-[11px] text-gray-700 font-medium">Retirer le style</span>
-            </button>
-            <button 
-              type="button" 
-              class="right-tb-btn btn-wrap flex items-center gap-2 text-left" 
-              @click="activePageIdx === 0 ? toggleFullWrap(true) : propagateEnveloping(leftPage, rightPage)"
-              :disabled="activePageIdx !== 0 && !rightPage"
-            >
-              <Icon name="lucide:book-open" class="text-indigo-500 text-xs" />
-              <span class="text-[11px] text-gray-700 font-medium">Rendre Enveloppante</span>
-            </button>
-          </div>
-          <div v-else class="text-[10px] text-gray-400 italic">Page vide</div>
-        </div>
-
-        <div class="h-[1px] bg-gray-100 my-1"></div>
-
-        <!-- RIGHT PAGE SECTION -->
-        <div class="flex flex-col gap-2">
-          <div class="page-section-header flex items-center justify-between border-b border-gray-50 pb-1">
-            <span class="text-[11px] font-bold text-gray-600 font-serif">
-              {{ activePageIdx === 0 ? 'Couverture Début (Droite)' : `Page de Droite (${activePageIdx})` }}
-            </span>
-          </div>
-          
-          <div class="flex flex-col gap-1.5" v-if="activePageIdx === 0 || rightPage">
-            <button 
-              type="button" 
-              class="right-tb-btn btn-retirer flex items-center gap-2 text-left" 
-              @click="activePageIdx === 0 ? onDeleteCover() : retirePageStyle(rightPage)"
-            >
-              <Icon name="lucide:trash-2" class="text-red-500 text-xs" />
-              <span class="text-[11px] text-gray-700 font-medium">Retirer le style</span>
-            </button>
-            <button 
-              type="button" 
-              class="right-tb-btn btn-wrap flex items-center gap-2 text-left" 
-              @click="activePageIdx === 0 ? toggleFullWrap(true) : propagateEnveloping(rightPage, leftPage)"
-              :disabled="activePageIdx !== 0 && !leftPage"
-            >
-              <Icon name="lucide:book-open" class="text-indigo-500 text-xs" />
-              <span class="text-[11px] text-gray-700 font-medium">Rendre Enveloppante</span>
-            </button>
-          </div>
-          <div v-else class="text-[10px] text-gray-400 italic">Page vide</div>
-        </div>
-      </template>
+      <!-- Right Page Design Toolbar (AlbumToolbar) -->
+      <div v-if="rightPage && activePageIdx !== 0" class="flex flex-col gap-1.5">
+        <span class="text-[9px] font-extrabold text-gray-400 uppercase tracking-wider pl-1">Outils Page Droite</span>
+        <AlbumToolbar :page="rightPage" class="w-full" />
+      </div>
     </aside>
   </div>
 </template>
