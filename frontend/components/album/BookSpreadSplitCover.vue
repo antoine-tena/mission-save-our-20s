@@ -16,10 +16,12 @@
         description-text="Glissez-déposez une photo ici"
         :draggable="true"
         @dragstart="$emit('dragstart', $event)"
+        @delete="$emit('delete')"
+        @toggle-wrap="$emit('toggle-wrap', $event)"
       />
       
-      <div class="cover-overlay-minimal flex gap-2">
-        <button v-if="activeAlbum?.back_cover_photo_url" type="button" class="delete-cover-btn-full-floating" @click.stop="$emit('delete')">
+      <div v-if="!activeAlbum?.show_cover_photo" class="cover-overlay-minimal flex gap-2">
+        <button type="button" class="delete-cover-btn-full-floating" @click.stop="$emit('delete')">
           <Icon name="lucide:trash-2" /> Retirer
         </button>
         <button type="button" class="toggle-wrap-btn-floating" @click.stop="$emit('toggle-wrap', true)">
@@ -44,9 +46,11 @@
         :photo-url="activeAlbum?.cover_photo_url || null"
         placeholder-text="Couverture de début"
         description-text="Glissez-déposez une photo ici"
+        @delete="$emit('delete')"
+        @toggle-wrap="$emit('toggle-wrap', $event)"
       />
       
-      <div class="cover-overlay-minimal flex gap-2">
+      <div v-if="!activeAlbum?.show_cover_photo" class="cover-overlay-minimal flex gap-2">
         <button type="button" class="delete-cover-btn-full-floating" @click.stop="$emit('delete')">
           <Icon name="lucide:trash-2" /> Retirer
       </button>
