@@ -52,71 +52,14 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
 import { useCinema } from '~/composables/useCinema';
+import { useCinemaFilters } from '~/composables/useCinemaFilters';
 
 const { movies, isSubmitting, fetchMovies, createMovie, updateMovie, deleteMovie } = useCinema();
 const showAddForm = ref(false);
 const editingId = ref<number | null>(null);
 const route = useRoute();
 
-const filters = ref({
-  search: '',
-  genre: '',
-  ratingAmani: 0,
-  ratingAntoine: 0,
-  ratingGlobal: 0,
-  year: '',
-  sortBy: 'date-desc'
-});
-
-const availableGenres = computed(() => {
-  const genres = new Set<string>();
-  movies.value.forEach(m => {
-    if (m.genres) {
-      m.genres.split(', ').forEach(g => genres.add(g));
-    }
-  });
-  return Array.from(genres).sort();
-});
-
-const availableYears = computed(() => {
-  const years = new Set<string>();
-  movies.value.forEach(m => {
-    years.add(new Date(m.date_seen).getFullYear().toString());
-  });
-  return Array.from(years).sort((a, b) => b.localeCompare(a));
-});
-
-const filteredMovies = computed(() => {
-  return movies.value
-    .filter(m => {
-      const searchTerm = filters.value.search.toLowerCase();
-      const matchSearch = 
-        m.title.toLowerCase().includes(searchTerm) || 
-        (m.director && m.director.toLowerCase().includes(searchTerm)) ||
-        (m.cast && m.cast.toLowerCase().includes(searchTerm));
-        
-      const matchGenre = !filters.value.genre || (m.genres && m.genres.includes(filters.value.genre));
-      const matchRatingAmani = m.amani_rating >= filters.value.ratingAmani;
-      const matchRatingAntoine = m.antoine_rating >= filters.value.ratingAntoine;
-      
-      const avgRating = ((m.amani_rating || 0) + (m.antoine_rating || 0)) / 2;
-      const matchRatingGlobal = avgRating >= filters.value.ratingGlobal;
-      
-      const matchYear = !filters.value.year || new Date(m.date_seen).getFullYear().toString() === filters.value.year;
-      
-      return matchSearch && matchGenre && matchRatingAmani && matchRatingAntoine && matchRatingGlobal && matchYear;
-    })
-    .sort((a, b) => {
-      if (filters.value.sortBy === 'date-desc') return new Date(b.date_seen).getTime() - new Date(a.date_seen).getTime();
-      if (filters.value.sortBy === 'date-asc') return new Date(a.date_seen).getTime() - new Date(b.date_seen).getTime();
-      if (filters.value.sortBy === 'title-asc') return a.title.localeCompare(b.title);
-      return 0;
-    });
-});
-
-const resetFilters = () => {
-  filters.value = { search: '', genre: '', ratingAmani: 0, ratingAntoine: 0, ratingGlobal: 0, year: '', sortBy: 'date-desc' };
-};
+const { filters, availableGenres, availableYears, filteredMovies, resetFilters } = useCinemaFilters(movies);
 
 const newMovie = ref({
   tmdb_id: null as number | null,
@@ -194,15 +137,5 @@ useSeoMeta({ title: 'Ciné-Journal — MSO20s' });
 </script>
 
 <style scoped>
-.cinema-page { min-height: 100vh; padding-top: calc(var(--header-height) + 2rem); padding-bottom: 4rem; }
-.mso-scrapbook-bg { position: fixed; inset: 0; background-color: #ffffff; background-image: radial-gradient(#ca75d611 1.5px, transparent 1.5px); background-size: 30px 30px; z-index: -1; }
-.movies-timeline { display: flex; flex-direction: column; gap: 3rem; }
-.slide-fade-enter-active { transition: all 0.4s ease-out; }
-.slide-fade-leave-active { transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1); }
-.slide-fade-enter-from, .slide-fade-leave-to { transform: translateY(-20px); opacity: 0; }
-.empty-state { text-align: center; padding: 5rem 2rem; color: #94a3b8; }
-.empty-icon { font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3; }
-.btn-reset { background: #1a1a1a; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 1rem; }
-:deep(.highlight-movie) { outline: 3px solid #ca75d6; outline-offset: 10px; animation: pulse-highlight 2s infinite; }
-@keyframes pulse-highlight { 0% { outline-color: rgba(202, 117, 214, 0.8); } 50% { outline-color: rgba(202, 117, 214, 0.2); } 100% { outline-color: rgba(202, 117, 214, 0.8); } }
+@import '~/assets/css/cinema.css';
 </style>

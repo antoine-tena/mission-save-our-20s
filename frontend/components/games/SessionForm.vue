@@ -6,7 +6,7 @@
       <GamesSessionFormFields :model-value="modelValue" :game-types="gameTypes" @update:field="$emit('update:modelValue', { ...modelValue, ...$event })" />
       <div class="form-group full-width">
         <label>Lieu</label>
-        <input :value="modelValue.location" @input="$emit('update:modelValue', { ...modelValue, location: ($event.target as HTMLInputElement).value })" type="text" placeholder="Ex: Billard Club" />
+        <LocationAutocomplete :model-value="modelValue.location" @update:model-value="val => $emit('update:modelValue', { ...modelValue, location: val })" placeholder="Ex: Billard Club" />
       </div>
       <div class="form-group full-width">
         <label>Notes</label>

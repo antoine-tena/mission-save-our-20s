@@ -20,6 +20,7 @@ defineProps<{ isMobile?: boolean }>();
 
 const navigationLinks = [
   { id: 'album', to: '/album', label: 'Album', icon: 'lucide:camera' },
+  { id: 'journal', to: '/journal', label: 'Journal', icon: 'lucide:book-open' },
   { id: 'carte', to: '/carte', label: 'Carte', icon: 'lucide:map' },
   { id: 'cinema', to: '/cinema', label: 'Cinéma', icon: 'lucide:clapperboard' },
   { id: 'jeux', to: '/jeux', label: 'Jeux', icon: 'lucide:gamepad-2' },

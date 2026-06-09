@@ -1,0 +1,11 @@
+.cinema-page { min-height: 100vh; padding-top: calc(var(--header-height) + 2rem); padding-bottom: 4rem; }
+.mso-scrapbook-bg { position: fixed; inset: 0; background-color: #ffffff; background-image: radial-gradient(#ca75d611 1.5px, transparent 1.5px); background-size: 30px 30px; z-index: -1; }
+.movies-timeline { display: flex; flex-direction: column; gap: 3rem; }
+.slide-fade-enter-active { transition: all 0.4s ease-out; }
+.slide-fade-leave-active { transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1); }
+.slide-fade-enter-from, .slide-fade-leave-to { transform: translateY(-20px); opacity: 0; }
+.empty-state { text-align: center; padding: 5rem 2rem; color: #94a3b8; }
+.empty-icon { font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3; }
+.btn-reset { background: #1a1a1a; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 1rem; }
+:deep(.highlight-movie) { outline: 3px solid #ca75d6; outline-offset: 10px; animation: pulse-highlight 2s infinite; }
+@keyframes pulse-highlight { 0% { outline-color: rgba(202, 117, 214, 0.8); } 50% { outline-color: rgba(202, 117, 214, 0.2); } 100% { outline-color: rgba(202, 117, 214, 0.8); } }
