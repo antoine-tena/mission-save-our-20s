@@ -29,7 +29,7 @@
     <template v-if="!isCropping">
       <template v-if="activeAlbum?.is_full_wrap">
         <!-- Left page overlay (back cover part) -->
-        <div class="cover-overlay-minimal left-overlay flex gap-2">
+        <div class="cover-overlay-minimal left-overlay flex flex-col gap-2">
           <button type="button" class="delete-cover-btn-full-floating" @click.stop="onDelete">
             <Icon name="lucide:trash-2" /> Retirer
           </button>
@@ -39,7 +39,7 @@
         </div>
 
         <!-- Right page overlay (front cover part) -->
-        <div class="cover-overlay-minimal right-overlay flex gap-2">
+        <div class="cover-overlay-minimal right-overlay flex flex-col gap-2">
           <button type="button" class="delete-cover-btn-full-floating" @click.stop="onDelete">
             <Icon name="lucide:trash-2" /> Retirer
           </button>
@@ -50,7 +50,7 @@
       </template>
       <template v-else>
         <!-- Single page overlay (split cover part) -->
-        <div class="cover-overlay-minimal flex gap-2">
+        <div class="cover-overlay-minimal flex flex-col gap-2" :class="type === 'back' ? 'left-overlay' : 'right-overlay'">
           <button type="button" class="delete-cover-btn-full-floating" @click.stop="onDelete">
             <Icon name="lucide:trash-2" /> Retirer
           </button>

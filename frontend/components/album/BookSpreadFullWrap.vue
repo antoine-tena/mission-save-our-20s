@@ -23,7 +23,7 @@
       />
 
       <!-- Left page overlay (back cover part) -->
-      <div v-if="!activeAlbum?.show_cover_photo" class="cover-overlay-minimal left-overlay flex gap-2">
+      <div v-if="!activeAlbum?.show_cover_photo" class="cover-overlay-minimal left-overlay flex flex-col gap-2">
         <button type="button" class="delete-cover-btn-full-floating" @click.stop="$emit('delete')">
           <Icon name="lucide:trash-2" /> Retirer
         </button>
@@ -33,7 +33,7 @@
       </div>
 
       <!-- Right page overlay (front cover part) -->
-      <div v-if="!activeAlbum?.show_cover_photo" class="cover-overlay-minimal right-overlay flex gap-2">
+      <div v-if="!activeAlbum?.show_cover_photo" class="cover-overlay-minimal right-overlay flex flex-col gap-2">
         <button type="button" class="delete-cover-btn-full-floating" @click.stop="$emit('delete')">
           <Icon name="lucide:trash-2" /> Retirer
         </button>
