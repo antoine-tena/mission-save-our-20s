@@ -88,6 +88,19 @@
           </div>
         </div>
 
+        <!-- Magic Auto-Color Spread Toggle -->
+        <div class="auto-color-spread-control-row" v-if="activePageIdx !== 0 && (leftPage || rightPage)">
+          <button 
+            type="button" 
+            class="auto-color-toggle-btn"
+            :class="{ 'active': isSpreadAutoColor }"
+            @click="toggleSpreadAutoColor"
+          >
+            <Icon :name="isSpreadAutoColor ? 'lucide:sparkles' : 'lucide:palette'" class="magic-icon" />
+            <span>Mode Couleur Auto : <strong>{{ isSpreadAutoColor ? 'Activé' : 'Désactivé' }}</strong></span>
+          </button>
+        </div>
+
       </div>
 
       <!-- Next page arrow -->
@@ -214,7 +227,7 @@ const logicState = useBookSpreadLogic(props, emit);
 const {
   activeAlbum, isFlipping, flipDirection, isCoverDragOver, isBackCoverDragOver,
   leftPage, rightPage, onTurnPage, toggleFullWrap, isFullWrapCover, maxPageIdx,
-  retirePageStyle, propagateEnveloping
+  retirePageStyle, propagateEnveloping, isSpreadAutoColor, toggleSpreadAutoColor
 } = logicState;
 
 const {
@@ -226,4 +239,59 @@ const {
 
 <style scoped>
 @import '~/assets/css/book-spread.css';
+
+.auto-color-spread-control-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 0.8rem;
+  margin-bottom: 0.2rem;
+}
+
+.auto-color-toggle-btn {
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  color: #718096;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 8px 18px;
+  border-radius: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.auto-color-toggle-btn:hover {
+  border-color: #6366f1;
+  color: #4f46e5;
+  background: rgba(99, 102, 241, 0.02);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(99, 102, 241, 0.08);
+}
+
+.auto-color-toggle-btn.active {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border-color: #4f46e5;
+  color: white;
+  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
+}
+
+.magic-icon {
+  font-size: 1rem;
+}
+
+.auto-color-toggle-btn.active .magic-icon {
+  animation: magicPulse 1.5s infinite alternate;
+}
+
+@keyframes magicPulse {
+  0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,255,255,0.6)); }
+  100% { transform: scale(1.2); filter: drop-shadow(0 0 5px rgba(255,255,255,0.9)); }
+}
 </style>
