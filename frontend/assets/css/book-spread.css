@@ -124,4 +124,10 @@
   box-shadow: none !important;
 }
 
+/* Pages de garde (restricted blank white pages) */
+.garde-page {
+  border: none !important;
+  box-shadow: none !important;
+}
+
 @media (max-width: 1000px) { .book-pages-spread { grid-template-columns: 1fr; } .left-page { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.05); } .nav-turn-btn { display: none; } }

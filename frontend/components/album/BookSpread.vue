@@ -122,7 +122,7 @@
               />
               
               <!-- Regular interior left page -->
-              <div v-else-if="leftPage" class="book-page left-page" :style="{ backgroundColor: isPageRestricted(leftPage.id) ? '#ffffff' : (leftPage.background_color || '#ffffff') }">
+              <div v-else-if="leftPage" class="book-page left-page" :class="{ 'garde-page': isPageRestricted(leftPage.id) }" :style="{ backgroundColor: isPageRestricted(leftPage.id) ? '#ffffff' : (leftPage.background_color || '#ffffff') }">
                 <div class="page-corner-fold-left"></div>
                 <AlbumBookPageHeader v-if="!isPageRestricted(leftPage.id)" :page="leftPage" />
                 <AlbumBookPageContent :page="leftPage" />
@@ -148,7 +148,7 @@
               />
               
               <!-- Regular interior right page -->
-              <div v-else-if="rightPage" class="book-page right-page relative" :style="{ backgroundColor: isPageRestricted(rightPage.id) ? '#ffffff' : (rightPage.background_color || '#ffffff') }">
+              <div v-else-if="rightPage" class="book-page right-page relative" :class="{ 'garde-page': isPageRestricted(rightPage.id) }" :style="{ backgroundColor: isPageRestricted(rightPage.id) ? '#ffffff' : (rightPage.background_color || '#ffffff') }">
                 <div class="page-corner-fold-right"></div>
                 <AlbumBookPageHeader v-if="!isPageRestricted(rightPage.id)" :page="rightPage" />
                 <AlbumBookPageContent :page="rightPage" />
@@ -276,7 +276,7 @@ import { useBookCoverDrops } from '~/composables/useBookCoverDrops';
 const props = defineProps<{ activePageIdx: number; }>();
 const emit = defineEmits(['update:activePageIdx']);
 
-const { updatePageField, isPageRestricted } = useAlbumEditorStore();
+const { updatePageField, isPageRestricted, updateAlbumField } = useAlbumEditorStore();
 const logicState = useBookSpreadLogic(props, emit);
 const {
   activeAlbum, isFlipping, flipDirection, isCoverDragOver, isBackCoverDragOver,
@@ -323,11 +323,7 @@ const onAlbumColorInput = async (e: Event) => {
   if (activeAlbum.value) {
     const color = (e.target as HTMLInputElement).value;
     try {
-      const config = useRuntimeConfig();
-      const token = useCookie<string | null>('auth_token');
-      await $fetch(`${config.public.apiBase}/photos/albums/${activeAlbum.value.id}/`, {
-        method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { cover_color: color }
-      });
+      await updateAlbumField(activeAlbum.value.id, 'cover_color', color);
       await logicState.fetchAlbumDetail(activeAlbum.value.id, true);
     } catch (err) { console.error(err); }
   }
