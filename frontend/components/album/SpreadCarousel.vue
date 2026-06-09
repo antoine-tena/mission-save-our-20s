@@ -43,7 +43,7 @@ const spreadsList = computed(() => {
   const pages = activeAlbum.value.pages;
   const spreads = [];
   
-  // 1. Cover Spread: Left is Back Cover, Right is Front Cover
+  // 1. Cover Spread (Beginning): Left is Back Cover, Right is Front Cover
   spreads.push({ leftPage: null, rightPage: null });
   
   // 2. Interior spreads: Left is pages[2k], Right is pages[2k+1]
@@ -53,6 +53,9 @@ const spreadsList = computed(() => {
       rightPage: pages[i + 1] || null
     });
   }
+  
+  // 3. Cover Spread (End): Left is Back Cover, Right is Front Cover
+  spreads.push({ leftPage: null, rightPage: null });
   
   return spreads;
 });
@@ -94,6 +97,6 @@ const insertSpreadAt = async (insertSpreadIndex: number) => {
 };
 </script>
 
-<style scoped>
+<style>
 @import '~/assets/css/spread-carousel.css';
 </style>
