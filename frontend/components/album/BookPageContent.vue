@@ -1,148 +1,144 @@
 <template>
-  <div class="page-content-wrapper select-none">
+  <div class="page-content-wrapper select-none" :class="{ 'readonly': readonly || isRestricted }">
+    <!-- If Restricted Guard Page -->
+    <div v-if="isRestricted" class="restricted-blank-page h-full w-full flex items-center justify-center">
+      <!-- Completely blank white page -->
+    </div>
+
     <!-- If Text-Only Layout -->
-    <div v-if="page.layout_type === 'text-only'" class="text-only-layout">
+    <div v-else-if="page.layout_type === 'text-only'" class="text-only-layout" :class="{ 'readonly': readonly }">
       <textarea 
         v-model="page.description" 
         placeholder="Ajouter vos mémoires..." 
         class="page-textarea font-serif" 
+        :class="{ 'readonly': readonly }"
         rows="6"
+        :disabled="readonly"
+        :readonly="readonly"
         @save="val => onDescBlur(val)"
       />
     </div>
 
-    <!-- Grid Layout with slots -->
-    <div v-else class="slots-grid" :style="gridStyles">
-      <div 
-        v-for="sIdx in slotsCount" 
-        :key="sIdx" 
-        class="photo-slot"
-        :class="{ 'drag-over': activeDragOverSlot === sIdx - 1 }"
-        :style="getSlotItemStyle(sIdx - 1)"
-        @dragover="onDragOver($event, sIdx - 1)" 
-        @dragleave="onDragLeave(sIdx - 1)"
-        @drop="onDrop($event, sIdx - 1)"
-      >
-        <AlbumPolaroidPhoto 
-          v-if="getPhotoAtSlot(sIdx - 1)" 
-          :photo="getPhotoAtSlot(sIdx - 1)"
-          :page-id="page.id"
-        />
-        <div v-else class="empty-slot-placeholder">
-          <Icon name="lucide:image" class="text-2xl opacity-35" /><span>Glisser photo</span>
-        </div>
-      </div>
+    <!-- 24x18 Snapping Canvas Grid -->
+    <div 
+      v-else 
+      class="grid-canvas" 
+      :class="{ 'readonly': readonly }"
+      @dragover.prevent
+      @drop="readonly ? null : onDrop($event)"
+    >
+      <AlbumPolaroidPhoto 
+        v-for="photo in page.photos" 
+        :key="photo.id"
+        :photo="photo"
+        :page-id="page.id"
+        :readonly="readonly"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useAlbumEditorStore } from '~/composables/useAlbumEditorStore';
 
-const props = defineProps<{ page: any; }>();
-const { updatePageField, fetchAlbumDetail, activeAlbum, draggedPhotoId, draggedSourcePageId } = useAlbumEditorStore();
-
-const activeDragOverSlot = ref<number | null>(null);
-
-const getPhotoAtSlot = (slotIdx: number) => {
-  return props.page.photos?.find((p: any) => p.order === slotIdx) || null;
-};
-
-const slotsCount = computed(() => {
-  const layoutType = props.page.layout_type;
-  if (layoutType === 'full' || layoutType === 'scrapbook') return 1;
-  if (layoutType === 'mosaic') return 3;
-  if (layoutType === 'text-only') return 0;
-  if (layoutType.startsWith('grid-')) {
-    return parseInt(layoutType.split('-')[1]) || 1;
+const props = withDefaults(
+  defineProps<{
+    page: any;
+    readonly?: boolean;
+  }>(),
+  {
+    readonly: false
   }
-  return 1;
-});
+);
+const { updatePageField, fetchAlbumDetail, draggedPhotoId, draggedSourcePageId, isPageRestricted } = useAlbumEditorStore();
 
-const gridStyles = computed(() => {
-  const count = slotsCount.value;
-  if (count === 0) return {};
-  if (count === 1) return { gridTemplateColumns: '1fr' };
-  if (count === 2) return { gridTemplateColumns: '1fr 1fr', gap: '1rem' };
-  if (count === 3) return { gridTemplateColumns: '1.2fr 1fr', gridTemplateRows: '1fr 1fr', gap: '0.6rem' };
-  if (count === 4) return { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '0.6rem' };
-  if (count === 5) return { gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: '1.2fr 1fr', gap: '0.5rem' };
-  if (count === 6) return { gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '0.5rem' };
-  return { gridTemplateColumns: 'repeat(auto-fit, minmax(65px, 1fr))', gap: '0.4rem' };
-});
-
-const getSlotItemStyle = (sIdx: number) => {
-  const count = slotsCount.value;
-  if (count === 3 && sIdx === 0) return { gridRow: 'span 2', height: '100%' };
-  if (count === 5 && sIdx === 0) return { gridColumn: 'span 2', height: '100%' };
-  return {};
-};
+const isRestricted = computed(() => isPageRestricted(props.page.id));
 
 const onDescBlur = (val: string) => updatePageField(props.page.id, 'description', val);
 
-const onDragOver = (e: DragEvent, slotIdx: number) => {
-  e.preventDefault();
-  activeDragOverSlot.value = slotIdx;
-};
-
-const onDragLeave = (slotIdx: number) => {
-  if (activeDragOverSlot.value === slotIdx) {
-    activeDragOverSlot.value = null;
-  }
-};
-
-const onDrop = async (e: DragEvent, slotIdx: number) => {
-  activeDragOverSlot.value = null;
+const onDrop = async (e: DragEvent) => {
   const droppedIdRaw = e.dataTransfer?.getData('text/plain');
   if (!droppedIdRaw || !/^\d+$/.test(droppedIdRaw)) return;
   const draggedId = parseInt(droppedIdRaw, 10);
   if (draggedPhotoId.value === null || draggedPhotoId.value !== draggedId) return;
 
+  const wrapperEl = e.currentTarget as HTMLElement;
+  const rect = wrapperEl.getBoundingClientRect();
+  const dropX = e.clientX - rect.left;
+  const dropY = e.clientY - rect.top;
+
+  const GRID_COLS = 24;
+  const GRID_ROWS = 18;
+
+  const cellWidth = rect.width / GRID_COLS;
+  const cellHeight = rect.height / GRID_ROWS;
+
+  const defaultSpanW = 10;
+  const defaultSpanH = 8;
+
+  let colStart = Math.floor(dropX / cellWidth) + 1 - Math.floor(defaultSpanW / 2);
+  let rowStart = Math.floor(dropY / cellHeight) + 1 - Math.floor(defaultSpanH / 2);
+
+  colStart = Math.max(1, Math.min(GRID_COLS - defaultSpanW + 1, colStart));
+  rowStart = Math.max(1, Math.min(GRID_ROWS - defaultSpanH + 1, rowStart));
+
   try {
     const config = useRuntimeConfig();
     const token = useCookie<string | null>('auth_token');
-    const existingPhoto = getPhotoAtSlot(slotIdx);
 
-    if (draggedSourcePageId.value !== null) {
-      if (existingPhoto) {
-        const originalPhoto = activeAlbum.value?.pages.flatMap(p => p.photos).find(ph => ph.id === draggedPhotoId.value);
-        const originalOrder = originalPhoto ? originalPhoto.order : 0;
-        await $fetch(`${config.public.apiBase}/photos/${existingPhoto.id}/`, {
-          method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { page: draggedSourcePageId.value, order: originalOrder }
-        });
+    await $fetch(`${config.public.apiBase}/photos/${draggedPhotoId.value}/`, {
+      method: 'PATCH',
+      headers: { Authorization: `Token ${token.value}` },
+      body: {
+        page: props.page.id,
+        order: props.page.photos?.length || 0,
+        custom_x: colStart,
+        custom_y: rowStart,
+        custom_width: defaultSpanW,
+        custom_height: defaultSpanH
       }
-      await $fetch(`${config.public.apiBase}/photos/${draggedPhotoId.value}/`, {
-        method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { page: props.page.id, order: slotIdx }
-      });
-    } else {
-      if (existingPhoto) {
-        await $fetch(`${config.public.apiBase}/photos/${existingPhoto.id}/`, {
-          method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { page: null, order: 0 }
-        });
-      }
-      await $fetch(`${config.public.apiBase}/photos/${draggedPhotoId.value}/`, {
-        method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { page: props.page.id, order: slotIdx, duplicate: true }
-      });
-    }
+    });
+
     await fetchAlbumDetail(props.page.album, true);
-  } catch (err) { console.error(err); }
-  finally { 
-    draggedPhotoId.value = null; 
-    draggedSourcePageId.value = null; 
-    activeDragOverSlot.value = null;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    draggedPhotoId.value = null;
+    draggedSourcePageId.value = null;
   }
 };
 </script>
 
 <style scoped>
-.page-content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; max-height: 335px; width: 100%; }
+.page-content-wrapper { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; max-height: 335px; width: 100%; }
 .text-only-layout { display: flex; align-items: center; justify-content: center; padding: 1rem; }
 .page-textarea { border: none; outline: none; background: transparent; width: 100%; font-size: 0.95rem; color: #52473e; resize: none; text-align: center; line-height: 1.8; }
 
-.slots-grid { display: grid; width: 100%; height: 100%; align-content: center; max-height: 330px; overflow: hidden; }
-.photo-slot { aspect-ratio: 4/3; border: 1.5px dashed rgba(197,168,128,0.25); background: rgba(197,168,128,0.01); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.25s; overflow: visible; min-height: 0; position: relative; }
-.photo-slot:hover { border-color: #6366f1; background: rgba(99,102,241,0.02); }
-.photo-slot.drag-over { border-color: #6366f1; background: rgba(99,102,241,0.08); transform: scale(1.02); }
-.empty-slot-placeholder { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8c7e6e; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.grid-canvas {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  grid-template-rows: repeat(18, 1fr);
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: visible;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.grid-canvas.readonly {
+  pointer-events: none;
+}
+
+.page-textarea.readonly,
+.page-textarea:disabled {
+  background: transparent !important;
+  opacity: 1 !important;
+  color: #52473e !important;
+  -webkit-text-fill-color: #52473e !important;
+  cursor: default;
+  resize: none;
+  pointer-events: none;
+}
 </style>

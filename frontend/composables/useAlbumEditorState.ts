@@ -8,3 +8,4 @@ export const draggedPhotoId = ref<number | null>(null);
 export const draggedSourcePageId = ref<number | null>(null);
 export const isSidebarCollapsed = ref(false);
 export const activeSidebarTab = ref('photos');
+export const focusedPhotoId = ref<number | null>(null);

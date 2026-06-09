@@ -117,4 +117,11 @@
   cursor: not-allowed;
 }
 
+/* Split Cover absolute fullscreen flat color or photo */
+.split-cover-page {
+  padding: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 @media (max-width: 1000px) { .book-pages-spread { grid-template-columns: 1fr; } .left-page { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.05); } .nav-turn-btn { display: none; } }

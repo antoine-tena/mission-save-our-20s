@@ -1,6 +1,6 @@
 import { useRuntimeConfig, useCookie } from '#app';
 import type { AlbumData } from '~/types/album';
-import { activeAlbum, isLoading, uploadQueue, draggedPhotoId, draggedSourcePageId, isSidebarCollapsed, activeSidebarTab } from './useAlbumEditorState';
+import { activeAlbum, isLoading, uploadQueue, draggedPhotoId, draggedSourcePageId, isSidebarCollapsed, activeSidebarTab, focusedPhotoId } from './useAlbumEditorState';
 import { useAlbumEditorActions } from './useAlbumEditorActions';
 
 export const useAlbumEditorStore = () => {
@@ -55,6 +55,29 @@ export const useAlbumEditorStore = () => {
     } catch (err) { console.error('Failed to update photo crop:', err); }
   };
 
+  const updatePhotoPosition = async (photoId: number, customX: number | null, customY: number | null, customWidth: number | null = null, customHeight: number | null = null) => {
+    if (activeAlbum.value) {
+      for (const page of activeAlbum.value.pages) {
+        const photo = page.photos.find(p => p.id === photoId);
+        if (photo) {
+          photo.custom_x = customX; photo.custom_y = customY;
+          if (customWidth !== null) photo.custom_width = customWidth;
+          if (customHeight !== null) photo.custom_height = customHeight;
+          break;
+        }
+      }
+    }
+    try {
+      const bodyPayload: any = { custom_x: customX, custom_y: customY };
+      if (customWidth !== null) bodyPayload.custom_width = customWidth;
+      if (customHeight !== null) bodyPayload.custom_height = customHeight;
+      await $fetch(`${apiBase}/photos/${photoId}/`, {
+        method: 'PATCH', headers: { Authorization: `Token ${token.value}` },
+        body: bodyPayload
+      });
+    } catch (err) { console.error('Failed to update photo position:', err); }
+  };
+
   const fetchAlbumDetail = async (id: number, silent = false) => {
     if (!silent) isLoading.value = true;
     try {
@@ -65,9 +88,16 @@ export const useAlbumEditorStore = () => {
     }
   };
 
+  const isPageRestricted = (pageId: number | undefined): boolean => {
+    if (!activeAlbum.value || !pageId) return false;
+    const pages = activeAlbum.value.pages;
+    if (pages.length < 2) return false;
+    return pageId === pages[0].id || pageId === pages[pages.length - 1].id;
+  };
+
   return {
-    activeAlbum, isLoading, uploadQueue, draggedPhotoId, draggedSourcePageId, isSidebarCollapsed, activeSidebarTab,
-    fetchAlbumDetail, updateAlbumTitle, updateAlbumCover, updateAlbumField, updatePhotoCrop,
+    activeAlbum, isLoading, uploadQueue, draggedPhotoId, draggedSourcePageId, isSidebarCollapsed, activeSidebarTab, focusedPhotoId,
+    fetchAlbumDetail, updateAlbumTitle, updateAlbumCover, updateAlbumField, updatePhotoCrop, updatePhotoPosition, isPageRestricted,
     ...actions
   };
 };

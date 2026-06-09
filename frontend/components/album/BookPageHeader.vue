@@ -1,7 +1,5 @@
 <template>
   <div class="page-header-minimal">
-    <div class="page-number font-sans">Page {{ pageNum }}</div>
-    
     <!-- Floating Gold Stamp Icon -->
     <div v-if="page.sticker" class="page-stamp-seal-badge animate-bounce">
       <Icon :name="page.sticker" class="stamp-badge-icon" />
@@ -12,7 +10,6 @@
 <script setup lang="ts">
 defineProps<{
   page: any;
-  pageNum: number;
 }>();
 </script>
 
@@ -23,18 +20,6 @@ defineProps<{
   width: 100%;
   margin-bottom: 0.8rem;
   box-sizing: border-box;
-}
-
-.page-number {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #b3a79a;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 2px;
-  text-transform: uppercase;
 }
 
 .page-stamp-seal-badge {

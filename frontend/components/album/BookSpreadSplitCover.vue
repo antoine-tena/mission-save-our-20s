@@ -1,5 +1,5 @@
 <template>
-  <div v-if="type === 'back'" class="book-page left-page" :style="{ backgroundColor: activeAlbum?.cover_color || '#3d352e' }">
+  <div v-if="type === 'back'" class="book-page left-page split-cover-page" :style="{ backgroundColor: activeAlbum?.cover_color || '#3d352e' }">
     <div 
       class="studio-book-cover-wrapper"
       :class="{ 'drag-over': isDragOver }"
@@ -31,7 +31,7 @@
     </div>
   </div>
 
-  <div v-else class="book-page right-page" :style="{ backgroundColor: activeAlbum?.cover_color || '#3d352e' }">
+  <div v-else class="book-page right-page split-cover-page" :style="{ backgroundColor: activeAlbum?.cover_color || '#3d352e' }">
     <div 
       class="studio-book-cover-wrapper"
       :class="{ 'drag-over': isDragOver }"
