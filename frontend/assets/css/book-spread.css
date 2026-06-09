@@ -1,5 +1,5 @@
-.turn-page-controls-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; }
-.turn-page-controls { display: flex; align-items: center; justify-content: center; gap: 1.5rem; width: 100%; }
+.turn-page-controls-wrapper { width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 2rem; }
+.turn-page-controls { display: flex; align-items: center; justify-content: center; gap: 1.5rem; width: auto; }
 .nav-turn-btn { background: white; border: 1px solid #e2e8f0; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; color: #718096; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
 .nav-turn-btn:hover:not(:disabled) { border-color: #c5a880; color: #c5a880; transform: scale(1.08); }
 .nav-turn-btn:disabled { opacity: 0.35; cursor: not-allowed; }
