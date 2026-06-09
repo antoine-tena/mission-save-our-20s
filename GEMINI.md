@@ -1,3 +1,11 @@
+# Project Guidelines (GEMINI.md)
+
+This file contains the consolidated guidelines for workflows and architectural rules of the project.
+
+---
+
+## 1. Workflow Guidelines
+
 pour faire un commit (git commit -m "feat: ")
 feat: nouvelle fonctionnalité
 fix: correction de bug
@@ -10,7 +18,7 @@ build/ci: tooling
 chore: petites tâches, ménage
 revert: annule un commit
 
-## Bonnes pratiques de commit
+### Bonnes pratiques de commit
 
 **Privilégier plusieurs petits commits plutôt qu'un gros commit :**
 - Grouper les modifications par logique/fonctionnalité, et faire un maximum de commits
@@ -44,3 +52,44 @@ git branch release/v1.0.0
 
 tout en minuscules, pas d'espace (utiliser des tirets ou underscores)
 sois explicite : en lisant la branche on doit directement comprendre de quoi il est question
+
+---
+
+## 2. Architectural Rules (AnnSki Backend)
+
+### Architecture Fractale
+
+- Aucun fichier ne dépasse **300 lignes**.
+- Si un module grossit, il est éclaté en sous-modules avec un `__init__.py` d'agrégation.
+
+### Règle des 30 Lignes
+
+- Une fonction / méthode = une seule responsabilité.
+- Maximum **30 lignes** par fonction.
+
+### Nommage Sémantique
+
+- Interdiction des noms génériques : `data`, `res`, `val`, `tmp`, `info`.
+- Booléens préfixés par `is_`, `has_`, `should_`.
+- Classes en PascalCase, fonctions et variables en snake_case.
+
+### Zéro Magie
+
+- Pas de valeurs littérales magiques.
+- Utilisation systématique de **constantes** ou de **TextChoices / IntegerChoices** Django.
+
+### Asynchronie
+
+- `async/await` quand applicable (Django 4.1+ async views).
+- Sinon synchrone standard avec gestion d'exceptions explicite.
+
+### Typage Strict
+
+- Type Hinting Python obligatoire sur toutes les signatures de fonctions et méthodes.
+- Zéro `Any` non justifié. Utiliser `Union`, `Optional`, ou `Protocol`.
+
+### Django Conventions
+
+- Vues basées sur DRF `APIView` ou `ViewSet`.
+- Sérialiseurs explicites, pas de `ModelSerializer` sans champs déclarés.
+- Permissions déclarées par vue, jamais de `AllowAny` en production.
