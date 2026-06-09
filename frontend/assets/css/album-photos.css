@@ -1,0 +1,45 @@
+.mso-album-gallery { min-height: 100vh; padding-top: calc(var(--header-height) + 3rem); padding-bottom: 6rem; position: relative; }
+.mso-scrapbook-bg { position: fixed; inset: 0; background-color: #faf9f6; background-image: radial-gradient(#d4af3710 1.5px, transparent 1.5px); background-size: 24px 24px; z-index: -1; }
+.mso-album__header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3.5rem; border-b: 1px solid rgba(0,0,0,0.05); padding-bottom: 1.5rem; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: #8c7e6e; font-weight: 700; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; }
+.back-link:hover { color: #6366f1; transform: translateX(-3px); }
+
+.mso-title-fancy { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.2rem, 6vw, 3.5rem); color: #2d2a26; font-weight: 900; letter-spacing: -1.5px; }
+.mso-subtitle { color: #c5a880; font-weight: 700; display: flex; align-items: center; gap: 10px; margin-top: 0.8rem; font-size: 0.95rem; }
+.pulse-dot { width: 8px; height: 8px; background: #c5a880; border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+
+.mso-btn-add { background: #1e1b18; color: white; border: none; padding: 12px 26px; border-radius: 50px; font-weight: 800; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 10px 25px rgba(0,0,0,0.08); font-size: 0.9rem; }
+.mso-btn-add:hover { transform: translateY(-3px); background: #6366f1; box-shadow: 0 15px 30px rgba(99,102,241,0.25); }
+.mso-btn-add--active { background: #e53e3e; }
+.mso-btn-add--active:hover { background: #c53030; }
+
+.loader-container { padding: 4rem 0; }
+.shimmer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 2rem; }
+.skeleton-polaroid { aspect-ratio: 1/1.25; background: #e2e8f0; border-radius: 12px; animation: pulseShimmer 1.5s infinite ease-in-out; }
+@keyframes pulseShimmer { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+.mso-empty { text-align: center; padding: 6rem 2rem; max-width: 600px; margin: 2rem auto; border-radius: 24px; border: 1px dashed rgba(0,0,0,0.1); background: white; }
+.empty-icon { font-size: 4rem; color: #c5a880; margin-bottom: 1.5rem; }
+.mso-empty h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.6rem; font-weight: 800; color: #2d2a26; margin-bottom: 0.5rem; }
+.mso-empty p { color: #8c7e6e; margin-bottom: 2rem; font-size: 0.95rem; }
+.btn-create-now { background: #2d2a26; color: white; border: none; padding: 12px 28px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.btn-create-now:hover { background: #6366f1; }
+
+/* Confirm Delete Modal */
+.mso-dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+.mso-dialog { max-width: 440px; width: 100%; padding: 3rem; text-align: center; background: white; border-radius: 24px; border: 1px solid rgba(197, 168, 128, 0.2); box-shadow: 0 30px 60px rgba(0,0,0,0.12); }
+.alert-icon { font-size: 3rem; color: #e53e3e; margin-bottom: 1.5rem; }
+.mso-dialog h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.5rem; font-weight: 900; color: #2d2a26; margin-bottom: 0.8rem; }
+.mso-dialog p { color: #718096; font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem; }
+.mso-dialog__actions { display: flex; gap: 1rem; }
+.btn-cancel { flex: 1; padding: 14px; border-radius: 50px; border: 1px solid #e2e8f0; background: none; cursor: pointer; font-weight: 700; color: #475569; transition: all 0.2s; }
+.btn-cancel:hover { background: #f7fafc; }
+.btn-danger { flex: 1; padding: 14px; border-radius: 50px; border: none; background: #e53e3e; color: white; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+.btn-danger:hover { background: #c53030; }
+
+@media (max-width: 900px) {
+  .mso-album__header { flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
+  .header-actions { width: 100%; }
+  .mso-btn-add { width: 100%; justify-content: center; }
+}
