@@ -10,6 +10,8 @@ export interface PhotoData {
   crop_scale: number;
   custom_width: number | null;
   custom_height: number | null;
+  custom_x: number | null;
+  custom_y: number | null;
 }
 
 export interface PageData {
@@ -23,6 +25,7 @@ export interface PageData {
   background_color: string;
   sticker: string | null;
   order: number;
+  is_auto_color: boolean;
   photos: PhotoData[];
 }
 
