@@ -23,7 +23,7 @@
     <!-- Mode 1: Photo Panels (Only shown if show_cover_photo is true) -->
     <div v-if="activeAlbum?.show_cover_photo" class="flex gap-4 w-full">
       <!-- Front Cover -->
-      <div class="cover-panel flex flex-col items-center" :class="{ active: !isBackCover }">
+      <div class="cover-panel" :class="{ active: !isBackCover }">
         <h3 class="cover-title font-serif">Couverture de Début</h3>
         <div class="cover-preview" @click="triggerUpload(false)">
           <img v-if="activeAlbum?.cover_photo_url" :src="activeAlbum.cover_photo_url" class="cover-img" />
@@ -31,18 +31,6 @@
             <Icon name="lucide:image-plus" class="empty-icon" />
             <span>Ajouter une image</span>
           </div>
-        </div>
-
-        <!-- Album Title input field -->
-        <div class="mt-3 flex flex-col gap-1 w-full text-left">
-          <label class="text-[9px] font-extrabold text-gray-400 uppercase tracking-wider pl-1">Titre de l'album</label>
-          <input 
-            type="text"
-            :value="activeAlbum?.title"
-            @input="e => updateAlbumField(activeAlbum.id, 'title', (e.target as HTMLInputElement).value)"
-            placeholder="Titre de l'album..."
-            class="w-full text-xs font-bold text-gray-700 border border-gray-200 rounded-lg px-2.5 py-1.5 outline-none focus:border-indigo-500 focus:bg-white transition-all bg-gray-50"
-          />
         </div>
       </div>
 
@@ -68,44 +56,40 @@
       </p>
     </div>
 
-    <!-- Color Palette Section (Shown in both modes for max flexibility) -->
-    <div class="cover-color-palette-section flex flex-col gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100">
-      <span class="text-[9px] font-extrabold text-gray-400 uppercase tracking-wider mb-1">Couleur de fond de la couverture</span>
-      
-      <div class="flex flex-wrap gap-2 justify-center items-center">
-        <button 
-          v-for="c in coverPresets" 
-          :key="c" 
-          type="button" 
-          class="cover-color-btn border-none"
-          :style="{ backgroundColor: c }"
-          :class="{ 'active': activeAlbum?.cover_color === c }"
-          @click="updateCoverColor(c)"
-          :title="c"
-        ></button>
-        
-        <div class="hex-picker-wrapper">
-          <button type="button" class="cover-color-btn hex-rainbow-btn border-none" @click="triggerHexPicker" title="Couleur personnalisée (HEX)"></button>
-          <input ref="hexInput" type="color" :value="activeAlbum?.cover_color || '#3d352e'" class="hidden-color-input" @input="onHexColorInput" />
-        </div>
-      </div>
-    </div>
-
     <input ref="fileInput" type="file" class="hidden" accept="image/*" @change="onFileSelected" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useAlbumEditorStore } from '~/composables/useAlbumEditorStore';
 
 const props = defineProps<{ isBackCover: boolean }>();
 const { activeAlbum, updateAlbumCover, updateAlbumField } = useAlbumEditorStore();
 const fileInput = ref<HTMLInputElement>();
-const hexInput = ref<HTMLInputElement>();
 const uploadingForBack = ref(false);
 
-const coverPresets = ['#1A1A1A', '#4A5568', '#1B365D', '#722F37', '#2D5A27', '#EAE6DF', '#FFFFFF', '#89CFF0'];
+const localTitle = ref('');
+const isSavingTitle = ref(false);
+
+watch(() => activeAlbum.value?.title, (newVal) => {
+  if (newVal !== undefined && newVal !== localTitle.value) {
+    localTitle.value = newVal;
+  }
+}, { immediate: true });
+
+let saveTimeout: any = null;
+const onTitleInput = (val: string) => {
+  localTitle.value = val;
+  isSavingTitle.value = true;
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(async () => {
+    if (activeAlbum.value) {
+      await updateAlbumField(activeAlbum.value.id, 'title', val);
+    }
+    isSavingTitle.value = false;
+  }, 800);
+};
 
 const triggerUpload = (isBack: boolean) => {
   uploadingForBack.value = isBack;
@@ -123,21 +107,6 @@ const setCoverMode = async (showPhotos: boolean) => {
   if (activeAlbum.value) {
     await updateAlbumField(activeAlbum.value.id, 'show_cover_photo', showPhotos);
   }
-};
-
-const updateCoverColor = async (color: string) => {
-  if (activeAlbum.value) {
-    await updateAlbumField(activeAlbum.value.id, 'cover_color', color);
-  }
-};
-
-const triggerHexPicker = () => {
-  hexInput.value?.click();
-};
-
-const onHexColorInput = async (e: Event) => {
-  const color = (e.target as HTMLInputElement).value;
-  await updateCoverColor(color);
 };
 </script>
 
