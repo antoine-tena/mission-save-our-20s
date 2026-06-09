@@ -47,9 +47,9 @@
               />
               
               <!-- Regular interior left page -->
-              <div v-else-if="leftPage" class="book-page left-page" :style="{ backgroundColor: leftPage.background_color || '#ffffff' }">
+              <div v-else-if="leftPage" class="book-page left-page" :style="{ backgroundColor: isPageRestricted(leftPage.id) ? '#ffffff' : (leftPage.background_color || '#ffffff') }">
                 <div class="page-corner-fold-left"></div>
-                <AlbumBookPageHeader :page="leftPage" />
+                <AlbumBookPageHeader v-if="!isPageRestricted(leftPage.id)" :page="leftPage" />
                 <AlbumBookPageContent :page="leftPage" />
               </div>
               
@@ -73,9 +73,9 @@
               />
               
               <!-- Regular interior right page -->
-              <div v-else-if="rightPage" class="book-page right-page relative" :style="{ backgroundColor: rightPage.background_color || '#ffffff' }">
+              <div v-else-if="rightPage" class="book-page right-page relative" :style="{ backgroundColor: isPageRestricted(rightPage.id) ? '#ffffff' : (rightPage.background_color || '#ffffff') }">
                 <div class="page-corner-fold-right"></div>
-                <AlbumBookPageHeader :page="rightPage" />
+                <AlbumBookPageHeader v-if="!isPageRestricted(rightPage.id)" :page="rightPage" />
                 <AlbumBookPageContent :page="rightPage" />
               </div>
               
@@ -88,16 +88,167 @@
           </div>
         </div>
 
-        <!-- Magic Auto-Color Spread Toggle -->
-        <div class="auto-color-spread-control-row" v-if="activePageIdx !== 0 && (leftPage || rightPage)">
+        <!-- Two horizontal toolbars under the left and right pages -->
+        <div class="split-toolbars-under-book flex justify-between gap-6 w-[640px] mx-auto mt-4 select-none">
+          <!-- LEFT TOOLBAR (Page de Gauche / Back Cover) -->
+          <div class="horizontal-toolbar-pill flex items-center gap-3 bg-white border border-gray-100 rounded-full shadow-md py-1.5 px-4 flex-1 justify-center min-h-[46px]">
+            <div v-if="!isCoverSpread && leftPage && isPageRestricted(leftPage.id)" class="flex items-center gap-2 text-gray-400 font-sans text-xs font-semibold py-1 px-3">
+              <Icon name="lucide:lock" class="text-sm text-gray-300" />
+              <span>Garde verrouillée</span>
+            </div>
+            <template v-else-if="isCoverSpread || leftPage">
+              <!-- Color Picker -->
+              <button 
+                type="button" 
+                class="color-dot-btn" 
+                :style="{ backgroundColor: isCoverSpread ? (activeAlbum?.cover_color || '#3d352e') : (leftPage?.background_color || '#ffffff') }" 
+                @click="isCoverSpread ? triggerAlbumColorPicker() : triggerLeftColorPicker()"
+                :title="isCoverSpread ? 'Couleur de couverture' : 'Couleur de page (Gauche)'"
+              ></button>
+
+              <!-- Layout toggle -->
+              <button 
+                type="button" 
+                class="pill-action-btn" 
+                :class="{ 'active': !isCoverSpread && leftPage?.layout_type === 'text-only' }" 
+                :disabled="isCoverSpread"
+                @click="!isCoverSpread ? togglePageLayout(leftPage) : null" 
+                title="Mode texte/photo"
+              >
+                <Icon name="lucide:align-left" />
+              </button>
+
+              <!-- Adjust slots count -->
+              <button 
+                type="button" 
+                class="pill-action-btn" 
+                :disabled="isCoverSpread || leftPage?.layout_type === 'text-only'"
+                @click="!isCoverSpread ? cycleSlots(leftPage) : null" 
+                title="Nombre de photos"
+              >
+                <Icon name="lucide:image" />
+              </button>
+
+              <!-- Add/Edit page title -->
+              <button 
+                type="button" 
+                class="pill-action-btn" 
+                :disabled="isCoverSpread"
+                @click="!isCoverSpread ? injectTitle(leftPage) : null" 
+                title="Titre de la page"
+              >
+                <Icon name="lucide:heading" />
+              </button>
+
+              <!-- Enveloping propagate / full wrap -->
+              <button 
+                type="button" 
+                class="pill-action-btn" 
+                @click="isCoverSpread ? toggleFullWrap(!isFullWrapCover) : propagateEnveloping(leftPage, rightPage)" 
+                :disabled="!isCoverSpread && !rightPage" 
+                :title="isCoverSpread ? (isFullWrapCover ? 'Séparer en 2' : 'Rendre Enveloppante') : 'Rendre Enveloppante'"
+              >
+                <Icon :name="isCoverSpread && isFullWrapCover ? 'lucide:columns' : 'lucide:book-open'" />
+              </button>
+
+              <!-- Delete cover style / page style -->
+              <button 
+                type="button" 
+                class="pill-action-btn text-red-500 hover:bg-red-50" 
+                @click="isCoverSpread ? onDeleteBackCover() : retirePageStyle(leftPage)" 
+                title="Retirer le style"
+              >
+                <Icon name="lucide:trash-2" />
+              </button>
+            </template>
+            <div v-else class="text-xs text-gray-300 font-sans italic">Page de gauche vide</div>
+          </div>
+
+          <!-- RIGHT TOOLBAR (Page de Droite / Front Cover) -->
+          <div class="horizontal-toolbar-pill flex items-center gap-3 bg-white border border-gray-100 rounded-full shadow-md py-1.5 px-4 flex-1 justify-center min-h-[46px]">
+            <div v-if="!isCoverSpread && rightPage && isPageRestricted(rightPage.id)" class="flex items-center gap-2 text-gray-400 font-sans text-xs font-semibold py-1 px-3">
+              <Icon name="lucide:lock" class="text-sm text-gray-300" />
+              <span>Garde verrouillée</span>
+            </div>
+            <template v-else-if="isCoverSpread || rightPage">
+              <!-- Color Picker -->
+              <button 
+                type="button" 
+                class="color-dot-btn" 
+                :style="{ backgroundColor: isCoverSpread ? (activeAlbum?.cover_color || '#3d352e') : (rightPage?.background_color || '#ffffff') }" 
+                @click="isCoverSpread ? triggerAlbumColorPicker() : triggerRightColorPicker()"
+                :title="isCoverSpread ? 'Couleur de couverture' : 'Couleur de page (Droite)'"
+              ></button>
+
+              <!-- Layout toggle -->
+              <button 
+                type="button" 
+                class="pill-action-btn" 
+                :class="{ 'active': !isCoverSpread && rightPage?.layout_type === 'text-only' }" 
+                :disabled="isCoverSpread"
+                @click="!isCoverSpread ? togglePageLayout(rightPage) : null" 
+                title="Mode texte/photo"
+              >
+                <Icon name="lucide:align-left" />
+              </button>
+
+              <!-- Adjust slots count -->
+              <button 
+                type="button" 
+                class="pill-action-btn" 
+                :disabled="isCoverSpread || rightPage?.layout_type === 'text-only'"
+                @click="!isCoverSpread ? cycleSlots(rightPage) : null" 
+                title="Nombre de photos"
+              >
+                <Icon name="lucide:image" />
+              </button>
+
+              <!-- Add/Edit page title -->
+              <button 
+                type="button" 
+                class="pill-action-btn" 
+                :disabled="isCoverSpread"
+                @click="!isCoverSpread ? injectTitle(rightPage) : null" 
+                title="Titre de la page"
+              >
+                <Icon name="lucide:heading" />
+              </button>
+
+              <!-- Enveloping propagate / full wrap -->
+              <button 
+                type="button" 
+                class="pill-action-btn" 
+                @click="isCoverSpread ? toggleFullWrap(!isFullWrapCover) : propagateEnveloping(rightPage, leftPage)" 
+                :disabled="!isCoverSpread && !leftPage" 
+                :title="isCoverSpread ? (isFullWrapCover ? 'Séparer en 2' : 'Rendre Enveloppante') : 'Rendre Enveloppante'"
+              >
+                <Icon :name="isCoverSpread && isFullWrapCover ? 'lucide:columns' : 'lucide:book-open'" />
+              </button>
+
+              <!-- Delete cover style / page style -->
+              <button 
+                type="button" 
+                class="pill-action-btn text-red-500 hover:bg-red-50" 
+                @click="isCoverSpread ? onDeleteCover() : retirePageStyle(rightPage)" 
+                title="Retirer le style"
+              >
+                <Icon name="lucide:trash-2" />
+              </button>
+            </template>
+            <div v-else class="text-xs text-gray-300 font-sans italic">Page de droite vide</div>
+          </div>
+        </div>
+
+        <!-- Suggest background color automatically -->
+        <div class="auto-color-spread-control-row" v-if="!isCoverSpread && (leftPage || rightPage)">
           <button 
             type="button" 
-            class="auto-color-toggle-btn"
-            :class="{ 'active': isSpreadAutoColor }"
-            @click="toggleSpreadAutoColor"
+            class="auto-color-suggest-btn"
+            :disabled="isAnalyzing"
+            @click="applySuggestedColor"
           >
-            <Icon :name="isSpreadAutoColor ? 'lucide:sparkles' : 'lucide:palette'" class="magic-icon" />
-            <span>Mode Couleur Auto : <strong>{{ isSpreadAutoColor ? 'Activé' : 'Désactivé' }}</strong></span>
+            <Icon :name="isAnalyzing ? 'svg-spinners:ring-resize' : 'lucide:sparkles'" class="magic-icon" :class="{ 'spinning': isAnalyzing }" />
+            <span>{{ isAnalyzing ? 'Recherche de la meilleure couleur...' : 'Trouver automatiquement une couleur de fond' }}</span>
           </button>
         </div>
 
@@ -109,130 +260,15 @@
       </button>
     </div>
 
-    <!-- Right Sidebar Column containing the vertical pill toolbar -->
-    <aside class="right-spread-sidebar-col flex items-center justify-center">
-      <div class="vertical-pill-toolbar flex flex-col items-center gap-4 py-6 px-2.5 bg-white border border-gray-100 rounded-full shadow-lg select-none">
-        
-        <!-- FULL WRAP COVER MODE -->
-        <template v-if="activePageIdx === 0 && isFullWrapCover">
-          <!-- Color Picker Button -->
-          <div class="relative flex items-center justify-center">
-            <button 
-              type="button" 
-              class="color-dot-btn" 
-              :style="{ backgroundColor: activeAlbum?.cover_color || '#3d352e' }" 
-              @click="triggerAlbumColorPicker"
-              title="Couleur de couverture"
-            ></button>
-            <input ref="albumColorInput" type="color" :value="activeAlbum?.cover_color || '#3d352e'" class="hidden" @input="onAlbumColorInput" />
-          </div>
-
-          <!-- Separer in 2 Covers -->
-          <button type="button" class="pill-action-btn" @click="toggleFullWrap(false)" title="Séparer en 2 couvertures">
-            <Icon name="lucide:columns" />
-          </button>
-
-          <!-- Delete cover style -->
-          <button type="button" class="pill-action-btn text-red-500 hover:bg-red-50" @click="onDeleteCover" title="Retirer le style/photo">
-            <Icon name="lucide:trash-2" />
-          </button>
-        </template>
-
-        <!-- SPLIT COVER OR REGULAR PAGES -->
-        <template v-else>
-          <!-- LEFT PAGE SECTION (Top half of vertical pill) -->
-          <div class="flex flex-col items-center gap-3" v-if="activePageIdx === 0 || leftPage">
-            <!-- Color Picker -->
-            <div class="relative flex items-center justify-center">
-              <button 
-                type="button" 
-                class="color-dot-btn" 
-                :style="{ backgroundColor: activePageIdx === 0 ? (activeAlbum?.cover_color || '#3d352e') : (leftPage?.background_color || '#ffffff') }" 
-                @click="activePageIdx === 0 ? triggerAlbumColorPicker() : triggerLeftColorPicker()"
-                :title="activePageIdx === 0 ? 'Couleur de couverture' : 'Couleur de page (Gauche)'"
-              ></button>
-              <input v-if="activePageIdx === 0" ref="albumColorInput" type="color" :value="activeAlbum?.cover_color || '#3d352e'" class="hidden" @input="onAlbumColorInput" />
-              <input v-else ref="leftColorInput" type="color" :value="leftPage?.background_color || '#ffffff'" class="hidden" @input="onLeftColorInput" />
-            </div>
-
-            <!-- Layout toggle (Only if interior page) -->
-            <button v-if="activePageIdx !== 0" type="button" class="pill-action-btn" :class="{ 'active': leftPage?.layout_type === 'text-only' }" @click="togglePageLayout(leftPage)" title="Mode texte/photo">
-              <Icon name="lucide:align-left" />
-            </button>
-
-            <!-- Adjust slots count (Only if interior page and not text-only) -->
-            <button v-if="activePageIdx !== 0 && leftPage?.layout_type !== 'text-only'" type="button" class="pill-action-btn" @click="cycleSlots(leftPage)" title="Nombre de photos">
-              <Icon name="lucide:image" />
-            </button>
-
-            <!-- Add/Edit page title -->
-            <button v-if="activePageIdx !== 0" type="button" class="pill-action-btn" @click="injectTitle(leftPage)" title="Titre de la page">
-              <Icon name="lucide:heading" />
-            </button>
-
-            <!-- Enveloping propagate -->
-            <button type="button" class="pill-action-btn" @click="activePageIdx === 0 ? toggleFullWrap(true) : propagateEnveloping(leftPage, rightPage)" :disabled="activePageIdx !== 0 && !rightPage" title="Rendre Enveloppante">
-              <Icon name="lucide:book-open" />
-            </button>
-
-            <!-- Delete cover style / page style -->
-            <button type="button" class="pill-action-btn text-red-500 hover:bg-red-50" @click="activePageIdx === 0 ? onDeleteBackCover() : retirePageStyle(leftPage)" title="Retirer le style">
-              <Icon name="lucide:trash-2" />
-            </button>
-          </div>
-
-          <!-- Divider -->
-          <div class="h-[1px] w-6 bg-gray-100 my-1"></div>
-
-          <!-- RIGHT PAGE SECTION (Bottom half of vertical pill) -->
-          <div class="flex flex-col items-center gap-3" v-if="activePageIdx === 0 || rightPage">
-            <!-- Color Picker -->
-            <div class="relative flex items-center justify-center">
-              <button 
-                type="button" 
-                class="color-dot-btn" 
-                :style="{ backgroundColor: activePageIdx === 0 ? (activeAlbum?.cover_color || '#3d352e') : (rightPage?.background_color || '#ffffff') }" 
-                @click="activePageIdx === 0 ? triggerAlbumColorPicker() : triggerRightColorPicker()"
-                :title="activePageIdx === 0 ? 'Couleur de couverture' : 'Couleur de page (Droite)'"
-              ></button>
-              <input v-if="activePageIdx === 0" ref="albumColorInput" type="color" :value="activeAlbum?.cover_color || '#3d352e'" class="hidden" @input="onAlbumColorInput" />
-              <input v-else ref="rightColorInput" type="color" :value="rightPage?.background_color || '#ffffff'" class="hidden" @input="onRightColorInput" />
-            </div>
-
-            <!-- Layout toggle -->
-            <button v-if="activePageIdx !== 0" type="button" class="pill-action-btn" :class="{ 'active': rightPage?.layout_type === 'text-only' }" @click="togglePageLayout(rightPage)" title="Mode texte/photo">
-              <Icon name="lucide:align-left" />
-            </button>
-
-            <!-- Adjust slots count -->
-            <button v-if="activePageIdx !== 0 && rightPage?.layout_type !== 'text-only'" type="button" class="pill-action-btn" @click="cycleSlots(rightPage)" title="Nombre de photos">
-              <Icon name="lucide:image" />
-            </button>
-
-            <!-- Add/Edit page title -->
-            <button v-if="activePageIdx !== 0" type="button" class="pill-action-btn" @click="injectTitle(rightPage)" title="Titre de la page">
-              <Icon name="lucide:heading" />
-            </button>
-
-            <!-- Enveloping propagate -->
-            <button type="button" class="pill-action-btn" @click="activePageIdx === 0 ? toggleFullWrap(true) : propagateEnveloping(rightPage, leftPage)" :disabled="activePageIdx !== 0 && !leftPage" title="Rendre Enveloppante">
-              <Icon name="lucide:book-open" />
-            </button>
-
-            <!-- Delete cover style / page style -->
-            <button type="button" class="pill-action-btn text-red-500 hover:bg-red-50" @click="activePageIdx === 0 ? onDeleteCover() : retirePageStyle(rightPage)" title="Retirer le style">
-              <Icon name="lucide:trash-2" />
-            </button>
-          </div>
-        </template>
-
-      </div>
-    </aside>
+    <!-- Hidden color inputs -->
+    <input ref="albumColorInput" type="color" :value="activeAlbum?.cover_color || '#3d352e'" class="hidden" @input="onAlbumColorInput" />
+    <input ref="leftColorInput" type="color" :value="leftPage?.background_color || '#ffffff'" class="hidden" @input="onLeftColorInput" />
+    <input ref="rightColorInput" type="color" :value="rightPage?.background_color || '#ffffff'" class="hidden" @input="onRightColorInput" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRuntimeConfig, useCookie } from '#app';
 import { useAlbumEditorStore } from '~/composables/useAlbumEditorStore';
 import { useBookSpreadLogic } from '~/composables/useBookSpreadLogic';
@@ -241,13 +277,17 @@ import { useBookCoverDrops } from '~/composables/useBookCoverDrops';
 const props = defineProps<{ activePageIdx: number; }>();
 const emit = defineEmits(['update:activePageIdx']);
 
-const { updatePageField } = useAlbumEditorStore();
+const { updatePageField, isPageRestricted } = useAlbumEditorStore();
 const logicState = useBookSpreadLogic(props, emit);
 const {
   activeAlbum, isFlipping, flipDirection, isCoverDragOver, isBackCoverDragOver,
   leftPage, rightPage, onTurnPage, toggleFullWrap, isFullWrapCover, maxPageIdx,
-  retirePageStyle, propagateEnveloping, isSpreadAutoColor, toggleSpreadAutoColor
+  retirePageStyle, propagateEnveloping, isAnalyzing, applySuggestedColor
 } = logicState;
+
+const isCoverSpread = computed(() => {
+  return props.activePageIdx === 0 || props.activePageIdx === maxPageIdx.value;
+});
 
 const {
   onCoverDragOver, onCoverDragLeave, onBackCoverDragOver, onBackCoverDragLeave,
@@ -339,10 +379,10 @@ const injectTitle = async (page: any) => {
   margin-bottom: 0.2rem;
 }
 
-.auto-color-toggle-btn {
-  background: white;
-  border: 1.5px solid #e2e8f0;
-  color: #718096;
+.auto-color-suggest-btn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.3px;
@@ -352,36 +392,37 @@ const injectTitle = async (page: any) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
 }
 
-.auto-color-toggle-btn:hover {
-  border-color: #6366f1;
-  color: #4f46e5;
-  background: rgba(99, 102, 241, 0.02);
+.auto-color-suggest-btn:hover:not(:disabled) {
+  border-color: #cbd5e1;
+  color: #334155;
+  background: #f1f5f9;
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(99, 102, 241, 0.08);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
-.auto-color-toggle-btn.active {
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
-  border-color: #4f46e5;
-  color: white;
-  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
+.auto-color-suggest-btn:disabled {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
 }
 
 .magic-icon {
   font-size: 1rem;
+  color: #a855f7;
 }
 
-.auto-color-toggle-btn.active .magic-icon {
-  animation: magicPulse 1.5s infinite alternate;
+.spinning {
+  animation: spin 1s linear infinite;
 }
 
-@keyframes magicPulse {
-  0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,255,255,0.6)); }
-  100% { transform: scale(1.2); filter: drop-shadow(0 0 5px rgba(255,255,255,0.9)); }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>
