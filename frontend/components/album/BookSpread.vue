@@ -109,120 +109,139 @@
       </button>
     </div>
 
-    <!-- Right Sidebar Column containing all page design toolbars & spread controls -->
-    <aside class="right-spread-sidebar-col">
-      <!-- Spread Actions (Retirer, Rendre Enveloppante) -->
-      <div class="spread-right-toolbar">
-        <div class="flex items-center gap-2 border-b border-gray-100 pb-2 mb-1">
-          <Icon name="lucide:sliders" class="text-indigo-500 text-sm" />
-          <h4 class="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider font-sans">Mise en page</h4>
-        </div>
-
+    <!-- Right Sidebar Column containing the vertical pill toolbar -->
+    <aside class="right-spread-sidebar-col flex items-center justify-center">
+      <div class="vertical-pill-toolbar flex flex-col items-center gap-4 py-6 px-2.5 bg-white border border-gray-100 rounded-full shadow-lg select-none">
+        
         <!-- FULL WRAP COVER MODE -->
-        <div v-if="activePageIdx === 0 && isFullWrapCover" class="flex flex-col gap-3">
-          <div class="page-section-header">
-            <span class="text-xs font-bold text-gray-700">Couverture Enveloppante</span>
+        <template v-if="activePageIdx === 0 && isFullWrapCover">
+          <!-- Color Picker Button -->
+          <div class="relative flex items-center justify-center">
+            <button 
+              type="button" 
+              class="color-dot-btn" 
+              :style="{ backgroundColor: activeAlbum?.cover_color || '#3d352e' }" 
+              @click="triggerAlbumColorPicker"
+              title="Couleur de couverture"
+            ></button>
+            <input ref="albumColorInput" type="color" :value="activeAlbum?.cover_color || '#3d352e'" class="hidden" @input="onAlbumColorInput" />
           </div>
-          <div class="flex flex-col gap-2">
-            <button type="button" class="right-tb-btn btn-retirer flex items-center gap-2 text-left" @click="onDeleteCover">
-              <Icon name="lucide:trash-2" class="text-red-500" />
-              <span>Retirer le style</span>
-            </button>
-            <button type="button" class="right-tb-btn btn-wrap flex items-center gap-2 text-left" @click="toggleFullWrap(false)">
-              <Icon name="lucide:columns" class="text-indigo-500" />
-              <span>Séparer en 2</span>
-            </button>
-          </div>
-        </div>
 
-        <!-- SPLIT COVER OR REGULAR SPREAD MODE -->
+          <!-- Separer in 2 Covers -->
+          <button type="button" class="pill-action-btn" @click="toggleFullWrap(false)" title="Séparer en 2 couvertures">
+            <Icon name="lucide:columns" />
+          </button>
+
+          <!-- Delete cover style -->
+          <button type="button" class="pill-action-btn text-red-500 hover:bg-red-50" @click="onDeleteCover" title="Retirer le style/photo">
+            <Icon name="lucide:trash-2" />
+          </button>
+        </template>
+
+        <!-- SPLIT COVER OR REGULAR PAGES -->
         <template v-else>
-          <!-- LEFT PAGE SECTION -->
-          <div class="flex flex-col gap-2">
-            <div class="page-section-header flex items-center justify-between border-b border-gray-50 pb-1">
-              <span class="text-[11px] font-bold text-gray-600 font-serif">
-                {{ activePageIdx === 0 ? 'Couverture Fin (Gauche)' : `Page de Gauche (${activePageIdx - 1})` }}
-              </span>
-            </div>
-            
-            <div class="flex flex-col gap-1.5" v-if="activePageIdx === 0 || leftPage">
+          <!-- LEFT PAGE SECTION (Top half of vertical pill) -->
+          <div class="flex flex-col items-center gap-3" v-if="activePageIdx === 0 || leftPage">
+            <!-- Color Picker -->
+            <div class="relative flex items-center justify-center">
               <button 
                 type="button" 
-                class="right-tb-btn btn-retirer flex items-center gap-2 text-left" 
-                @click="activePageIdx === 0 ? onDeleteBackCover() : retirePageStyle(leftPage)"
-              >
-                <Icon name="lucide:trash-2" class="text-red-500 text-xs" />
-                <span class="text-[11px] text-gray-700 font-medium">Retirer le style</span>
-              </button>
-              <button 
-                type="button" 
-                class="right-tb-btn btn-wrap flex items-center gap-2 text-left" 
-                @click="activePageIdx === 0 ? toggleFullWrap(true) : propagateEnveloping(leftPage, rightPage)"
-                :disabled="activePageIdx !== 0 && !rightPage"
-              >
-                <Icon name="lucide:book-open" class="text-indigo-500 text-xs" />
-                <span class="text-[11px] text-gray-700 font-medium">Rendre Enveloppante</span>
-              </button>
+                class="color-dot-btn" 
+                :style="{ backgroundColor: activePageIdx === 0 ? (activeAlbum?.cover_color || '#3d352e') : (leftPage?.background_color || '#ffffff') }" 
+                @click="activePageIdx === 0 ? triggerAlbumColorPicker() : triggerLeftColorPicker()"
+                :title="activePageIdx === 0 ? 'Couleur de couverture' : 'Couleur de page (Gauche)'"
+              ></button>
+              <input v-if="activePageIdx === 0" ref="albumColorInput" type="color" :value="activeAlbum?.cover_color || '#3d352e'" class="hidden" @input="onAlbumColorInput" />
+              <input v-else ref="leftColorInput" type="color" :value="leftPage?.background_color || '#ffffff'" class="hidden" @input="onLeftColorInput" />
             </div>
-            <div v-else class="text-[10px] text-gray-400 italic">Page vide</div>
+
+            <!-- Layout toggle (Only if interior page) -->
+            <button v-if="activePageIdx !== 0" type="button" class="pill-action-btn" :class="{ 'active': leftPage?.layout_type === 'text-only' }" @click="togglePageLayout(leftPage)" title="Mode texte/photo">
+              <Icon name="lucide:align-left" />
+            </button>
+
+            <!-- Adjust slots count (Only if interior page and not text-only) -->
+            <button v-if="activePageIdx !== 0 && leftPage?.layout_type !== 'text-only'" type="button" class="pill-action-btn" @click="cycleSlots(leftPage)" title="Nombre de photos">
+              <Icon name="lucide:image" />
+            </button>
+
+            <!-- Add/Edit page title -->
+            <button v-if="activePageIdx !== 0" type="button" class="pill-action-btn" @click="injectTitle(leftPage)" title="Titre de la page">
+              <Icon name="lucide:heading" />
+            </button>
+
+            <!-- Enveloping propagate -->
+            <button type="button" class="pill-action-btn" @click="activePageIdx === 0 ? toggleFullWrap(true) : propagateEnveloping(leftPage, rightPage)" :disabled="activePageIdx !== 0 && !rightPage" title="Rendre Enveloppante">
+              <Icon name="lucide:book-open" />
+            </button>
+
+            <!-- Delete cover style / page style -->
+            <button type="button" class="pill-action-btn text-red-500 hover:bg-red-50" @click="activePageIdx === 0 ? onDeleteBackCover() : retirePageStyle(leftPage)" title="Retirer le style">
+              <Icon name="lucide:trash-2" />
+            </button>
           </div>
 
-          <div class="h-[1px] bg-gray-100 my-1"></div>
+          <!-- Divider -->
+          <div class="h-[1px] w-6 bg-gray-100 my-1"></div>
 
-          <!-- RIGHT PAGE SECTION -->
-          <div class="flex flex-col gap-2">
-            <div class="page-section-header flex items-center justify-between border-b border-gray-50 pb-1">
-              <span class="text-[11px] font-bold text-gray-600 font-serif">
-                {{ activePageIdx === 0 ? 'Couverture Début (Droite)' : `Page de Droite (${activePageIdx})` }}
-              </span>
-            </div>
-            
-            <div class="flex flex-col gap-1.5" v-if="activePageIdx === 0 || rightPage">
+          <!-- RIGHT PAGE SECTION (Bottom half of vertical pill) -->
+          <div class="flex flex-col items-center gap-3" v-if="activePageIdx === 0 || rightPage">
+            <!-- Color Picker -->
+            <div class="relative flex items-center justify-center">
               <button 
                 type="button" 
-                class="right-tb-btn btn-retirer flex items-center gap-2 text-left" 
-                @click="activePageIdx === 0 ? onDeleteCover() : retirePageStyle(rightPage)"
-              >
-                <Icon name="lucide:trash-2" class="text-red-500 text-xs" />
-                <span class="text-[11px] text-gray-700 font-medium">Retirer le style</span>
-              </button>
-              <button 
-                type="button" 
-                class="right-tb-btn btn-wrap flex items-center gap-2 text-left" 
-                @click="activePageIdx === 0 ? toggleFullWrap(true) : propagateEnveloping(rightPage, leftPage)"
-                :disabled="activePageIdx !== 0 && !leftPage"
-              >
-                <Icon name="lucide:book-open" class="text-indigo-500 text-xs" />
-                <span class="text-[11px] text-gray-700 font-medium">Rendre Enveloppante</span>
-              </button>
+                class="color-dot-btn" 
+                :style="{ backgroundColor: activePageIdx === 0 ? (activeAlbum?.cover_color || '#3d352e') : (rightPage?.background_color || '#ffffff') }" 
+                @click="activePageIdx === 0 ? triggerAlbumColorPicker() : triggerRightColorPicker()"
+                :title="activePageIdx === 0 ? 'Couleur de couverture' : 'Couleur de page (Droite)'"
+              ></button>
+              <input v-if="activePageIdx === 0" ref="albumColorInput" type="color" :value="activeAlbum?.cover_color || '#3d352e'" class="hidden" @input="onAlbumColorInput" />
+              <input v-else ref="rightColorInput" type="color" :value="rightPage?.background_color || '#ffffff'" class="hidden" @input="onRightColorInput" />
             </div>
-            <div v-else class="text-[10px] text-gray-400 italic">Page vide</div>
+
+            <!-- Layout toggle -->
+            <button v-if="activePageIdx !== 0" type="button" class="pill-action-btn" :class="{ 'active': rightPage?.layout_type === 'text-only' }" @click="togglePageLayout(rightPage)" title="Mode texte/photo">
+              <Icon name="lucide:align-left" />
+            </button>
+
+            <!-- Adjust slots count -->
+            <button v-if="activePageIdx !== 0 && rightPage?.layout_type !== 'text-only'" type="button" class="pill-action-btn" @click="cycleSlots(rightPage)" title="Nombre de photos">
+              <Icon name="lucide:image" />
+            </button>
+
+            <!-- Add/Edit page title -->
+            <button v-if="activePageIdx !== 0" type="button" class="pill-action-btn" @click="injectTitle(rightPage)" title="Titre de la page">
+              <Icon name="lucide:heading" />
+            </button>
+
+            <!-- Enveloping propagate -->
+            <button type="button" class="pill-action-btn" @click="activePageIdx === 0 ? toggleFullWrap(true) : propagateEnveloping(rightPage, leftPage)" :disabled="activePageIdx !== 0 && !leftPage" title="Rendre Enveloppante">
+              <Icon name="lucide:book-open" />
+            </button>
+
+            <!-- Delete cover style / page style -->
+            <button type="button" class="pill-action-btn text-red-500 hover:bg-red-50" @click="activePageIdx === 0 ? onDeleteCover() : retirePageStyle(rightPage)" title="Retirer le style">
+              <Icon name="lucide:trash-2" />
+            </button>
           </div>
         </template>
-      </div>
 
-      <!-- Left Page Design Toolbar (AlbumToolbar) -->
-      <div v-if="leftPage && activePageIdx !== 0" class="flex flex-col gap-1.5">
-        <span class="text-[9px] font-extrabold text-gray-400 uppercase tracking-wider pl-1">Outils Page Gauche</span>
-        <AlbumToolbar :page="leftPage" class="w-full" />
-      </div>
-
-      <!-- Right Page Design Toolbar (AlbumToolbar) -->
-      <div v-if="rightPage && activePageIdx !== 0" class="flex flex-col gap-1.5">
-        <span class="text-[9px] font-extrabold text-gray-400 uppercase tracking-wider pl-1">Outils Page Droite</span>
-        <AlbumToolbar :page="rightPage" class="w-full" />
       </div>
     </aside>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
+import { useRuntimeConfig, useCookie } from '#app';
+import { useAlbumEditorStore } from '~/composables/useAlbumEditorStore';
 import { useBookSpreadLogic } from '~/composables/useBookSpreadLogic';
 import { useBookCoverDrops } from '~/composables/useBookCoverDrops';
 
 const props = defineProps<{ activePageIdx: number; }>();
 const emit = defineEmits(['update:activePageIdx']);
 
+const { updatePageField } = useAlbumEditorStore();
 const logicState = useBookSpreadLogic(props, emit);
 const {
   activeAlbum, isFlipping, flipDirection, isCoverDragOver, isBackCoverDragOver,
@@ -235,6 +254,77 @@ const {
   onDeleteCover, onDeleteBackCover, onCoverDrop, onBackCoverDrop, onFullWrapDrop,
   onBackCoverDragStart
 } = useBookCoverDrops(logicState);
+
+// Color Pickers refs
+const leftColorInput = ref<HTMLInputElement | null>(null);
+const rightColorInput = ref<HTMLInputElement | null>(null);
+const albumColorInput = ref<HTMLInputElement | null>(null);
+
+const triggerLeftColorPicker = () => { leftColorInput.value?.click(); };
+const triggerRightColorPicker = () => { rightColorInput.value?.click(); };
+const triggerAlbumColorPicker = () => { albumColorInput.value?.click(); };
+
+const onLeftColorInput = async (e: Event) => {
+  if (leftPage.value) {
+    const color = (e.target as HTMLInputElement).value;
+    await updatePageField(leftPage.value.id, 'background_color', color);
+    await logicState.fetchAlbumDetail(leftPage.value.album, true);
+  }
+};
+
+const onRightColorInput = async (e: Event) => {
+  if (rightPage.value) {
+    const color = (e.target as HTMLInputElement).value;
+    await updatePageField(rightPage.value.id, 'background_color', color);
+    await logicState.fetchAlbumDetail(rightPage.value.album, true);
+  }
+};
+
+const onAlbumColorInput = async (e: Event) => {
+  if (activeAlbum.value) {
+    const color = (e.target as HTMLInputElement).value;
+    try {
+      const config = useRuntimeConfig();
+      const token = useCookie<string | null>('auth_token');
+      await $fetch(`${config.public.apiBase}/photos/albums/${activeAlbum.value.id}/`, {
+        method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { cover_color: color }
+      });
+      await logicState.fetchAlbumDetail(activeAlbum.value.id, true);
+    } catch (err) { console.error(err); }
+  }
+};
+
+const togglePageLayout = async (page: any) => {
+  if (!page) return;
+  const isText = page.layout_type === 'text-only';
+  await updatePageField(page.id, 'layout_type', isText ? 'grid-1' : 'text-only');
+  await logicState.fetchAlbumDetail(page.album, true);
+};
+
+const cycleSlots = async (page: any) => {
+  if (!page) return;
+  const layoutType = page.layout_type || 'grid-1';
+  let count = 1;
+  if (layoutType.startsWith('grid-')) {
+    count = parseInt(layoutType.split('-')[1]) || 1;
+  } else if (layoutType === 'mosaic') {
+    count = 3;
+  }
+  let nextCount = count + 1;
+  if (nextCount > 6) nextCount = 1;
+  await updatePageField(page.id, 'layout_type', `grid-${nextCount}`);
+  await logicState.fetchAlbumDetail(page.album, true);
+};
+
+const injectTitle = async (page: any) => {
+  if (!page) return;
+  const currentTitle = page.title || '';
+  const newTitle = prompt('Entrez le titre de la page :', currentTitle);
+  if (newTitle !== null) {
+    await updatePageField(page.id, 'title', newTitle);
+    await logicState.fetchAlbumDetail(page.album, true);
+  }
+};
 </script>
 
 <style scoped>

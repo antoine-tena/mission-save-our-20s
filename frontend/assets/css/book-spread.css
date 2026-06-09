@@ -45,66 +45,75 @@
 
 /* Right toolbar styling */
 .right-spread-sidebar-col {
-  width: 260px;
-  min-width: 260px;
-  max-width: 260px;
+  width: 54px;
+  min-width: 54px;
+  max-width: 54px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  height: 520px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-.right-spread-sidebar-col::-webkit-scrollbar {
-  width: 4px;
-}
-.right-spread-sidebar-col::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  height: auto;
 }
 
-.spread-right-toolbar {
+.vertical-pill-toolbar {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
-  width: 100%;
-  box-sizing: border-box;
-  flex-shrink: 0;
+  border-radius: 9999px;
+  padding: 20px 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  width: 48px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  z-index: 10;
-  height: fit-content;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
 }
 
-.page-section-header {
-  margin-bottom: 4px;
-}
-
-.right-tb-btn {
-  background: #fcfbf9;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
-  padding: 8px 12px;
+.color-dot-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   cursor: pointer;
   transition: all 0.2s ease;
-  width: 100%;
-  box-sizing: border-box;
+  padding: 0;
+  display: block;
+}
+
+.color-dot-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+.pill-action-btn {
+  background: none;
+  border: none;
+  color: #718096;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  padding: 0;
 }
 
-.right-tb-btn:hover:not(:disabled) {
-  background: #f3f0ec;
-  border-color: rgba(0, 0, 0, 0.1);
-  transform: translateY(-1px);
+.pill-action-btn:hover:not(:disabled) {
+  background: #f7fafc;
+  color: #4f46e5;
 }
 
-.right-tb-btn:disabled {
-  opacity: 0.5;
+.pill-action-btn.active {
+  background: #6366f1;
+  color: white;
+}
+
+.pill-action-btn:disabled {
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
