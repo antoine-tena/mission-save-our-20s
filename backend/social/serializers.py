@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile, SocialPost, FriendRequest
+from .models import Profile, SocialPost, FriendRequest, RichPost, RichPostAttachment
 from typing import Optional, Any
 
 class UserSerializer(serializers.ModelSerializer):
@@ -92,3 +92,30 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
         fields = ['id', 'from_user', 'to_user', 'created_at', 'accepted']
+
+
+class RichPostAttachmentSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RichPostAttachment
+        fields = ['id', 'file', 'file_name', 'file_type', 'caption', 'location', 'file_url']
+        extra_kwargs = {
+            'file': {'write_only': True}
+        }
+
+    def get_file_url(self, obj: RichPostAttachment) -> Optional[str]:
+        request = self.context.get('request')
+        if obj.file and request:
+            return request.build_absolute_uri(obj.file.url)
+        return None
+
+
+class RichPostSerializer(serializers.ModelSerializer):
+    author = UserSerializer(read_only=True)
+    attachments = RichPostAttachmentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = RichPost
+        fields = ['id', 'author', 'title', 'caption', 'location', 'created_at', 'attachments']
+

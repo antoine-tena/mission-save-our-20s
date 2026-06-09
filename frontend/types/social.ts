@@ -14,3 +14,23 @@ export interface SocialPost {
 export interface FriendRequest {
   id: number; from_user: User; to_user: User; created_at: string; accepted: boolean;
 }
+
+export interface RichPostAttachment {
+  id: number;
+  file_name: string;
+  file_type: 'IMAGE' | 'VIDEO' | 'PDF' | 'OTHER';
+  caption: string | null;
+  location: string | null;
+  file_url: string;
+}
+
+export interface RichPost {
+  id: number;
+  author: User;
+  title: string | null;
+  caption: string | null;
+  location: string | null;
+  created_at: string;
+  attachments: RichPostAttachment[];
+}
+

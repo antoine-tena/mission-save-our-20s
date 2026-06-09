@@ -93,3 +93,47 @@ class FriendRequest(models.Model):
 
     def __str__(self) -> str:
         return f"Demande d'ami de {self.from_user.username} à {self.to_user.username}"
+
+
+def rich_post_upload_path(instance: 'RichPostAttachment', filename: str) -> str:
+    """Chemin d'upload pour les fichiers de publications riches."""
+    return os.path.join('rich_posts', str(instance.post.id), filename)
+
+
+class RichPost(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rich_posts')
+    title = models.CharField(max_length=255, blank=True, null=True)
+    caption = models.TextField(blank=True, null=True)
+    location = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Publication Riche"
+        verbose_name_plural = "Publications Riches"
+
+    def __str__(self) -> str:
+        return f"RichPost de {self.author.username} ({self.created_at})"
+
+
+class RichPostAttachment(models.Model):
+    FILE_TYPES = [
+        ('IMAGE', 'Image'),
+        ('VIDEO', 'Vidéo'),
+        ('PDF', 'PDF'),
+        ('OTHER', 'Autre'),
+    ]
+    post = models.ForeignKey(RichPost, on_delete=models.CASCADE, related_name='attachments')
+    file = models.FileField(upload_to=rich_post_upload_path)
+    file_name = models.CharField(max_length=255, blank=True)
+    file_type = models.CharField(max_length=20, choices=FILE_TYPES, default='OTHER')
+    caption = models.TextField(blank=True, null=True)
+    location = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Fichier joint"
+        verbose_name_plural = "Fichiers joints"
+
+    def __str__(self) -> str:
+        return f"Fichier {self.file_name} du post {self.post.id}"
+

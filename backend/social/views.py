@@ -5,8 +5,12 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from .models import Profile, SocialPost, FriendRequest
-from .serializers import ProfileSerializer, SocialPostSerializer, FriendRequestSerializer, UserSerializer
+from .models import Profile, SocialPost, FriendRequest, RichPost, RichPostAttachment
+from .serializers import (
+    ProfileSerializer, SocialPostSerializer, FriendRequestSerializer, 
+    UserSerializer, RichPostSerializer
+)
+import os
 from typing import Any
 
 class MyProfileView(APIView):
@@ -124,3 +128,108 @@ class HandleFriendRequestView(APIView):
             return Response({'message': 'Déclinée.'})
         
         return Response({'error': 'Action invalide.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def resolve_coordinates(location_name: str | None) -> tuple[float | None, float | None]:
+    """Résout des noms de lieux courants vers leurs coordonnées GPS."""
+    if not location_name:
+        return None, None
+    name = location_name.strip().lower()
+    gps_map = {
+        "semnoz": (45.7981, 6.1042),
+        "crêt de châtillon": (45.7981, 6.1042),
+        "lac d'annecy": (45.8992, 6.1294),
+        "annecy": (45.8992, 6.1294),
+        "cinéma pathé": (45.9032, 6.1214),
+        "cinéma pathé annecy": (45.9032, 6.1214),
+        "pathé": (45.9032, 6.1214),
+        "cinema": (45.9032, 6.1214),
+        "cinéma": (45.9032, 6.1214),
+        "col de la forclaz": (45.8111, 6.2435),
+        "forclaz": (45.8111, 6.2435),
+        "aravis": (45.87, 6.35),
+        "bivouac aravis": (45.87, 6.35),
+        "chamonix": (45.92, 6.87),
+        "aiguille du midi": (45.92, 6.87),
+    }
+    for key, coords in gps_map.items():
+        if key in name:
+            return coords
+    return None, None
+
+
+class RichPostListCreateView(APIView):
+    """Vue pour lister et créer des publications riches avec multi-médias."""
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get(self, request: Any) -> Response:
+        """Liste toutes les publications riches avec leurs pièces jointes."""
+        posts = RichPost.objects.all().prefetch_related('attachments')
+        serializer = RichPostSerializer(posts, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    def _create_attachments(self, rich_post: RichPost, request_data: Any, request_files: Any) -> None:
+        """Crée des pièces jointes pour une publication riche et synchronise avec l'Album."""
+        from photos.models import Photo
+        index = 0
+        while True:
+            file_key = f'file_{index}'
+            if file_key not in request_files:
+                break
+            uploaded_file = request_files[file_key]
+            att_caption = request_data.get(f'caption_{index}', '')
+            att_location = request_data.get(f'location_{index}', '')
+            filename = uploaded_file.name
+            ext = os.path.splitext(filename)[1].lower()
+            if ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
+                file_type = 'IMAGE'
+            elif ext in ['.mp4', '.mov', '.avi', '.mkv', '.webm']:
+                file_type = 'VIDEO'
+            elif ext == '.pdf':
+                file_type = 'PDF'
+            else:
+                file_type = 'OTHER'
+            RichPostAttachment.objects.create(
+                post=rich_post, file=uploaded_file, file_name=filename,
+                file_type=file_type, caption=att_caption, location=att_location
+            )
+            if file_type == 'IMAGE':
+                lat, lon = resolve_coordinates(att_location or rich_post.location)
+                photo_title = att_caption or rich_post.title or f"Photo de {rich_post.author.username}"
+                photo_obj = Photo.objects.create(
+                    author=rich_post.author, titre=photo_title,
+                    description=att_caption or rich_post.caption or "",
+                    latitude=lat, longitude=lon
+                )
+                photo_obj.image.save(filename, uploaded_file, save=True)
+            index += 1
+
+    def post(self, request: Any) -> Response:
+        """Crée une publication riche avec pièces jointes et synchro auto."""
+        from cinema.models import Movie
+        from django.utils import timezone
+        title, caption, loc = request.data.get('title', ''), request.data.get('caption', ''), request.data.get('location', '')
+        rich_post = RichPost.objects.create(author=request.user, title=title, caption=caption, location=loc)
+        self._create_attachments(rich_post, request.data, request.FILES)
+
+        # Détection de journée Cinéma
+        text_search = (title + ' ' + caption).lower()
+        is_cin = any(w in text_search for w in ['cinema', 'cinéma', 'film', 'movie']) or request.data.get('movie_title')
+        if is_cin:
+            lat, lon = resolve_coordinates(loc)
+            Movie.objects.get_or_create(
+                title=request.data.get('movie_title') or title or "Film du Journal",
+                defaults={
+                    "date_seen": timezone.now(), "location": loc, "latitude": lat, "longitude": lon, "added_by": request.user,
+                    "antoine_review": "Via Journal 📖" if request.user.username == "antoine" else "", "antoine_rating": 4 if request.user.username == "antoine" else None,
+                    "amani_review": "Via Journal 📖" if request.user.username == "amani" else "", "amani_rating": 4 if request.user.username == "amani" else None,
+                }
+            )
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        profile.points += 20
+        profile.save(update_fields=['points'])
+        serializer = RichPostSerializer(rich_post, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
