@@ -18,10 +18,12 @@
         :photo-url="activeAlbum?.cover_photo_url || null"
         placeholder-text="Couverture Enveloppante"
         description-text="Glissez-déposez une photo pour l'appliquer sur l'ensemble de la couverture"
+        @delete="$emit('delete')"
+        @toggle-wrap="$emit('toggle-wrap', $event)"
       />
 
       <!-- Left page overlay (back cover part) -->
-      <div class="cover-overlay-minimal left-overlay flex gap-2">
+      <div v-if="!activeAlbum?.show_cover_photo" class="cover-overlay-minimal left-overlay flex gap-2">
         <button type="button" class="delete-cover-btn-full-floating" @click.stop="$emit('delete')">
           <Icon name="lucide:trash-2" /> Retirer
         </button>
@@ -31,7 +33,7 @@
       </div>
 
       <!-- Right page overlay (front cover part) -->
-      <div class="cover-overlay-minimal right-overlay flex gap-2">
+      <div v-if="!activeAlbum?.show_cover_photo" class="cover-overlay-minimal right-overlay flex gap-2">
         <button type="button" class="delete-cover-btn-full-floating" @click.stop="$emit('delete')">
           <Icon name="lucide:trash-2" /> Retirer
         </button>
