@@ -46,18 +46,7 @@
         :photo-url="activeAlbum?.cover_photo_url || null"
         placeholder-text="Couverture de début"
         description-text="Glissez-déposez une photo ici"
-        @delete="$emit('delete')"
-        @toggle-wrap="$emit('toggle-wrap', $event)"
       />
-      
-      <div v-if="!activeAlbum?.show_cover_photo" class="cover-overlay-minimal right-overlay flex flex-col gap-2">
-        <button type="button" class="delete-cover-btn-full-floating" @click.stop="$emit('delete')">
-          <Icon name="lucide:trash-2" /> Retirer
-      </button>
-        <button type="button" class="toggle-wrap-btn-floating" @click.stop="$emit('toggle-wrap', true)">
-          <Icon name="lucide:book-open" /> Rendre Enveloppante
-        </button>
-      </div>
     </div>
   </div>
 </template>

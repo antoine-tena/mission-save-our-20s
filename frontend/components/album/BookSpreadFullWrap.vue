@@ -18,29 +18,7 @@
         :photo-url="activeAlbum?.cover_photo_url || null"
         placeholder-text="Couverture Enveloppante"
         description-text="Glissez-déposez une photo pour l'appliquer sur l'ensemble de la couverture"
-        @delete="$emit('delete')"
-        @toggle-wrap="$emit('toggle-wrap', $event)"
       />
-
-      <!-- Left page overlay (back cover part) -->
-      <div v-if="!activeAlbum?.show_cover_photo" class="cover-overlay-minimal left-overlay flex flex-col gap-2">
-        <button type="button" class="delete-cover-btn-full-floating" @click.stop="$emit('delete')">
-          <Icon name="lucide:trash-2" /> Retirer
-        </button>
-        <button type="button" class="toggle-wrap-btn-floating" @click.stop="$emit('toggle-wrap', false)">
-          <Icon name="lucide:columns" /> Séparer en 2 couvertures
-        </button>
-      </div>
-
-      <!-- Right page overlay (front cover part) -->
-      <div v-if="!activeAlbum?.show_cover_photo" class="cover-overlay-minimal right-overlay flex flex-col gap-2">
-        <button type="button" class="delete-cover-btn-full-floating" @click.stop="$emit('delete')">
-          <Icon name="lucide:trash-2" /> Retirer
-        </button>
-        <button type="button" class="toggle-wrap-btn-floating" @click.stop="$emit('toggle-wrap', false)">
-          <Icon name="lucide:columns" /> Séparer en 2 couvertures
-        </button>
-      </div>
     </div>
   </div>
 </template>

@@ -24,42 +24,6 @@
 
     <!-- Crop Controls Overlay -->
     <AlbumCropToolbar v-if="isCropping" v-model="tempCropScale" style="bottom: 16px; left: 16px; right: 16px;" />
-
-    <!-- Floating controls overlay inside BookCoverPhoto.vue -->
-    <template v-if="!isCropping">
-      <template v-if="activeAlbum?.is_full_wrap">
-        <!-- Left page overlay (back cover part) -->
-        <div class="cover-overlay-minimal left-overlay flex flex-col gap-2">
-          <button type="button" class="delete-cover-btn-full-floating" @click.stop="onDelete">
-            <Icon name="lucide:trash-2" /> Retirer
-          </button>
-          <button type="button" class="toggle-wrap-btn-floating" @click.stop="onToggleWrap">
-            <Icon name="lucide:columns" /> Séparer en 2 couvertures
-          </button>
-        </div>
-
-        <!-- Right page overlay (front cover part) -->
-        <div class="cover-overlay-minimal right-overlay flex flex-col gap-2">
-          <button type="button" class="delete-cover-btn-full-floating" @click.stop="onDelete">
-            <Icon name="lucide:trash-2" /> Retirer
-          </button>
-          <button type="button" class="toggle-wrap-btn-floating" @click.stop="onToggleWrap">
-            <Icon name="lucide:columns" /> Séparer en 2 couvertures
-          </button>
-        </div>
-      </template>
-      <template v-else>
-        <!-- Single page overlay (split cover part) -->
-        <div class="cover-overlay-minimal flex flex-col gap-2" :class="type === 'back' ? 'left-overlay' : 'right-overlay'">
-          <button type="button" class="delete-cover-btn-full-floating" @click.stop="onDelete">
-            <Icon name="lucide:trash-2" /> Retirer
-          </button>
-          <button type="button" class="toggle-wrap-btn-floating" @click.stop="onToggleWrap">
-            <Icon name="lucide:book-open" /> Rendre Enveloppante
-          </button>
-        </div>
-      </template>
-    </template>
   </div>
 </template>
 
@@ -76,7 +40,7 @@ const props = defineProps<{
   draggable?: boolean;
 }>();
 
-const emit = defineEmits(['dragstart', 'delete', 'toggle-wrap']);
+const emit = defineEmits(['dragstart']);
 
 const { activeAlbum } = useAlbumEditorStore();
 const {
@@ -86,14 +50,6 @@ const {
   onCropMouseDown,
   getImageStyle: _getImageStyle,
 } = usePhotoCrop();
-
-const onDelete = () => {
-  emit('delete');
-};
-
-const onToggleWrap = () => {
-  emit('toggle-wrap', !activeAlbum.value?.is_full_wrap);
-};
 
 const isCropping = computed(() => croppingPhotoId.value === (props.type === 'front' ? -1 : -2));
 
