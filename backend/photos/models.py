@@ -69,6 +69,7 @@ class AlbumPage(models.Model):
     background_color = models.CharField(max_length=50, default='#ffffff')
     sticker = models.CharField(max_length=50, blank=True, null=True)
     order = models.IntegerField(default=0)
+    is_auto_color = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['order']
@@ -96,6 +97,8 @@ class Photo(models.Model):
     crop_scale = models.FloatField(default=1.0)
     custom_width = models.IntegerField(null=True, blank=True)
     custom_height = models.IntegerField(null=True, blank=True)
+    custom_x = models.IntegerField(null=True, blank=True)
+    custom_y = models.IntegerField(null=True, blank=True)
     date_creation = models.DateTimeField(auto_now_add=True)
 
     class Meta:

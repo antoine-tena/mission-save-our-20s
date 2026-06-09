@@ -12,7 +12,8 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'author', 'author_name', 'page', 'titre', 'description', 
             'caption', 'image', 'image_url', 'latitude', 'longitude', 'order',
-            'crop_x', 'crop_y', 'crop_scale', 'custom_width', 'custom_height', 'date_creation'
+            'crop_x', 'crop_y', 'crop_scale', 'custom_width', 'custom_height',
+            'custom_x', 'custom_y', 'date_creation'
         ]
         extra_kwargs = {
             'image': {'required': False, 'allow_null': True}
@@ -31,7 +32,7 @@ class AlbumPageSerializer(serializers.ModelSerializer):
         model = AlbumPage
         fields = [
             'id', 'album', 'title', 'description', 'date', 
-            'location', 'layout_type', 'background_color', 'sticker', 'order', 'photos'
+            'location', 'layout_type', 'background_color', 'sticker', 'order', 'is_auto_color', 'photos'
         ]
 
 class AlbumSerializer(serializers.ModelSerializer):
