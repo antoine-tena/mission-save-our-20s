@@ -23,7 +23,7 @@
     <!-- Mode 1: Photo Panels (Only shown if show_cover_photo is true) -->
     <div v-if="activeAlbum?.show_cover_photo" class="flex gap-4 w-full">
       <!-- Front Cover -->
-      <div class="cover-panel" :class="{ active: !isBackCover }">
+      <div class="cover-panel flex flex-col items-center" :class="{ active: !isBackCover }">
         <h3 class="cover-title font-serif">Couverture de Début</h3>
         <div class="cover-preview" @click="triggerUpload(false)">
           <img v-if="activeAlbum?.cover_photo_url" :src="activeAlbum.cover_photo_url" class="cover-img" />
@@ -31,6 +31,18 @@
             <Icon name="lucide:image-plus" class="empty-icon" />
             <span>Ajouter une image</span>
           </div>
+        </div>
+
+        <!-- Album Title input field -->
+        <div class="mt-3 flex flex-col gap-1 w-full text-left">
+          <label class="text-[9px] font-extrabold text-gray-400 uppercase tracking-wider pl-1">Titre de l'album</label>
+          <input 
+            type="text"
+            :value="activeAlbum?.title"
+            @input="e => updateAlbumField(activeAlbum.id, 'title', (e.target as HTMLInputElement).value)"
+            placeholder="Titre de l'album..."
+            class="w-full text-xs font-bold text-gray-700 border border-gray-200 rounded-lg px-2.5 py-1.5 outline-none focus:border-indigo-500 focus:bg-white transition-all bg-gray-50"
+          />
         </div>
       </div>
 
@@ -93,7 +105,7 @@ const fileInput = ref<HTMLInputElement>();
 const hexInput = ref<HTMLInputElement>();
 const uploadingForBack = ref(false);
 
-const coverPresets = ['#3d352e', '#2c3e50', '#1a2a3a', '#5c2a2b', '#22443a', '#6e7d6c', '#FAF9F6'];
+const coverPresets = ['#1A1A1A', '#4A5568', '#1B365D', '#722F37', '#2D5A27', '#EAE6DF', '#FFFFFF', '#89CFF0'];
 
 const triggerUpload = (isBack: boolean) => {
   uploadingForBack.value = isBack;
