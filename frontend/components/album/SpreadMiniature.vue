@@ -6,9 +6,9 @@
   >
     <div class="mini-pages flex gap-0.5 h-[70px] w-[102px] overflow-hidden rounded bg-gray-100">
       
-      <!-- 1. FULL-WRAP COVER SPREAD PREVIEW (idx === 0 and isFullWrapCover is active) -->
+      <!-- 1. FULL-WRAP COVER SPREAD PREVIEW (isCover and isFullWrapCover is active) -->
       <div 
-        v-if="idx === 0 && isFullWrapCover"
+        v-if="isCover && isFullWrapCover"
         class="mini-page-scaled-wrapper" 
         :style="{ width: '102px', backgroundColor: activeAlbum?.cover_color || '#3d352e' }"
       >
@@ -30,9 +30,9 @@
       <!-- 2. STANDARD SPLIT COVER OR INTERIOR PAGES SPREAD -->
       <template v-else>
         <!-- LEFT PAGE PREVIEW -->
-        <!-- First spread left is Back Cover -->
+        <!-- Cover spread left is Back Cover -->
         <div 
-          v-if="idx === 0"
+          v-if="isCover"
           class="mini-page-scaled-wrapper border-r border-gray-200" 
           :style="{ backgroundColor: activeAlbum?.cover_color || '#3d352e' }"
         >
@@ -61,15 +61,16 @@
             class="mini-page-scaled-content-page" 
             :style="{ backgroundColor: spread.leftPage.background_color || '#ffffff' }"
           >
-            <AlbumBookPageContent :page="spread.leftPage" />
+            <AlbumBookPageHeader :page="spread.leftPage" />
+            <AlbumBookPageContent :page="spread.leftPage" :readonly="true" />
           </div>
           <div v-else class="mini-page-scaled-content-page" style="background-color: #ffffff;"></div>
         </div>
 
         <!-- RIGHT PAGE PREVIEW -->
-        <!-- First spread right is Front Cover -->
+        <!-- Cover spread right is Front Cover -->
         <div 
-          v-if="idx === 0"
+          v-if="isCover"
           class="mini-page-scaled-wrapper" 
           :style="{ backgroundColor: activeAlbum?.cover_color || '#3d352e' }"
         >
@@ -98,7 +99,8 @@
             class="mini-page-scaled-content-page" 
             :style="{ backgroundColor: spread.rightPage.background_color || '#ffffff' }"
           >
-            <AlbumBookPageContent :page="spread.rightPage" />
+            <AlbumBookPageHeader :page="spread.rightPage" />
+            <AlbumBookPageContent :page="spread.rightPage" :readonly="true" />
           </div>
           <div v-else class="mini-page-scaled-content-page" style="background-color: #ffffff;"></div>
         </div>
@@ -129,8 +131,23 @@ const isFullWrapCover = computed(() => {
   return activeAlbum.value?.is_full_wrap === true;
 });
 
+const isBeginningCover = computed(() => {
+  return props.idx === 0;
+});
+
+const isEndCover = computed(() => {
+  if (!activeAlbum.value) return false;
+  const pagesCount = activeAlbum.value.pages?.length || 0;
+  const totalSpreads = 2 + Math.ceil(pagesCount / 2);
+  return props.idx === totalSpreads - 1;
+});
+
+const isCover = computed(() => {
+  return isBeginningCover.value || isEndCover.value;
+});
+
 const spreadLabel = (idx: number, spread: any) => {
-  if (idx === 0) return 'Garde';
+  if (isCover.value) return 'Garde';
   return `P. ${(idx * 2) - 1} / ${idx * 2}`;
 };
 </script>

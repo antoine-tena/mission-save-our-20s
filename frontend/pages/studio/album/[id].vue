@@ -45,9 +45,20 @@ const { activeAlbum, isLoading: isAlbumLoading, fetchAlbumDetail, createPage } =
 
 const activePageIdx = ref(0);
 
+const maxPageIdx = computed(() => {
+  if (!activeAlbum.value) return 0;
+  const pagesCount = activeAlbum.value.pages?.length || 0;
+  const totalSpreads = 2 + Math.ceil(pagesCount / 2);
+  return (totalSpreads - 1) * 2;
+});
+
+const isCoverActive = computed(() => {
+  return activePageIdx.value === 0 || activePageIdx.value === maxPageIdx.value;
+});
+
 const currentUploadPageId = computed(() => {
   if (!activeAlbum.value || activeAlbum.value.pages.length === 0) return undefined;
-  if (activePageIdx.value === 0) return activeAlbum.value.pages[0]?.id;
+  if (isCoverActive.value) return activeAlbum.value.pages[0]?.id;
   return activeAlbum.value.pages[activePageIdx.value - 1]?.id || activeAlbum.value.pages[activePageIdx.value]?.id;
 });
 
