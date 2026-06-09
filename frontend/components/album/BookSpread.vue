@@ -6,6 +6,81 @@
         <Icon name="lucide:chevron-left" />
       </button>
 
+      <!-- LEFT VERTICAL TOOLBAR (Page de Gauche / Back Cover) -->
+      <div class="vertical-pill-toolbar select-none">
+        <div v-if="!isCoverSpread && leftPage && isPageRestricted(leftPage.id)" class="flex flex-col items-center justify-center text-gray-400 font-sans text-xs font-semibold p-1" title="Garde verrouillée">
+          <Icon name="lucide:lock" class="text-sm text-gray-300" />
+        </div>
+        <template v-else-if="isCoverSpread || leftPage">
+          <!-- Color Picker -->
+          <button 
+            type="button" 
+            class="color-dot-btn" 
+            :style="{ backgroundColor: isCoverSpread ? (activeAlbum?.cover_color || '#3d352e') : (leftPage?.background_color || '#ffffff') }" 
+            @click="isCoverSpread ? triggerAlbumColorPicker() : triggerLeftColorPicker()"
+            :title="isCoverSpread ? 'Couleur de couverture' : 'Couleur de page (Gauche)'"
+          ></button>
+
+          <!-- Layout toggle -->
+          <button 
+            type="button" 
+            class="pill-action-btn" 
+            :class="{ 'active': !isCoverSpread && leftPage?.layout_type === 'text-only' }" 
+            :disabled="isCoverSpread"
+            @click="!isCoverSpread ? togglePageLayout(leftPage) : null" 
+            title="Mode texte/photo"
+          >
+            <Icon name="lucide:align-left" />
+          </button>
+
+          <!-- Adjust slots count -->
+          <button 
+            type="button" 
+            class="pill-action-btn" 
+            :disabled="isCoverSpread || leftPage?.layout_type === 'text-only'"
+            @click="!isCoverSpread ? cycleSlots(leftPage) : null" 
+            title="Nombre de photos"
+          >
+            <Icon name="lucide:image" />
+          </button>
+
+          <!-- Add/Edit page title -->
+          <button 
+            type="button" 
+            class="pill-action-btn" 
+            :disabled="isCoverSpread"
+            @click="!isCoverSpread ? injectTitle(leftPage) : null" 
+            title="Titre de la page"
+          >
+            <Icon name="lucide:heading" />
+          </button>
+
+          <!-- Enveloping propagate / full wrap -->
+          <button 
+            type="button" 
+            class="pill-action-btn" 
+            @click="isCoverSpread ? toggleFullWrap(!isFullWrapCover) : propagateEnveloping(leftPage, rightPage)" 
+            :disabled="!isCoverSpread && !rightPage" 
+            :title="isCoverSpread ? (isFullWrapCover ? 'Séparer en 2' : 'Rendre Enveloppante') : 'Rendre Enveloppante'"
+          >
+            <Icon :name="isCoverSpread && isFullWrapCover ? 'lucide:columns' : 'lucide:book-open'" />
+          </button>
+
+          <!-- Delete cover style / page style -->
+          <button 
+            type="button" 
+            class="pill-action-btn text-red-500 hover:bg-red-50" 
+            @click="isCoverSpread ? onDeleteBackCover() : retirePageStyle(leftPage)" 
+            title="Retirer le style"
+          >
+            <Icon name="lucide:trash-2" />
+          </button>
+        </template>
+        <div v-else class="text-[10px] text-gray-300 font-sans italic flex flex-col items-center" title="Page de gauche vide">
+          <Icon name="lucide:image-off" class="text-sm" />
+        </div>
+      </div>
+
       <div class="book-and-controls-stack flex-1">
         <!-- 3D Book spread frame -->
         <div 
@@ -88,157 +163,6 @@
           </div>
         </div>
 
-        <!-- Two horizontal toolbars under the left and right pages -->
-        <div class="split-toolbars-under-book flex justify-between gap-6 w-[640px] mx-auto mt-4 select-none">
-          <!-- LEFT TOOLBAR (Page de Gauche / Back Cover) -->
-          <div class="horizontal-toolbar-pill flex items-center gap-3 bg-white border border-gray-100 rounded-full shadow-md py-1.5 px-4 flex-1 justify-center min-h-[46px]">
-            <div v-if="!isCoverSpread && leftPage && isPageRestricted(leftPage.id)" class="flex items-center gap-2 text-gray-400 font-sans text-xs font-semibold py-1 px-3">
-              <Icon name="lucide:lock" class="text-sm text-gray-300" />
-              <span>Garde verrouillée</span>
-            </div>
-            <template v-else-if="isCoverSpread || leftPage">
-              <!-- Color Picker -->
-              <button 
-                type="button" 
-                class="color-dot-btn" 
-                :style="{ backgroundColor: isCoverSpread ? (activeAlbum?.cover_color || '#3d352e') : (leftPage?.background_color || '#ffffff') }" 
-                @click="isCoverSpread ? triggerAlbumColorPicker() : triggerLeftColorPicker()"
-                :title="isCoverSpread ? 'Couleur de couverture' : 'Couleur de page (Gauche)'"
-              ></button>
-
-              <!-- Layout toggle -->
-              <button 
-                type="button" 
-                class="pill-action-btn" 
-                :class="{ 'active': !isCoverSpread && leftPage?.layout_type === 'text-only' }" 
-                :disabled="isCoverSpread"
-                @click="!isCoverSpread ? togglePageLayout(leftPage) : null" 
-                title="Mode texte/photo"
-              >
-                <Icon name="lucide:align-left" />
-              </button>
-
-              <!-- Adjust slots count -->
-              <button 
-                type="button" 
-                class="pill-action-btn" 
-                :disabled="isCoverSpread || leftPage?.layout_type === 'text-only'"
-                @click="!isCoverSpread ? cycleSlots(leftPage) : null" 
-                title="Nombre de photos"
-              >
-                <Icon name="lucide:image" />
-              </button>
-
-              <!-- Add/Edit page title -->
-              <button 
-                type="button" 
-                class="pill-action-btn" 
-                :disabled="isCoverSpread"
-                @click="!isCoverSpread ? injectTitle(leftPage) : null" 
-                title="Titre de la page"
-              >
-                <Icon name="lucide:heading" />
-              </button>
-
-              <!-- Enveloping propagate / full wrap -->
-              <button 
-                type="button" 
-                class="pill-action-btn" 
-                @click="isCoverSpread ? toggleFullWrap(!isFullWrapCover) : propagateEnveloping(leftPage, rightPage)" 
-                :disabled="!isCoverSpread && !rightPage" 
-                :title="isCoverSpread ? (isFullWrapCover ? 'Séparer en 2' : 'Rendre Enveloppante') : 'Rendre Enveloppante'"
-              >
-                <Icon :name="isCoverSpread && isFullWrapCover ? 'lucide:columns' : 'lucide:book-open'" />
-              </button>
-
-              <!-- Delete cover style / page style -->
-              <button 
-                type="button" 
-                class="pill-action-btn text-red-500 hover:bg-red-50" 
-                @click="isCoverSpread ? onDeleteBackCover() : retirePageStyle(leftPage)" 
-                title="Retirer le style"
-              >
-                <Icon name="lucide:trash-2" />
-              </button>
-            </template>
-            <div v-else class="text-xs text-gray-300 font-sans italic">Page de gauche vide</div>
-          </div>
-
-          <!-- RIGHT TOOLBAR (Page de Droite / Front Cover) -->
-          <div class="horizontal-toolbar-pill flex items-center gap-3 bg-white border border-gray-100 rounded-full shadow-md py-1.5 px-4 flex-1 justify-center min-h-[46px]">
-            <div v-if="!isCoverSpread && rightPage && isPageRestricted(rightPage.id)" class="flex items-center gap-2 text-gray-400 font-sans text-xs font-semibold py-1 px-3">
-              <Icon name="lucide:lock" class="text-sm text-gray-300" />
-              <span>Garde verrouillée</span>
-            </div>
-            <template v-else-if="isCoverSpread || rightPage">
-              <!-- Color Picker -->
-              <button 
-                type="button" 
-                class="color-dot-btn" 
-                :style="{ backgroundColor: isCoverSpread ? (activeAlbum?.cover_color || '#3d352e') : (rightPage?.background_color || '#ffffff') }" 
-                @click="isCoverSpread ? triggerAlbumColorPicker() : triggerRightColorPicker()"
-                :title="isCoverSpread ? 'Couleur de couverture' : 'Couleur de page (Droite)'"
-              ></button>
-
-              <!-- Layout toggle -->
-              <button 
-                type="button" 
-                class="pill-action-btn" 
-                :class="{ 'active': !isCoverSpread && rightPage?.layout_type === 'text-only' }" 
-                :disabled="isCoverSpread"
-                @click="!isCoverSpread ? togglePageLayout(rightPage) : null" 
-                title="Mode texte/photo"
-              >
-                <Icon name="lucide:align-left" />
-              </button>
-
-              <!-- Adjust slots count -->
-              <button 
-                type="button" 
-                class="pill-action-btn" 
-                :disabled="isCoverSpread || rightPage?.layout_type === 'text-only'"
-                @click="!isCoverSpread ? cycleSlots(rightPage) : null" 
-                title="Nombre de photos"
-              >
-                <Icon name="lucide:image" />
-              </button>
-
-              <!-- Add/Edit page title -->
-              <button 
-                type="button" 
-                class="pill-action-btn" 
-                :disabled="isCoverSpread"
-                @click="!isCoverSpread ? injectTitle(rightPage) : null" 
-                title="Titre de la page"
-              >
-                <Icon name="lucide:heading" />
-              </button>
-
-              <!-- Enveloping propagate / full wrap -->
-              <button 
-                type="button" 
-                class="pill-action-btn" 
-                @click="isCoverSpread ? toggleFullWrap(!isFullWrapCover) : propagateEnveloping(rightPage, leftPage)" 
-                :disabled="!isCoverSpread && !leftPage" 
-                :title="isCoverSpread ? (isFullWrapCover ? 'Séparer en 2' : 'Rendre Enveloppante') : 'Rendre Enveloppante'"
-              >
-                <Icon :name="isCoverSpread && isFullWrapCover ? 'lucide:columns' : 'lucide:book-open'" />
-              </button>
-
-              <!-- Delete cover style / page style -->
-              <button 
-                type="button" 
-                class="pill-action-btn text-red-500 hover:bg-red-50" 
-                @click="isCoverSpread ? onDeleteCover() : retirePageStyle(rightPage)" 
-                title="Retirer le style"
-              >
-                <Icon name="lucide:trash-2" />
-              </button>
-            </template>
-            <div v-else class="text-xs text-gray-300 font-sans italic">Page de droite vide</div>
-          </div>
-        </div>
-
         <!-- Suggest background color automatically -->
         <div class="auto-color-spread-control-row" v-if="!isCoverSpread && (leftPage || rightPage)">
           <button 
@@ -252,6 +176,81 @@
           </button>
         </div>
 
+      </div>
+
+      <!-- RIGHT VERTICAL TOOLBAR (Page de Droite / Front Cover) -->
+      <div class="vertical-pill-toolbar select-none">
+        <div v-if="!isCoverSpread && rightPage && isPageRestricted(rightPage.id)" class="flex flex-col items-center justify-center text-gray-400 font-sans text-xs font-semibold p-1" title="Garde verrouillée">
+          <Icon name="lucide:lock" class="text-sm text-gray-300" />
+        </div>
+        <template v-else-if="isCoverSpread || rightPage">
+          <!-- Color Picker -->
+          <button 
+            type="button" 
+            class="color-dot-btn" 
+            :style="{ backgroundColor: isCoverSpread ? (activeAlbum?.cover_color || '#3d352e') : (rightPage?.background_color || '#ffffff') }" 
+            @click="isCoverSpread ? triggerAlbumColorPicker() : triggerRightColorPicker()"
+            :title="isCoverSpread ? 'Couleur de couverture' : 'Couleur de page (Droite)'"
+          ></button>
+
+          <!-- Layout toggle -->
+          <button 
+            type="button" 
+            class="pill-action-btn" 
+            :class="{ 'active': !isCoverSpread && rightPage?.layout_type === 'text-only' }" 
+            :disabled="isCoverSpread"
+            @click="!isCoverSpread ? togglePageLayout(rightPage) : null" 
+            title="Mode texte/photo"
+          >
+            <Icon name="lucide:align-left" />
+          </button>
+
+          <!-- Adjust slots count -->
+          <button 
+            type="button" 
+            class="pill-action-btn" 
+            :disabled="isCoverSpread || rightPage?.layout_type === 'text-only'"
+            @click="!isCoverSpread ? cycleSlots(rightPage) : null" 
+            title="Nombre de photos"
+          >
+            <Icon name="lucide:image" />
+          </button>
+
+          <!-- Add/Edit page title -->
+          <button 
+            type="button" 
+            class="pill-action-btn" 
+            :disabled="isCoverSpread"
+            @click="!isCoverSpread ? injectTitle(rightPage) : null" 
+            title="Titre de la page"
+          >
+            <Icon name="lucide:heading" />
+          </button>
+
+          <!-- Enveloping propagate / full wrap -->
+          <button 
+            type="button" 
+            class="pill-action-btn" 
+            @click="isCoverSpread ? toggleFullWrap(!isFullWrapCover) : propagateEnveloping(rightPage, leftPage)" 
+            :disabled="!isCoverSpread && !leftPage" 
+            :title="isCoverSpread ? (isFullWrapCover ? 'Séparer en 2' : 'Rendre Enveloppante') : 'Rendre Enveloppante'"
+          >
+            <Icon :name="isCoverSpread && isFullWrapCover ? 'lucide:columns' : 'lucide:book-open'" />
+          </button>
+
+          <!-- Delete cover style / page style -->
+          <button 
+            type="button" 
+            class="pill-action-btn text-red-500 hover:bg-red-50" 
+            @click="isCoverSpread ? onDeleteCover() : retirePageStyle(rightPage)" 
+            title="Retirer le style"
+          >
+            <Icon name="lucide:trash-2" />
+          </button>
+        </template>
+        <div v-else class="text-[10px] text-gray-300 font-sans italic flex flex-col items-center" title="Page de droite vide">
+          <Icon name="lucide:image-off" class="text-sm" />
+        </div>
       </div>
 
       <!-- Next page arrow -->
