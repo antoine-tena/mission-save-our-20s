@@ -8,7 +8,11 @@
 
       <div class="book-and-controls-stack flex-1">
         <!-- 3D Book spread frame -->
-        <div class="book-container" :class="{ 'flipping-next': isFlipping && flipDirection === 'next', 'flipping-prev': isFlipping && flipDirection === 'prev' }">
+        <div 
+          class="book-container" 
+          :class="{ 'flipping-next': isFlipping && flipDirection === 'next', 'flipping-prev': isFlipping && flipDirection === 'prev' }"
+          :style="{ backgroundColor: activeAlbum?.cover_color || '#3d352e' }"
+        >
           <div class="spine-line" v-if="!(activePageIdx === 0 && isFullWrapCover)"></div>
           <div class="spine-glow" v-if="!(activePageIdx === 0 && isFullWrapCover)"></div>
           <div class="book-pages-spread">
@@ -45,7 +49,7 @@
               <!-- Regular interior left page -->
               <div v-else-if="leftPage" class="book-page left-page" :style="{ backgroundColor: leftPage.background_color || '#ffffff' }">
                 <div class="page-corner-fold-left"></div>
-                <AlbumBookPageHeader :page="leftPage" :page-num="activePageIdx - 1" />
+                <AlbumBookPageHeader :page="leftPage" />
                 <AlbumBookPageContent :page="leftPage" />
               </div>
               
@@ -71,11 +75,11 @@
               <!-- Regular interior right page -->
               <div v-else-if="rightPage" class="book-page right-page relative" :style="{ backgroundColor: rightPage.background_color || '#ffffff' }">
                 <div class="page-corner-fold-right"></div>
-                <AlbumBookPageHeader :page="rightPage" :page-num="activePageIdx" />
+                <AlbumBookPageHeader :page="rightPage" />
                 <AlbumBookPageContent :page="rightPage" />
 
                 <!-- Floating page controls overlay for rightPage -->
-                <div class="cover-overlay-minimal right-overlay flex gap-2">
+                <div class="cover-overlay-minimal right-overlay flex flex-col gap-2">
                   <button type="button" class="delete-cover-btn-full-floating" @click.stop="retirePageStyle(rightPage)">
                     <Icon name="lucide:trash-2" /> Retirer
                   </button>
