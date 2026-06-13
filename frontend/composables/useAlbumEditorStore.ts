@@ -1,7 +1,8 @@
 import { useRuntimeConfig, useCookie } from '#app';
 import type { AlbumData } from '~/types/album';
-import { activeAlbum, isLoading, uploadQueue, draggedPhotoId, draggedSourcePageId, isSidebarCollapsed, activeSidebarTab, focusedPhotoId } from './useAlbumEditorState';
+import { activeAlbum, isLoading, uploadQueue, draggedPhotoId, draggedSourcePageId, isSidebarCollapsed, activeSidebarTab, focusedPhotoId, activePageIdx, croppingPhotoId, tempCropScale, canvasZoom } from './useAlbumEditorState';
 import { useAlbumEditorActions } from './useAlbumEditorActions';
+import { useAlbumHistory } from './useAlbumHistory';
 
 export const useAlbumEditorStore = () => {
   const config = useRuntimeConfig();
@@ -11,6 +12,8 @@ export const useAlbumEditorStore = () => {
   const actions = useAlbumEditorActions();
 
   const updateAlbumTitle = async (albumId: number, title: string) => {
+    const { recordHistory } = useAlbumHistory();
+    recordHistory();
     if (activeAlbum.value && activeAlbum.value.id === albumId) activeAlbum.value.title = title;
     try {
       await $fetch(`${apiBase}/photos/albums/${albumId}/`, { method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { title } });
@@ -18,6 +21,8 @@ export const useAlbumEditorStore = () => {
   };
 
   const updateAlbumCover = async (albumId: number, isBackCover: boolean, file: File) => {
+    const { recordHistory } = useAlbumHistory();
+    recordHistory();
     try {
       const fd = new FormData();
       fd.append(isBackCover ? 'back_cover_photo' : 'cover_photo', file);
@@ -30,6 +35,8 @@ export const useAlbumEditorStore = () => {
   };
 
   const updateAlbumField = async (albumId: number, field: string, value: any) => {
+    const { recordHistory } = useAlbumHistory();
+    recordHistory();
     if (activeAlbum.value && activeAlbum.value.id === albumId) (activeAlbum.value as any)[field] = value;
     try {
       await $fetch(`${apiBase}/photos/albums/${albumId}/`, { method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { [field]: value } });
@@ -37,6 +44,8 @@ export const useAlbumEditorStore = () => {
   };
 
   const updatePhotoCrop = async (photoId: number, cropX: number, cropY: number, cropScale: number, customWidth: number | null = null, customHeight: number | null = null) => {
+    const { recordHistory } = useAlbumHistory();
+    recordHistory();
     if (activeAlbum.value) {
       for (const page of activeAlbum.value.pages) {
         const photo = page.photos.find(p => p.id === photoId);
@@ -56,6 +65,8 @@ export const useAlbumEditorStore = () => {
   };
 
   const updatePhotoPosition = async (photoId: number, customX: number | null, customY: number | null, customWidth: number | null = null, customHeight: number | null = null) => {
+    const { recordHistory } = useAlbumHistory();
+    recordHistory();
     if (activeAlbum.value) {
       for (const page of activeAlbum.value.pages) {
         const photo = page.photos.find(p => p.id === photoId);
@@ -79,7 +90,11 @@ export const useAlbumEditorStore = () => {
   };
 
   const fetchAlbumDetail = async (id: number, silent = false) => {
-    if (!silent) isLoading.value = true;
+    if (!silent) {
+      isLoading.value = true;
+      const { clearHistory } = useAlbumHistory();
+      clearHistory();
+    }
     try {
       const data = await $fetch<AlbumData>(`${apiBase}/photos/albums/${id}/?t=${Date.now()}`, { headers: { Authorization: `Token ${token.value}` } });
       activeAlbum.value = data;
@@ -96,7 +111,7 @@ export const useAlbumEditorStore = () => {
   };
 
   return {
-    activeAlbum, isLoading, uploadQueue, draggedPhotoId, draggedSourcePageId, isSidebarCollapsed, activeSidebarTab, focusedPhotoId,
+    activeAlbum, isLoading, uploadQueue, draggedPhotoId, draggedSourcePageId, isSidebarCollapsed, activeSidebarTab, focusedPhotoId, activePageIdx, croppingPhotoId, tempCropScale, canvasZoom,
     fetchAlbumDetail, updateAlbumTitle, updateAlbumCover, updateAlbumField, updatePhotoCrop, updatePhotoPosition, isPageRestricted,
     ...actions
   };

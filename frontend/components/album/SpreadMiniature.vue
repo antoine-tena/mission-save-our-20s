@@ -4,16 +4,16 @@
     :class="isActive ? 'border-indigo-600 ring-2 ring-indigo-100 shadow-md' : 'border-gray-200 hover:border-indigo-300'"
     @click="$emit('select')"
   >
-    <div class="mini-pages flex gap-0.5 h-[70px] w-[102px] overflow-hidden rounded bg-gray-100">
+    <div class="mini-pages flex gap-0.5 h-[55px] w-[82px] overflow-hidden rounded bg-gray-100">
       
       <!-- 1. FULL-WRAP COVER SPREAD PREVIEW (isCover and isFullWrapCover is active) -->
       <div 
         v-if="isCover && isFullWrapCover"
         class="mini-page-scaled-wrapper" 
-        :style="{ width: '102px', backgroundColor: activeAlbum?.cover_color || '#3d352e' }"
+        :style="{ width: '82px', backgroundColor: activeAlbum?.cover_color || '#3d352e' }"
       >
-        <div class="mini-page-scaled-content" style="width: 640px; transform: scale(0.159375); transform-origin: top left;">
-          <div class="studio-book-cover-wrapper" style="width: 640px;">
+        <div class="mini-page-scaled-content" style="width: 800px; transform: scale(0.1025); transform-origin: top left;">
+          <div class="studio-book-cover-wrapper" style="width: 800px;">
             <div class="spine-line-cover"></div>
             <div class="spine-glow-cover"></div>
             <div v-if="activeAlbum?.show_cover_photo" class="book-cover-image">
@@ -54,12 +54,12 @@
         <div 
           v-else
           class="mini-page-scaled-wrapper border-r border-gray-200" 
-          :style="{ backgroundColor: spread.leftPage?.background_color || '#ffffff' }"
+          :style="{ backgroundColor: isPageRestricted(spread.leftPage?.id) ? '#ffffff' : (spread.leftPage?.background_color || '#ffffff') }"
         >
           <div 
             v-if="spread.leftPage"
             class="mini-page-scaled-content-page" 
-            :style="{ backgroundColor: spread.leftPage.background_color || '#ffffff' }"
+            :style="{ backgroundColor: isPageRestricted(spread.leftPage.id) ? '#ffffff' : (spread.leftPage.background_color || '#ffffff') }"
           >
             <AlbumBookPageHeader :page="spread.leftPage" />
             <AlbumBookPageContent :page="spread.leftPage" :readonly="true" />
@@ -92,12 +92,12 @@
         <div 
           v-else
           class="mini-page-scaled-wrapper" 
-          :style="{ backgroundColor: spread.rightPage ? (spread.rightPage.background_color || '#ffffff') : '#ffffff' }"
+          :style="{ backgroundColor: isPageRestricted(spread.rightPage?.id) ? '#ffffff' : (spread.rightPage ? (spread.rightPage.background_color || '#ffffff') : '#ffffff') }"
         >
           <div 
             v-if="spread.rightPage" 
             class="mini-page-scaled-content-page" 
-            :style="{ backgroundColor: spread.rightPage.background_color || '#ffffff' }"
+            :style="{ backgroundColor: isPageRestricted(spread.rightPage.id) ? '#ffffff' : (spread.rightPage.background_color || '#ffffff') }"
           >
             <AlbumBookPageHeader :page="spread.rightPage" />
             <AlbumBookPageContent :page="spread.rightPage" :readonly="true" />
@@ -125,27 +125,16 @@ const props = defineProps<{
 
 const emit = defineEmits(['select']);
 
-const { activeAlbum } = useAlbumEditorStore();
-
-const isFullWrapCover = computed(() => {
-  return activeAlbum.value?.is_full_wrap === true;
-});
-
-const isBeginningCover = computed(() => {
-  return props.idx === 0;
-});
-
+const { activeAlbum, isPageRestricted } = useAlbumEditorStore();
+const isFullWrapCover = computed(() => activeAlbum.value?.is_full_wrap === true);
+const isBeginningCover = computed(() => props.idx === 0);
 const isEndCover = computed(() => {
   if (!activeAlbum.value) return false;
   const pagesCount = activeAlbum.value.pages?.length || 0;
   const totalSpreads = 2 + Math.ceil(pagesCount / 2);
   return props.idx === totalSpreads - 1;
 });
-
-const isCover = computed(() => {
-  return isBeginningCover.value || isEndCover.value;
-});
-
+const isCover = computed(() => isBeginningCover.value || isEndCover.value);
 const spreadLabel = (idx: number, spread: any) => {
   if (isCover.value) return 'Garde';
   return `P. ${(idx * 2) - 1} / ${idx * 2}`;

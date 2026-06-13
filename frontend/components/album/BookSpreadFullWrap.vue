@@ -1,7 +1,7 @@
 <template>
   <div 
     class="book-page full-wrap-cover-page"
-    :style="{ gridColumn: 'span 2', width: '640px', height: '440px', backgroundColor: activeAlbum?.cover_color || '#3d352e' }"
+    :style="{ gridColumn: 'span 2', width: '800px', height: '520px', backgroundColor: activeAlbum?.cover_color || '#3d352e' }"
   >
     <div 
       class="studio-book-cover-wrapper full-wrap"

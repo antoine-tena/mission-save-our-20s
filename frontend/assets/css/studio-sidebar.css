@@ -1,0 +1,32 @@
+.studio-sidebar {
+  border: 4px solid #8b5cf6 !important; /* Purple 500: Sidebar Outer */
+}
+
+.sidebar-rename-block {
+  border: 2px solid #f59e0b !important; /* Amber 500: Rename Block */
+  margin: 4px;
+  border-radius: 8px;
+}
+
+.sidebar-nav-tabs {
+  border: 2px solid #ec4899 !important; /* Pink 500: Navigation Tabs */
+  margin: 4px;
+  border-radius: 8px;
+}
+
+.sidebar-active-panel {
+  border: 2.5px solid #10b981 !important; /* Emerald 500: Active Tab Panel */
+  margin: 4px;
+  border-radius: 8px;
+}
+
+.sidebar-retract-panel {
+  border: 2px solid #06b6d4 !important; /* Cyan 500: Collapse Button Area */
+  margin: 4px;
+  border-radius: 8px;
+}
+
+.tab-btn {
+  outline: none;
+  cursor: pointer;
+}

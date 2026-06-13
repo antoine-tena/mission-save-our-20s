@@ -21,9 +21,6 @@
       </div>
       <div v-if="!isCropping" class="cover-wash" :style="washStyle"></div>
     </div>
-
-    <!-- Crop Controls Overlay -->
-    <AlbumCropToolbar v-if="isCropping" v-model="tempCropScale" style="bottom: 16px; left: 16px; right: 16px;" />
   </div>
 </template>
 

@@ -1,7 +1,14 @@
 <template>
-  <div class="crop-toolbar flex flex-col gap-1.5 p-2 bg-white/95 backdrop-blur-xs rounded-lg shadow-lg border border-gray-100" @click.stop>
-    <div class="flex items-center gap-2">
-      <Icon name="lucide:zoom-in" class="text-xs text-gray-400" />
+  <div class="crop-toolbar flex items-center gap-4 py-2.5 px-4 bg-white border border-gray-100 rounded-full shadow-lg" @click.stop>
+    <div class="flex items-center gap-2 flex-shrink-0 select-none">
+      <span class="text-[10px] font-extrabold text-indigo-600 bg-indigo-50 rounded-full px-2.5 py-0.5 uppercase tracking-wider flex items-center gap-1">
+        <Icon name="lucide:crop" class="text-xs" /> Recadrage
+      </span>
+    </div>
+
+    <!-- Zoom Slider Section -->
+    <div class="flex items-center gap-2 w-48 border-r border-gray-100 pr-4">
+      <Icon name="lucide:zoom-in" class="text-sm text-gray-400" />
       <input 
         type="range" 
         :value="modelValue"
@@ -11,13 +18,18 @@
         step="0.05" 
         class="crop-zoom-slider flex-1 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
       />
-      <span class="text-[9px] font-bold text-gray-500 w-8 text-right">{{ Math.round(modelValue * 100) }}%</span>
+      <span class="text-[10px] font-bold text-gray-600 w-10 text-right">{{ Math.round(modelValue * 100) }}%</span>
     </div>
-    <div class="flex items-center justify-between gap-2 mt-1">
-      <span class="text-[8px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-0.5 select-none">
-        <Icon name="lucide:move" /> Glissez pour déplacer
+
+    <!-- Help Info Section -->
+    <div class="flex items-center gap-4 text-[10px] text-gray-400 select-none">
+      <span class="flex items-center gap-1 font-bold text-gray-500 uppercase tracking-wide">
+        <Icon name="lucide:move" class="text-xs text-indigo-400" /> Glissez pour déplacer la photo
       </span>
-      <span class="text-[8px] text-gray-400 italic select-none">Cliquez ailleurs pour sauvegarder</span>
+      <span class="text-gray-300">|</span>
+      <span class="italic font-medium text-gray-400 flex items-center gap-1">
+        <Icon name="lucide:mouse-pointer-click" class="text-xs text-indigo-300" /> Cliquez en dehors de la photo pour valider
+      </span>
     </div>
   </div>
 </template>
@@ -30,8 +42,11 @@ defineEmits(['update:modelValue']);
 </script>
 
 <style scoped>
-.crop-toolbar { position: absolute; bottom: 8px; left: 8px; right: 8px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); pointer-events: auto; }
+.crop-toolbar { 
+  pointer-events: auto; 
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
 .crop-zoom-slider { -webkit-appearance: none; outline: none; }
-.crop-zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #6366f1; cursor: pointer; transition: transform 0.1s; }
-.crop-zoom-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
+.crop-zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #6366f1; cursor: pointer; transition: transform 0.1s; }
+.crop-zoom-slider::-webkit-slider-thumb:hover { transform: scale(1.25); }
 </style>

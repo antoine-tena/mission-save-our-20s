@@ -1,11 +1,10 @@
 import { ref, onBeforeUnmount } from 'vue';
 import { useAlbumEditorStore } from './useAlbumEditorStore';
+import { croppingPhotoId, tempCropScale } from './useAlbumEditorState';
 
 export function usePhotoCrop() {
   const { updatePhotoCrop } = useAlbumEditorStore();
-  
-  const croppingPhotoId = ref<number | null>(null);
-  const tempCropX = ref(0); const tempCropY = ref(0); const tempCropScale = ref(1.0);
+  const tempCropX = ref(0); const tempCropY = ref(0);
   const tempWidth = ref(200); const tempHeight = ref(180);
 
   const isDraggingCrop = ref(false);
@@ -23,30 +22,28 @@ export function usePhotoCrop() {
     croppingPhotoId.value = photo.id;
     tempCropX.value = photo.crop_x ?? 0;
     tempCropY.value = photo.crop_y ?? 0;
-    tempCropScale.value = photo.crop_scale ?? 1.0;
+    const rawScale = photo.crop_scale ?? 1.0;
+    tempCropScale.value = rawScale > 0.1 ? rawScale : 1.0;
     
     const frameEl = document.querySelector(selector);
-    if (frameEl) {
-      tempWidth.value = photo.custom_width ?? frameEl.clientWidth;
-      tempHeight.value = photo.custom_height ?? frameEl.clientHeight;
-    } else {
-      tempWidth.value = photo.custom_width ?? 200;
-      tempHeight.value = photo.custom_height ?? 180;
-    }
-    setTimeout(() => window.addEventListener('click', onGlobalClick), 50);
+    let finalW = 200, finalH = 180;
+    if (photo.custom_width && photo.custom_width > 50) finalW = photo.custom_width;
+    else if (frameEl && frameEl.clientWidth > 50) finalW = frameEl.clientWidth;
+    if (photo.custom_height && photo.custom_height > 50) finalH = photo.custom_height;
+    else if (frameEl && frameEl.clientHeight > 50) finalH = frameEl.clientHeight;
+    
+    tempWidth.value = finalW; tempHeight.value = finalH;
+    setTimeout(() => window.addEventListener('click', onGlobalClick), 300);
   };
 
   const onGlobalClick = (e: MouseEvent) => {
     const target = e.target as HTMLElement;
     const activeFrame = document.querySelector('.cropping-active');
-    if (activeFrame && !activeFrame.contains(target)) {
-      saveCrop();
-    }
+    if (activeFrame && !activeFrame.contains(target)) saveCrop();
   };
 
   const onCropMouseDown = (e: MouseEvent) => {
-    e.preventDefault();
-    isDraggingCrop.value = true;
+    e.preventDefault(); isDraggingCrop.value = true;
     dragStartX.value = e.clientX; dragStartY.value = e.clientY;
     initialCropX.value = tempCropX.value; initialCropY.value = tempCropY.value;
     window.addEventListener('mousemove', onCropMouseMove);
@@ -55,8 +52,7 @@ export function usePhotoCrop() {
 
   const onCropMouseMove = (e: MouseEvent) => {
     if (!isDraggingCrop.value) return;
-    const dx = e.clientX - dragStartX.value;
-    const dy = e.clientY - dragStartY.value;
+    const dx = e.clientX - dragStartX.value; const dy = e.clientY - dragStartY.value;
     tempCropX.value = initialCropX.value + (dx / tempCropScale.value);
     tempCropY.value = initialCropY.value + (dy / tempCropScale.value);
   };
@@ -92,10 +88,8 @@ export function usePhotoCrop() {
 
   const saveCrop = async () => {
     if (!activePhotoRef) return;
-    const photoId = activePhotoRef.id;
-    croppingPhotoId.value = null;
+    const photoId = activePhotoRef.id; croppingPhotoId.value = null;
     window.removeEventListener('click', onGlobalClick);
-    
     if (activePhotoRef.is_cover) {
       const { activeAlbum, updateAlbumField } = useAlbumEditorStore();
       if (activeAlbum.value) {
@@ -114,10 +108,10 @@ export function usePhotoCrop() {
     const isCurrentlyCropping = croppingPhotoId.value === photo.id;
     const x = isCurrentlyCropping ? tempCropX.value : (photo.crop_x ?? 0);
     const y = isCurrentlyCropping ? tempCropY.value : (photo.crop_y ?? 0);
-    const scale = isCurrentlyCropping ? tempCropScale.value : (photo.crop_scale ?? 1.0);
+    let scale = isCurrentlyCropping ? tempCropScale.value : (photo.crop_scale ?? 1.0);
+    if (scale < 0.1) scale = 1.0;
     return {
-      transform: `scale(${scale}) translate(${x}px, ${y}px)`,
-      transformOrigin: 'center center',
+      transform: `scale(${scale}) translate(${x}px, ${y}px)`, transformOrigin: 'center center',
       cursor: isCurrentlyCropping ? (isDraggingCrop.value ? 'grabbing' : 'grab') : 'default',
       transition: isCurrentlyCropping ? 'none' : 'transform 0.25s'
     };
@@ -125,23 +119,14 @@ export function usePhotoCrop() {
 
   const cleanup = () => {
     window.removeEventListener('click', onGlobalClick);
-    window.removeEventListener('mousemove', onCropMouseMove);
-    window.removeEventListener('mouseup', onCropMouseUp);
-    window.removeEventListener('mousemove', onResizeMouseMove);
-    window.removeEventListener('mouseup', onResizeMouseUp);
+    window.removeEventListener('mousemove', onCropMouseMove); window.removeEventListener('mouseup', onCropMouseUp);
+    window.removeEventListener('mousemove', onResizeMouseMove); window.removeEventListener('mouseup', onResizeMouseUp);
   };
 
   onBeforeUnmount(cleanup);
 
   return {
-    croppingPhotoId,
-    tempCropScale,
-    tempWidth,
-    tempHeight,
-    startCropping,
-    onCropMouseDown,
-    startResizing,
-    getImageStyle,
-    saveCrop
+    croppingPhotoId, tempCropScale, tempWidth, tempHeight,
+    startCropping, onCropMouseDown, startResizing, getImageStyle, saveCrop
   };
 }

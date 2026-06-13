@@ -1,86 +1,34 @@
-/**
- * Utility to extract dominant/average colors from images and transform them into gorgeous pastel backgrounds.
- */
-
-export interface RGB {
-  r: number;
-  g: number;
-  b: number;
-}
-
-export interface HSL {
-  h: number;
-  s: number;
-  l: number;
-}
-
-export function rgbToHsl(r: number, g: number, b: number): HSL {
-  r /= 255; g /= 255; b /= 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  let h = 0;
-  let s = 0;
-  const l = (max + min) / 2;
-
-  if (max !== min) {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
-    }
-    h /= 6;
-  }
-  return { h: h * 360, s, l };
-}
-
-export function hslToHex(h: number, s: number, l: number): string {
-  s = Math.max(0, Math.min(1, s));
-  l = Math.max(0, Math.min(1, l));
-  const c = (1 - Math.abs(2 * l - 1)) * s;
-  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-  const m = l - c / 2;
-  let r = 0, g = 0, b = 0;
-
-  if (0 <= h && h < 60) { r = c; g = x; b = 0; }
-  else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
-  else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
-  else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
-  else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
-  else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
-
-  const rHex = Math.round((r + m) * 255).toString(16).padStart(2, '0');
-  const gHex = Math.round((g + m) * 255).toString(16).padStart(2, '0');
-  const bHex = Math.round((b + m) * 255).toString(16).padStart(2, '0');
-
-  return `#${rHex}${gHex}${bHex}`;
-}
+import { rgbToHsl, hslToHex } from './colorConverters';
+import type { HSL } from './colorConverters';
 
 /**
- * Loads an image from a URL and extracts its average color.
+ * Loads an image from a URL and extracts its pixel HSL colors.
  */
-export function extractAverageColor(url: string): Promise<RGB> {
-  return new Promise((resolve, reject) => {
+export function extractImagePixels(url: string): Promise<HSL[]> {
+  return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = 'Anonymous';
-    img.src = url;
+    
+    // Bypass browser CORS cache issues by appending a cache bust parameter.
+    const cacheBustUrl = url + (url.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+    img.src = cacheBustUrl;
 
     img.onload = () => {
       try {
         const canvas = document.createElement('canvas');
+        // 16x16 is the perfect compromise between fast pixel reading and accurate color representation
         canvas.width = 16;
         canvas.height = 16;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          resolve({ r: 255, g: 255, b: 255 });
+          resolve([]);
           return;
         }
 
         ctx.drawImage(img, 0, 0, 16, 16);
         const imgData = ctx.getImageData(0, 0, 16, 16).data;
 
-        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+        const pixels: HSL[] = [];
         for (let i = 0; i < imgData.length; i += 4) {
           const r = imgData[i];
           const g = imgData[i + 1];
@@ -88,38 +36,26 @@ export function extractAverageColor(url: string): Promise<RGB> {
           const a = imgData[i + 3];
           
           if (a >= 200) { // Only analyze fully opaque pixels
-            rSum += r;
-            gSum += g;
-            bSum += b;
-            count++;
+            pixels.push(rgbToHsl(r, g, b));
           }
         }
-
-        if (count > 0) {
-          resolve({
-            r: Math.round(rSum / count),
-            g: Math.round(gSum / count),
-            b: Math.round(bSum / count)
-          });
-        } else {
-          resolve({ r: 255, g: 255, b: 255 });
-        }
+        resolve(pixels);
       } catch (err) {
-        console.error('Error drawing image for color analysis:', err);
-        resolve({ r: 255, g: 255, b: 255 });
+        console.error('Error drawing image for color extraction:', err);
+        resolve([]);
       }
     };
 
     img.onerror = (err) => {
-      console.warn('Could not load image for color analysis (CORS or network error):', url, err);
-      // Fallback to white gracefully
-      resolve({ r: 255, g: 255, b: 255 });
+      console.warn('Could not load image for color extraction:', url, err);
+      resolve([]);
     };
   });
 }
 
 /**
  * Calculates the best aesthetic background color (pastel) for a list of image URLs.
+ * Uses a dominant hue histogram clustering algorithm over all pixels of all images on the spread.
  */
 export async function getBestBackgroundForImages(urls: string[]): Promise<string> {
   if (urls.length === 0) {
@@ -127,30 +63,61 @@ export async function getBestBackgroundForImages(urls: string[]): Promise<string
   }
 
   try {
-    const rgbColors = await Promise.all(urls.map(url => extractAverageColor(url)));
-    
-    // Average the colors of all images
-    let rSum = 0, gSum = 0, bSum = 0;
-    for (const color of rgbColors) {
-      rSum += color.r;
-      gSum += color.g;
-      bSum += color.b;
+    const allImagesPixels = await Promise.all(urls.map(url => extractImagePixels(url)));
+    const flatPixels = allImagesPixels.flat();
+
+    if (flatPixels.length === 0) {
+      return '#FFFFFF';
     }
+
+    // Build a histogram of hues (36 bins of 10 degrees each)
+    const binsCount = 36;
+    const hueHistogram = new Array(binsCount).fill(0);
+    const hueValues = new Array(binsCount).fill(0).map(() => [] as number[]);
     
-    const finalR = Math.round(rSum / rgbColors.length);
-    const finalG = Math.round(gSum / rgbColors.length);
-    const finalB = Math.round(bSum / rgbColors.length);
+    let sumS = 0;
+    let sumL = 0;
 
-    // Convert to HSL
-    const { h, s, l } = rgbToHsl(finalR, finalG, finalB);
+    for (const px of flatPixels) {
+      sumS += px.s;
+      sumL += px.l;
 
-    // Make it a beautiful soft pastel color
-    // Saturation around 12% - 18% is ideal for subtle background
-    // Lightness around 95% is perfect for clean, high-end look
-    const pastelS = 0.15; 
-    const pastelL = 0.95;
+      // No pixel-level filtering: bin all pixels directly
+      const binIndex = Math.floor(px.h / 10) % binsCount;
+      hueHistogram[binIndex]++;
+      hueValues[binIndex].push(px.h);
+    }
 
-    return hslToHex(h, pastelS, pastelL);
+    // If the images are mostly neutral or grayscale (very low saturation), return pure white (#FFFFFF)
+    const avgS = sumS / flatPixels.length;
+    if (avgS < 0.15) {
+      return '#FFFFFF';
+    }
+
+    // Find the most dominant hue bin
+    let maxBinIndex = -1;
+    let maxBinCount = 0;
+    for (let i = 0; i < binsCount; i++) {
+      if (hueHistogram[i] > maxBinCount) {
+        maxBinCount = hueHistogram[i];
+        maxBinIndex = i;
+      }
+    }
+
+    let finalH = 0;
+    const pastelS = 0.28;
+    const pastelL = 0.88;
+
+    if (maxBinIndex !== -1 && maxBinCount > 0) {
+      // Calculate the average hue in the winning bin to avoid binned/rounding offsets
+      const winningHues = hueValues[maxBinIndex];
+      const sumH = winningHues.reduce((acc, val) => acc + val, 0);
+      finalH = sumH / winningHues.length;
+    } else {
+      return '#FFFFFF';
+    }
+
+    return hslToHex(finalH, pastelS, pastelL);
   } catch (err) {
     console.error('Failed to calculate best background color:', err);
     return '#FFFFFF';

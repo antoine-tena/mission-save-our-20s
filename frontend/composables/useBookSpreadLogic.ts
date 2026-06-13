@@ -8,7 +8,6 @@ export function useBookSpreadLogic(props: { activePageIdx: number }, emit: any) 
   const flipDirection = ref<'next' | 'prev'>('next');
   const isCoverDragOver = ref(false);
   const isBackCoverDragOver = ref(false);
-  const isAnalyzing = ref(false);
 
   const spreadsList = computed(() => {
     if (!activeAlbum.value) return [];
@@ -43,11 +42,7 @@ export function useBookSpreadLogic(props: { activePageIdx: number }, emit: any) 
   const toggleFullWrap = async (enable: boolean) => {
     if (!activeAlbum.value) return;
     try {
-      const config = useRuntimeConfig();
-      const token = useCookie<string | null>('auth_token');
-      await $fetch(`${config.public.apiBase}/photos/albums/${activeAlbum.value.id}/`, {
-        method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { is_full_wrap: enable }
-      });
+      await updateAlbumField(activeAlbum.value.id, 'is_full_wrap', enable);
       await fetchAlbumDetail(activeAlbum.value.id, true);
     } catch (err) { console.error(err); }
   };
@@ -72,52 +67,6 @@ export function useBookSpreadLogic(props: { activePageIdx: number }, emit: any) 
     } catch (err) { console.error('Failed to propagate enveloping style:', err); }
   };
 
-  // --- ONE-SHOT AUTO COLOR LOGIC FOR DOUBLE PAGE (SPREAD) ---
-  const applySuggestedColor = async () => {
-    if (isAnalyzing.value) return;
-    
-    // Collect all photo urls on this spread
-    const urls: string[] = [];
-    if (leftPage.value?.photos) {
-      for (const p of leftPage.value.photos) {
-        if (p.image_url) urls.push(p.image_url);
-      }
-    }
-    if (rightPage.value?.photos) {
-      for (const p of rightPage.value.photos) {
-        if (p.image_url) urls.push(p.image_url);
-      }
-    }
-
-    if (urls.length === 0) {
-      alert("Ajoutez d'abord des photos sur cette double-page pour pouvoir suggérer automatiquement une couleur de fond !");
-      return;
-    }
-
-    isAnalyzing.value = true;
-    try {
-      const { getBestBackgroundForImages } = await import('~/utils/colorExtractor');
-      const bestColor = await getBestBackgroundForImages(urls);
-
-      if (leftPage.value) {
-        await updatePageField(leftPage.value.id, 'background_color', bestColor);
-      }
-      if (rightPage.value) {
-        await updatePageField(rightPage.value.id, 'background_color', bestColor);
-      }
-
-      if (activeAlbum.value) {
-        await fetchAlbumDetail(activeAlbum.value.id, true);
-      }
-    } catch (err) {
-      console.error('Failed to apply suggested color:', err);
-    } finally {
-      // Artificial delay of 450ms for premium fluid visual feedback
-      await new Promise(r => setTimeout(r, 450));
-      isAnalyzing.value = false;
-    }
-  };
-
   return {
     activeAlbum,
     isFlipping,
@@ -135,8 +84,6 @@ export function useBookSpreadLogic(props: { activePageIdx: number }, emit: any) 
     draggedSourcePageId,
     fetchAlbumDetail,
     retirePageStyle,
-    propagateEnveloping,
-    isAnalyzing,
-    applySuggestedColor
+    propagateEnveloping
   };
 }

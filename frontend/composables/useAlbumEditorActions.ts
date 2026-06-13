@@ -1,6 +1,7 @@
 import { useRuntimeConfig, useCookie } from '#app';
 import type { AlbumData, PageData, PhotoData } from '~/types/album';
 import { activeAlbum, uploadQueue } from './useAlbumEditorState';
+import { useAlbumHistory } from './useAlbumHistory';
 
 export function useAlbumEditorActions() {
   const config = useRuntimeConfig();
@@ -8,6 +9,8 @@ export function useAlbumEditorActions() {
   const token = useCookie<string | null>('auth_token');
 
   const updatePageField = async (pageId: number, field: string, value: any) => {
+    const { recordHistory } = useAlbumHistory();
+    recordHistory();
     if (!activeAlbum.value) return;
     const page = activeAlbum.value.pages.find(p => p.id === pageId);
     if (page) (page as any)[field] = value;
@@ -42,7 +45,7 @@ export function useAlbumEditorActions() {
   const createPage = async (albumId: number) => {
     try {
       const pageResp = await $fetch<PageData>(`${apiBase}/photos/albums/${albumId}/pages/`, {
-        method: 'POST', headers: { Authorization: `Token ${token.value}` }, body: { layout_type: 'scrapbook', title: 'Nouveau Moment' }
+        method: 'POST', headers: { Authorization: `Token ${token.value}` }, body: { album: albumId, layout_type: 'scrapbook', title: 'Nouveau Moment' }
       });
       if (activeAlbum.value) activeAlbum.value.pages.push(pageResp);
       return pageResp;
@@ -68,6 +71,8 @@ export function useAlbumEditorActions() {
   };
 
   const reorderPages = async (albumId: number, orderedIds: number[]) => {
+    const { recordHistory } = useAlbumHistory();
+    recordHistory();
     if (activeAlbum.value) activeAlbum.value.pages.sort((a, b) => orderedIds.indexOf(a.id) - orderedIds.indexOf(b.id));
     try {
       await $fetch(`${apiBase}/photos/albums/${albumId}/reorder/`, {

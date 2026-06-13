@@ -45,6 +45,8 @@ const closeModal = () => {
 const saveCaption = async () => {
   if (props.photo) {
     try {
+      const { recordHistory } = useAlbumHistory();
+      recordHistory();
       const config = useRuntimeConfig();
       const token = useCookie<string | null>('auth_token');
       await $fetch(`${config.public.apiBase}/photos/${props.photo.id}/`, {

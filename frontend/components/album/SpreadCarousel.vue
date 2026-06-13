@@ -12,7 +12,7 @@
       />
 
       <!-- Small Inter-Spread Insertion [+] Button -->
-      <div v-if="idx < spreadsList.length - 1" class="insert-spread-divider px-1.5 flex items-center justify-center">
+      <div v-if="idx >= 1 && idx < spreadsList.length - 2" class="insert-spread-divider px-1.5 flex items-center justify-center">
         <button 
           type="button" 
           class="btn-insert-spread flex items-center justify-center w-6 h-6 rounded-full bg-white border border-gray-200 text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow hover:scale-110"
@@ -75,17 +75,22 @@ const insertSpreadAt = async (insertSpreadIndex: number) => {
     const page1 = await createPage(activeAlbum.value.id);
     const page2 = await createPage(activeAlbum.value.id);
     
+    if (!page1 || !page2) {
+      console.error('Failed to create new pages');
+      return;
+    }
+    
     // Refresh to get latest IDs on backend
     await fetchAlbumDetail(activeAlbum.value.id);
     
-    const allPages = [...activeAlbum.value.pages];
-    // Find the newly appended pages (the last two)
-    const newPages = allPages.slice(-2);
-    const existingPages = allPages.slice(0, -2);
+    // Filter out the two newly created pages to get only pre-existing pages
+    const existingPages = activeAlbum.value.pages.filter(
+      p => p.id !== page1.id && p.id !== page2.id
+    );
     
     // Insert them at the requested spot
     const pageInsertIndex = 2 * insertSpreadIndex - 2;
-    existingPages.splice(pageInsertIndex, 0, newPages[0]!, newPages[1]!);
+    existingPages.splice(pageInsertIndex, 0, page1, page2);
     
     const orderedIds = existingPages.map(p => p.id);
     await reorderPages(activeAlbum.value.id, orderedIds);

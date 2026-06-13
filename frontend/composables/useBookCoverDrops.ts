@@ -12,6 +12,8 @@ export function useBookCoverDrops(state: any) {
   const onDeleteCover = async () => {
     if (confirm('Retirer le style/photo de couverture ?')) {
       try {
+        const { recordHistory } = useAlbumHistory();
+        recordHistory();
         const config = useRuntimeConfig();
         const token = useCookie<string | null>('auth_token');
         const body: any = { cover_photo_id: null, cover_color: '#3d352e' };
@@ -29,6 +31,8 @@ export function useBookCoverDrops(state: any) {
   const onDeleteBackCover = async () => {
     if (confirm('Retirer le style/photo de couverture de fin ?')) {
       try {
+        const { recordHistory } = useAlbumHistory();
+        recordHistory();
         const config = useRuntimeConfig();
         const token = useCookie<string | null>('auth_token');
         await $fetch(`${config.public.apiBase}/photos/albums/${activeAlbum.value?.id}/`, {
@@ -46,6 +50,8 @@ export function useBookCoverDrops(state: any) {
     const photoId = parseInt(droppedIdRaw, 10);
     if (!activeAlbum.value) return;
     try {
+      const { recordHistory } = useAlbumHistory();
+      recordHistory();
       const config = useRuntimeConfig();
       const token = useCookie<string | null>('auth_token');
       if (draggedSourcePageId.value !== null && draggedPhotoId.value !== null) {
@@ -67,6 +73,8 @@ export function useBookCoverDrops(state: any) {
     const photoId = parseInt(droppedIdRaw, 10);
     if (!activeAlbum.value) return;
     try {
+      const { recordHistory } = useAlbumHistory();
+      recordHistory();
       const config = useRuntimeConfig();
       const token = useCookie<string | null>('auth_token');
       if (draggedSourcePageId.value !== null && draggedPhotoId.value !== null) {
@@ -88,6 +96,8 @@ export function useBookCoverDrops(state: any) {
     const photoId = parseInt(droppedIdRaw, 10);
     if (!activeAlbum.value) return;
     try {
+      const { recordHistory } = useAlbumHistory();
+      recordHistory();
       const config = useRuntimeConfig();
       const token = useCookie<string | null>('auth_token');
       if (draggedSourcePageId.value !== null && draggedPhotoId.value !== null) {
