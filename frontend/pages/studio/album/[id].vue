@@ -41,9 +41,13 @@ const route = useRoute();
 const albumId = computed(() => parseInt(route.params.id as string));
 
 const { photos, fetchPhotos } = usePhotos();
-const { activeAlbum, isLoading: isAlbumLoading, fetchAlbumDetail, createPage } = useAlbumEditorStore();
+const store = useAlbumEditorStore();
+const { activeAlbum, isLoading: isAlbumLoading, fetchAlbumDetail, createPage } = store;
 
-const activePageIdx = ref(0);
+const activePageIdx = computed({
+  get: () => store.activePageIdx.value,
+  set: (val) => { store.activePageIdx.value = val; }
+});
 
 const maxPageIdx = computed(() => {
   if (!activeAlbum.value) return 0;
