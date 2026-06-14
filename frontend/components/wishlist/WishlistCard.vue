@@ -68,6 +68,7 @@ const statusLabel = computed(() => {
 
 .is-favorite {
   border: 2px solid var(--clr-primary-400);
+  box-shadow: 0 10px 25px rgba(202, 117, 214, 0.15);
 }
 
 .card-header {
