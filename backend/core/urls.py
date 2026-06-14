@@ -11,7 +11,7 @@ from photos.views import (
     AlbumListCreateView, AlbumDetailDeleteUpdateView,
     AlbumPageListCreateView, AlbumPageDetailDeleteUpdateView,
     AlbumPageReorderView, AlbumPhotoUploadView,
-    AlbumAutoGenerateView
+    AlbumAutoGenerateView, AlbumPageMagicFillView
 )
 from . import auth_views
 from cinema.views import MovieListCreateView, MovieDetailView, MovieTMDBSearchView
@@ -51,6 +51,7 @@ urlpatterns = [
     path('api/photos/albums/<int:album_id>/pages/', AlbumPageListCreateView.as_view()),
     path('api/photos/pages/<int:pk>/', AlbumPageDetailDeleteUpdateView.as_view()),
     path('api/photos/pages/<int:page_id>/upload/', AlbumPhotoUploadView.as_view()),
+    path('api/photos/pages/<int:page_id>/magic-fill/', AlbumPageMagicFillView.as_view()),
     path('api/health/', HealthCheckView.as_view()),
 
     # Social

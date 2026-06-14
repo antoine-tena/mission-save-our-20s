@@ -39,6 +39,9 @@ class Album(models.Model):
         ordering = ['-created_at']
         verbose_name = "Album"
         verbose_name_plural = "Albums"
+        indexes = [
+            models.Index(fields=['user', '-created_at']),
+        ]
 
     def __str__(self) -> str:
         return self.title
@@ -75,6 +78,9 @@ class AlbumPage(models.Model):
         ordering = ['order']
         verbose_name = "Page d'Album"
         verbose_name_plural = "Pages d'Album"
+        indexes = [
+            models.Index(fields=['album', 'order']),
+        ]
 
     def __str__(self) -> str:
         return f"Page {self.order} de {self.album.title}"
@@ -88,6 +94,11 @@ class Photo(models.Model):
     image = models.ImageField(
         upload_to=photo_upload_path,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])]
+    )
+    thumbnail = models.ImageField(
+        upload_to=photo_upload_path, 
+        null=True, 
+        blank=True
     )
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
@@ -105,9 +116,49 @@ class Photo(models.Model):
         ordering = ['order', '-date_creation']
         verbose_name = "Photo"
         verbose_name_plural = "Photos"
+        indexes = [
+            models.Index(fields=['page', 'order']),
+            models.Index(fields=['author', '-date_creation']),
+        ]
+        constraints = [
+            models.CheckConstraint(check=models.Q(crop_scale__gt=0.0), name='check_photo_crop_scale_positive')
+        ]
 
     def __str__(self) -> str:
         return self.titre or self.caption or f"Photo {self.id}"
+
+    def make_thumbnail(self):
+        """Créer une miniature 400x400 via Pillow."""
+        if not self.image:
+            return
+
+        from io import BytesIO
+        from django.core.files.base import ContentFile
+        
+        img = Image.open(self.image)
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+            
+        img.thumbnail((400, 400), Image.Resampling.LANCZOS)
+        
+        thumb_io = BytesIO()
+        img.save(thumb_io, format='JPEG', quality=85)
+        
+        filename = os.path.basename(self.image.name)
+        thumb_filename = f"thumb_{filename}"
+        if not thumb_filename.lower().endswith('.jpg'):
+            thumb_filename = f"{os.path.splitext(thumb_filename)[0]}.jpg"
+            
+        self.thumbnail.save(thumb_filename, ContentFile(thumb_io.getvalue()), save=False)
+
+    def save(self, *args, **kwargs):
+        # Générer la miniature si elle n'existe pas et qu'une image est présente
+        if self.image and not self.thumbnail:
+            try:
+                self.make_thumbnail()
+            except Exception as e:
+                print(f"Erreur génération miniature: {e}")
+        super().save(*args, **kwargs)
 
     def _get_gps_info(self, exif_data: dict) -> dict:
         """Filtre et décode les tags GPS de l'EXIF."""

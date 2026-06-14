@@ -8,6 +8,7 @@ from django.db import transaction
 from .models import Photo, Album, AlbumPage
 from .serializers import PhotoSerializer, AlbumSerializer, AlbumPageSerializer
 from rest_framework.request import Request
+from rest_framework.pagination import PageNumberPagination
 from typing import Any
 
 class PhotoListCreateView(APIView):
@@ -23,8 +24,12 @@ class PhotoListCreateView(APIView):
             if p.image.name not in seen_images:
                 seen_images.add(p.image.name)
                 unique_photos.append(p)
-        serializer = PhotoSerializer(unique_photos, many=True, context={'request': request})
-        return Response(serializer.data)
+                
+        paginator = PageNumberPagination()
+        paginator.page_size = 50
+        result_page = paginator.paginate_queryset(unique_photos, request)
+        serializer = PhotoSerializer(result_page, many=True, context={'request': request})
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request: Request) -> Response:
         serializer = PhotoSerializer(data=request.data, context={'request': request})
@@ -96,9 +101,12 @@ class AlbumListCreateView(APIView):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get(self, request: Request) -> Response:
-        albums = Album.objects.filter(user=request.user).prefetch_related('pages__photos')
-        serializer = AlbumSerializer(albums, many=True, context={'request': request})
-        return Response(serializer.data)
+        albums = Album.objects.filter(user=request.user).prefetch_related('pages__photos__author')
+        paginator = PageNumberPagination()
+        paginator.page_size = 50
+        result_page = paginator.paginate_queryset(albums, request)
+        serializer = AlbumSerializer(result_page, many=True, context={'request': request})
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request: Request) -> Response:
         serializer = AlbumSerializer(data=request.data, context={'request': request})
@@ -113,7 +121,7 @@ class AlbumDetailDeleteUpdateView(APIView):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_object(self, pk: int, user: Any) -> Album:
-        return get_object_or_404(Album.objects.prefetch_related('pages__photos'), pk=pk, user=user)
+        return get_object_or_404(Album.objects.prefetch_related('pages__photos__author'), pk=pk, user=user)
 
     def get(self, request: Request, pk: int) -> Response:
         album = self.get_object(pk, request.user)
@@ -154,12 +162,13 @@ class AlbumPageListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, album_id: int) -> Response:
-        pages = AlbumPage.objects.filter(album__id=album_id, album__user=request.user).prefetch_related('photos')
+        pages = AlbumPage.objects.filter(album__id=album_id, album__user=request.user).prefetch_related('photos__author')
         serializer = AlbumPageSerializer(pages, many=True, context={'request': request})
         return Response(serializer.data)
 
+    @transaction.atomic
     def post(self, request: Request, album_id: int) -> Response:
-        album = get_object_or_404(Album, id=album_id, user=request.user)
+        album = get_object_or_404(Album.objects.select_for_update(), id=album_id, user=request.user)
         order = AlbumPage.objects.filter(album=album).count()
         
         # Alternating default layout grid-1 to grid-4
@@ -215,8 +224,18 @@ class AlbumPageReorderView(APIView):
         if not isinstance(page_ids, list):
             return Response({'error': 'page_ids must be a list'}, status=status.HTTP_400_BAD_REQUEST)
         
+        pages_to_update = []
+        pages = AlbumPage.objects.filter(id__in=page_ids, album=album)
+        page_dict = {p.id: p for p in pages}
+        
         for idx, page_id in enumerate(page_ids):
-            AlbumPage.objects.filter(id=page_id, album=album).update(order=idx)
+            if page_id in page_dict:
+                p = page_dict[page_id]
+                p.order = idx
+                pages_to_update.append(p)
+                
+        if pages_to_update:
+            AlbumPage.objects.bulk_update(pages_to_update, ['order'])
             
         return Response({'status': 'reordered'})
 
@@ -287,4 +306,49 @@ class AlbumAutoGenerateView(APIView):
 
         serializer = AlbumSerializer(created_albums, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class AlbumPageMagicFillView(APIView):
+    """Assigne automatiquement des photos libres à une page de l'album."""
+    permission_classes = [IsAuthenticated]
+
+    @transaction.atomic
+    def post(self, request: Request, page_id: int) -> Response:
+        page = get_object_or_404(AlbumPage, id=page_id, album__user=request.user)
+        
+        # Déterminer la capacité en fonction du layout
+        layout = page.layout_type
+        if layout.startswith('grid-'):
+            try:
+                capacity = int(layout.split('-')[1])
+            except ValueError:
+                capacity = 4
+        elif layout == 'full':
+            capacity = 1
+        elif layout == 'scrapbook':
+            capacity = 2
+        elif layout == 'mosaic':
+            capacity = 3
+        else:
+            capacity = 4
+            
+        current_count = Photo.objects.filter(page=page).count()
+        remaining_slots = capacity - current_count
+        
+        if remaining_slots <= 0:
+            return Response({'error': 'La page est déjà pleine pour ce layout.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        free_photos = Photo.objects.filter(page__isnull=True).order_by('date_creation')[:remaining_slots]
+        if not free_photos:
+            return Response({'error': 'Aucune photo libre disponible dans la bibliothèque.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        photos_to_update = []
+        for p in free_photos:
+            p.page = page
+            p.order = current_count
+            current_count += 1
+            photos_to_update.append(p)
+            
+        Photo.objects.bulk_update(photos_to_update, ['page', 'order'])
+        return Response({'message': f'{len(photos_to_update)} photos assignées !'}, status=status.HTTP_200_OK)
 

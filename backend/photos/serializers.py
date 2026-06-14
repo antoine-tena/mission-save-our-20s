@@ -5,13 +5,14 @@ from typing import Optional, Any
 
 class PhotoSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
     author_name = serializers.ReadOnlyField(source='author.username')
 
     class Meta:
         model = Photo
         fields = [
             'id', 'author', 'author_name', 'page', 'titre', 'description', 
-            'caption', 'image', 'image_url', 'latitude', 'longitude', 'order',
+            'caption', 'image', 'image_url', 'thumbnail', 'thumbnail_url', 'latitude', 'longitude', 'order',
             'crop_x', 'crop_y', 'crop_scale', 'custom_width', 'custom_height',
             'custom_x', 'custom_y', 'date_creation'
         ]
@@ -22,7 +23,19 @@ class PhotoSerializer(serializers.ModelSerializer):
     def get_image_url(self, obj: Photo) -> Optional[str]:
         request = self.context.get('request')
         if obj.image and request:
-            return request.build_absolute_uri(obj.image.url)
+            try:
+                return request.build_absolute_uri(obj.image.url)
+            except ValueError:
+                return None
+        return None
+
+    def get_thumbnail_url(self, obj: Photo) -> Optional[str]:
+        request = self.context.get('request')
+        if obj.thumbnail and request:
+            try:
+                return request.build_absolute_uri(obj.thumbnail.url)
+            except ValueError:
+                return None
         return None
 
 class AlbumPageSerializer(serializers.ModelSerializer):
@@ -61,11 +74,17 @@ class AlbumSerializer(serializers.ModelSerializer):
     def get_cover_photo_url(self, obj: Album) -> Optional[str]:
         request = self.context.get('request')
         if obj.cover_photo and request:
-            return request.build_absolute_uri(obj.cover_photo.url)
+            try:
+                return request.build_absolute_uri(obj.cover_photo.url)
+            except ValueError:
+                return None
         return None
 
     def get_back_cover_photo_url(self, obj: Album) -> Optional[str]:
         request = self.context.get('request')
         if obj.back_cover_photo and request:
-            return request.build_absolute_uri(obj.back_cover_photo.url)
+            try:
+                return request.build_absolute_uri(obj.back_cover_photo.url)
+            except ValueError:
+                return None
         return None
