@@ -61,10 +61,10 @@
       </div>
 
       <!-- Albums Grid -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16 perspective-1000">
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-12 gap-y-16 perspective-1000">
         <div v-for="album in customAlbums" :key="album.id" class="group flex flex-col items-center">
           <!-- 3D Book Cover -->
-          <NuxtLink :to="`/studio/album/${album.id}`" class="relative w-[300px] h-[400px] bg-[#3d352e] rounded-r-xl rounded-l-sm overflow-hidden shadow-[12px_16px_28px_rgba(0,0,0,0.15),_1px_2px_4px_rgba(0,0,0,0.1),_inset_3px_0_10px_rgba(255,255,255,0.05)] transform rotate-y-[-5deg] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-y-[-18deg] group-hover:translate-z-3 group-hover:-translate-y-2 group-hover:shadow-[20px_25px_40px_rgba(0,0,0,0.22),_2px_4px_8px_rgba(0,0,0,0.12)]">
+          <NuxtLink :to="`/studio/album/${album.id}`" class="relative w-full max-w-[260px] aspect-[3/4] bg-[#3d352e] rounded-r-xl rounded-l-sm overflow-hidden shadow-[12px_16px_28px_rgba(0,0,0,0.15),_1px_2px_4px_rgba(0,0,0,0.1),_inset_3px_0_10px_rgba(255,255,255,0.05)] transform rotate-y-[-5deg] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-y-[-18deg] group-hover:translate-z-3 group-hover:-translate-y-2 group-hover:shadow-[20px_25px_40px_rgba(0,0,0,0.22),_2px_4px_8px_rgba(0,0,0,0.12)]">
             <!-- Spine Edge -->
             <div class="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-black/40 via-white/10 to-black/50 z-10 rounded-l-sm border-r border-white/5"></div>
             
@@ -79,7 +79,7 @@
           </NuxtLink>
 
           <!-- Book Info -->
-          <div class="w-[300px] mt-6 flex flex-col gap-2">
+          <div class="w-full max-w-[260px] mt-6 flex flex-col gap-2">
             <h3 class="font-serif text-xl font-bold text-slate-900 truncate" :title="album.title">{{ album.title }}</h3>
             <div class="flex justify-between items-center">
               <span class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Par {{ album.author_name || 'MSO' }}</span>
