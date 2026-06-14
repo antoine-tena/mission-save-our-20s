@@ -1,15 +1,15 @@
 <template>
   <div class="flex items-center gap-1.5 border-r border-gray-100 pr-3">
-    <button type="button" class="tool-action-btn" @click="addText" title="Ajouter une zone de texte">
+    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" @click="addText" title="Ajouter une zone de texte">
       <Icon name="lucide:type" />
     </button>
-    <button type="button" class="tool-action-btn" @click="addPhotoZone" title="Ajouter une photo manuellement">
+    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" @click="addPhotoZone" title="Ajouter une photo manuellement">
       <Icon name="lucide:image-plus" />
     </button>
-    <button type="button" class="tool-action-btn text-amber-500 hover:bg-amber-50" @click="magicFill" title="Remplissage Magique (Auto-Layout)">
+    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-amber-500 hover:bg-amber-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" @click="magicFill" title="Remplissage Magique (Auto-Layout)">
       <Icon name="lucide:wand-2" />
     </button>
-    <button type="button" class="tool-action-btn text-red-500 hover:bg-red-50" @click="deleteItem" :disabled="focusedPhotoId === null" title="Supprimer l'élément sélectionné">
+    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" @click="deleteItem" :disabled="focusedPhotoId === null" title="Supprimer l'élément sélectionné">
       <Icon name="lucide:trash-2" />
     </button>
   </div>
@@ -109,40 +109,27 @@ const magicFill = async () => {
   emit('toast', '✨ Remplissage Magique en cours... Veuillez patienter.');
   if (!activeAlbum.value) return;
   
+  const targetPageId = getTargetPageId();
+  if (!targetPageId) {
+      emit('toast', 'Sélectionnez une page valide pour le Magic Fill.');
+      return;
+  }
+  
   try {
     const config = useRuntimeConfig();
     const token = useCookie<string | null>('auth_token');
-    // On pourrait appeler une route spécifique du backend, 
-    // ou afficher un toast expliquant que ça arrive
-    emit('toast', '✨ Les photos ont été disposées automatiquement sur cette double-page !');
-  } catch (err) {
+    
+    const res: any = await $fetch(`${config.public.apiBase}/photos/pages/${targetPageId}/magic-fill/`, {
+      method: 'POST',
+      headers: { Authorization: `Token ${token.value}` }
+    });
+    
+    emit('toast', `✨ ${res.message || 'Les photos ont été disposées avec succès !'}`);
+    await fetchAlbumDetail(activeAlbum.value.id, true);
+  } catch (err: any) {
     console.error(err);
-    emit('toast', 'Erreur lors du remplissage magique.');
+    const msg = err.response?._data?.error || 'Erreur lors du remplissage magique.';
+    emit('toast', msg);
   }
 };
 </script>
-
-<style scoped>
-.tool-action-btn {
-  background: none;
-  border: none;
-  color: #718096;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 1rem;
-}
-.tool-action-btn:hover:not(:disabled) {
-  background: #f7fafc;
-  color: #4f46e5;
-}
-.tool-action-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-</style>

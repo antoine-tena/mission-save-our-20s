@@ -63,6 +63,19 @@
 
       <div v-else-if="hasPhotos" class="grid-container">
         <AlbumPhotoGrid :photos="photos" @delete="confirmDelete" />
+        
+        <!-- Load More Button -->
+        <div v-if="hasMorePhotos" class="mt-12 flex justify-center pb-8">
+          <button 
+            @click="loadMorePhotos" 
+            :disabled="isLoadingMore"
+            class="bg-white border-2 border-slate-200 text-slate-700 font-bold py-3 px-8 rounded-full shadow-sm hover:border-amber-400 hover:text-amber-600 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Icon v-if="isLoadingMore" name="lucide:loader-2" class="w-5 h-5 animate-spin" />
+            <Icon v-else name="lucide:chevron-down" class="w-5 h-5" />
+            {{ isLoadingMore ? 'Chargement...' : 'Voir plus de photos' }}
+          </button>
+        </div>
       </div>
 
       <div v-else class="text-center py-24 px-4 max-w-2xl mx-auto backdrop-blur-md bg-white/40 rounded-3xl border border-slate-200/50">
@@ -105,7 +118,19 @@ import type { Photo } from '~/types';
 import { usePhotos } from '~/composables/usePhotos';
 import { usePhotosForm } from '~/composables/usePhotosForm';
 
-const { photos, totalPhotos, isLoading, isSubmitting, hasPhotos, fetchPhotos, createPhoto, deletePhoto } = usePhotos();
+const { 
+  photos, 
+  totalPhotos, 
+  isLoading, 
+  isSubmitting, 
+  hasPhotos, 
+  hasMorePhotos,
+  isLoadingMore,
+  fetchPhotos, 
+  loadMorePhotos,
+  createPhoto, 
+  deletePhoto 
+} = usePhotos();
 const { formState, formErrors, isFormValid, handleFileChange, resetForm } = usePhotosForm();
 
 const showForm = ref(false);

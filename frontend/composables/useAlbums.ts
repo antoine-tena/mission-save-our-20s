@@ -37,9 +37,10 @@ export const useAlbums = () => {
   const fetchAlbums = async () => {
     isAlbumsLoading.value = true;
     try {
-      customAlbums.value = await $fetch<AlbumDetail[]>(`${apiBase}/photos/albums/?t=${Date.now()}`, {
+      const res: any = await $fetch(`${apiBase}/photos/albums/?t=${Date.now()}`, {
         headers: { Authorization: `Token ${token.value}` }
       });
+      customAlbums.value = res.results || res;
     } catch (err) {
       console.error('Error fetching custom albums:', err);
     } finally {
