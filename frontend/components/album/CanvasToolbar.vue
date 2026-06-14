@@ -1,5 +1,5 @@
 <template>
-  <div class="canvas-toolbar-container relative">
+  <div v-if="croppingPhotoId === null" class="canvas-toolbar-container relative animate-fade-in">
     <div class="canvas-toolbar flex items-center justify-between gap-4 px-6 py-2.5 bg-white border border-gray-100 rounded-full shadow-lg select-none">
       
       <!-- Left: History & Save -->
@@ -25,7 +25,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useAlbumEditorStore } from '~/composables/useAlbumEditorStore';
 
+const { croppingPhotoId } = useAlbumEditorStore();
 const toastMsg = ref<string | null>(null);
 
 const showToast = (msg: string) => {

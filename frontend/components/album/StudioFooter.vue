@@ -2,7 +2,7 @@
   <div class="studio-footer-container relative flex flex-col flex-shrink-0 select-none">
     
     <!-- Top-floating "X pages" Collapse/Expand drawer tab -->
-    <div class="absolute -top-[38px] left-6 z-50">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full z-50">
       <button 
         type="button" 
         class="volume-dropdown-trigger flex items-center gap-1.5 bg-white border border-gray-100 hover:border-indigo-300 shadow-[0_-4px_12px_rgba(0,0,0,0.03)] hover:shadow-md rounded-t-xl px-4 py-2 cursor-pointer transition-all text-xs font-bold text-gray-700"
@@ -21,7 +21,7 @@
         class="studio-footer bg-white border-t border-gray-100 px-6 py-2 flex items-center justify-between gap-6 h-[75px] w-full"
       >
         <!-- Center: Horizontal Spread Carousel -->
-        <div class="flex-1 min-w-0">
+        <div class="flex-1 min-w-0 flex justify-center">
           <AlbumSpreadCarousel :active-page-idx="activePageIdx" @update:active-page-idx="onUpdateActiveSpread" />
         </div>
       </footer>

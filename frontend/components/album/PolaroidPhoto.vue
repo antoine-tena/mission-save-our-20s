@@ -2,20 +2,38 @@
   <div 
     :data-photo-id="photo.id"
     class="polaroid-frame shadow-md"
-    :class="{ 'cropping-active': croppingPhotoId === photo.id, 'readonly': readonly, 'focused': focusedPhotoId === photo.id }"
+    :class="[
+      `frame-style-${pageFrameStyle}`,
+      { 'cropping-active': croppingPhotoId === photo.id, 'readonly': readonly, 'focused': focusedPhotoId === photo.id }
+    ]"
     :draggable="false"
     :style="getGridStyles()"
     @mousedown="onMousedown($event, startCropping)"
-    @dblclick.stop="readonly ? null : startCropping()"
+    @dblclick.stop="handleDoubleClick()"
   >
     <div 
-      class="image-crop-container"
+      class="image-crop-container relative"
       @mousedown="croppingPhotoId === photo.id ? onCropMouseDown($event) : null"
+      @wheel.prevent.stop="croppingPhotoId === photo.id ? onCropWheel($event) : null"
     >
       <img :src="photo.image_url" class="slot-image font-sans" :style="getImageStyle()" />
+      
+      <!-- Rule-of-Thirds 3x3 Grid Overlay -->
+      <div v-if="croppingPhotoId === photo.id" class="crop-grid-overlay absolute inset-0 pointer-events-none grid grid-cols-3 grid-rows-3 z-30">
+        <div v-for="i in 9" :key="i" class="border border-white/20 border-dashed"></div>
+      </div>
     </div>
 
-    <div v-if="croppingPhotoId !== photo.id" class="washi-tape" :style="getTapeRotationStyle()"></div>
+    <!-- Central Washi Tape for 'polaroid-tape' style -->
+    <div v-if="pageFrameStyle === 'polaroid-tape' && croppingPhotoId !== photo.id" class="washi-tape" :style="getTapeRotationStyle()"></div>
+
+    <!-- 4 Corner Washi Tapes for 'washi-corners' style -->
+    <template v-if="pageFrameStyle === 'washi-corners' && croppingPhotoId !== photo.id">
+      <div class="corner-tape tl"></div>
+      <div class="corner-tape tr"></div>
+      <div class="corner-tape bl"></div>
+      <div class="corner-tape br"></div>
+    </template>
 
     <!-- Clear position / snap back button -->
     <button 
@@ -29,15 +47,6 @@
       <Icon name="lucide:x" />
     </button>
 
-    <!-- Resize Handles for cropping (fine-tune scale/dimensions) -->
-    <template v-if="croppingPhotoId === photo.id">
-      <div class="resize-handle resize-handle-r" @mousedown="startResizing($event, 'r')"></div>
-      <div class="resize-handle resize-handle-b" @mousedown="startResizing($event, 'b')"></div>
-      <div class="resize-handle resize-handle-se" @mousedown="startResizing($event, 'se')">
-        <Icon name="lucide:arrow-down-right" class="text-[8px] text-gray-400" />
-      </div>
-    </template>
-
     <!-- Bottom-right corner snap-to-grid resize handle -->
     <div v-if="!readonly && croppingPhotoId !== photo.id" class="grid-resize-handle" @mousedown.stop.prevent="onResizeMousedown($event)">
       <Icon name="lucide:arrow-down-right" class="text-xs text-gray-500" />
@@ -46,10 +55,12 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useAlbumEditorStore } from '~/composables/useAlbumEditorStore';
 import { usePhotoCrop } from '~/composables/usePhotoCrop';
 import { usePolaroidDragResize } from '~/composables/usePolaroidDragResize';
 import { useAlbumHistory } from '~/composables/useAlbumHistory';
+import { getDefaultPhotoSlot } from '~/utils/photoSlots';
 import { useCookie } from '#app';
 
 const props = withDefaults(
@@ -59,40 +70,39 @@ const props = withDefaults(
 
 const { fetchAlbumDetail, updatePhotoPosition, activeAlbum, focusedPhotoId } = useAlbumEditorStore();
 const { onMousedown, onResizeMousedown } = usePolaroidDragResize(props);
-
 const {
   croppingPhotoId, tempCropScale, tempWidth, tempHeight,
-  startCropping: _startCropping, onCropMouseDown, startResizing, getImageStyle: _getImageStyle,
+  startCropping: _startCropping, onCropMouseDown, onCropWheel, startResizing, getImageStyle: _getImageStyle,
+  saveCrop,
 } = usePhotoCrop();
 
 const startCropping = () => _startCropping(props.photo, `.polaroid-frame[data-photo-id="${props.photo.id}"]`);
 const getImageStyle = () => _getImageStyle(props.photo);
+const pageFrameStyle = computed(() => activeAlbum.value?.pages.find(p => p.id === props.pageId)?.location || 'polaroid-tape');
+
+const handleDoubleClick = () => {
+  if (props.readonly) return;
+  if (croppingPhotoId.value === props.photo.id) saveCrop();
+  else startCropping();
+};
 
 const GRID_COLS = 24; const GRID_ROWS = 18;
 
 const getGridStyles = () => {
   let colStart = props.photo.custom_x; let rowStart = props.photo.custom_y;
   let spanW = props.photo.custom_width; let spanH = props.photo.custom_height;
-
   if (colStart === null || rowStart === null) {
-    const order = props.photo.order ?? 0;
-    if (order === 0) { colStart = 2; rowStart = 2; spanW = 10; spanH = 8; }
-    else if (order === 1) { colStart = 13; rowStart = 2; spanW = 10; spanH = 8; }
-    else if (order === 2) { colStart = 2; rowStart = 11; spanW = 10; spanH = 8; }
-    else if (order === 3) { colStart = 13; rowStart = 11; spanW = 10; spanH = 8; }
-    else {
-      colStart = 2 + (order % 4) * 4; rowStart = 2 + Math.floor(order / 4) * 4;
-      spanW = 8; spanH = 8;
-    }
+    const slot = getDefaultPhotoSlot(props.photo.order ?? 0);
+    colStart = slot.x; rowStart = slot.y;
+    if (spanW === null) spanW = slot.w;
+    if (spanH === null) spanH = slot.h;
   }
-
   spanW = spanW ?? 8; spanH = spanH ?? 8;
   colStart = Math.max(1, Math.min(GRID_COLS - spanW + 1, colStart));
   rowStart = Math.max(1, Math.min(GRID_ROWS - spanH + 1, rowStart));
 
   const isFocused = focusedPhotoId.value === props.photo.id;
   const isCropping = croppingPhotoId.value === props.photo.id;
-
   const angles = [-1.5, 1, -2.5, 1.8, -0.8, 2.2, -2, 1.2];
   const angle = angles[props.photo.id % angles.length];
 
@@ -101,7 +111,6 @@ const getGridStyles = () => {
     gridRowStart: `${rowStart}`, gridRowEnd: `${rowStart + spanH}`,
     zIndex: isFocused ? 20 : 10, transform: isCropping ? 'none' : `rotate(${angle}deg)`
   };
-
   if (isCropping) {
     styles.width = `${tempWidth.value}px`; styles.height = `${tempHeight.value}px`;
     styles.position = 'absolute';
@@ -124,8 +133,7 @@ const resetPosition = async () => {
 
 const deletePhoto = async () => {
   try {
-    const { recordHistory } = useAlbumHistory();
-    recordHistory();
+    const { recordHistory } = useAlbumHistory(); recordHistory();
     const config = useRuntimeConfig(); const token = useCookie<string | null>('auth_token');
     await $fetch(`${config.public.apiBase}/photos/${props.photo.id}/`, {
       method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { page: null, order: 0 }

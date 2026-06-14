@@ -2,8 +2,7 @@
   <div class="photo-tray-sidebar">
     <div class="tray-header">
       <div class="tray-header-titles">
-        <h4 class="tray-title font-sans">Photos Disponibles</h4>
-        <span class="photo-counter">{{ photos.length }} clichés</span>
+        <h4 class="tray-title font-sans">{{ photos.length }} photos disponibles</h4>
       </div>
       <button 
         v-if="photos.length > 0"

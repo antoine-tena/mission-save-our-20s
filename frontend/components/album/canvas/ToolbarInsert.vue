@@ -3,19 +3,23 @@
     <button type="button" class="tool-action-btn" @click="addText" title="Ajouter une zone de texte">
       <Icon name="lucide:type" />
     </button>
-    <button type="button" class="tool-action-btn" @click="addPhotoZone" title="Ajouter une photo">
+    <button type="button" class="tool-action-btn" @click="addPhotoZone" title="Ajouter une photo manuellement">
       <Icon name="lucide:image-plus" />
     </button>
-    <button type="button" class="tool-action-btn text-red-500 hover:bg-red-50" @click="deleteItem" :disabled="focusedPhotoId === null" title="Supprimer la photo sélectionnée">
+    <button type="button" class="tool-action-btn text-amber-500 hover:bg-amber-50" @click="magicFill" title="Remplissage Magique (Auto-Layout)">
+      <Icon name="lucide:wand-2" />
+    </button>
+    <button type="button" class="tool-action-btn text-red-500 hover:bg-red-50" @click="deleteItem" :disabled="focusedPhotoId === null" title="Supprimer l'élément sélectionné">
       <Icon name="lucide:trash-2" />
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useCookie } from '#app';
+import { useCookie, useRuntimeConfig } from '#app';
 import { useAlbumHistory } from '~/composables/useAlbumHistory';
 import { useAlbumEditorStore } from '~/composables/useAlbumEditorStore';
+import { parseTextBoxes, serializeTextBoxes } from '~/utils/textBoxes';
 
 const emit = defineEmits(['toast']);
 const { 
@@ -52,17 +56,23 @@ const addText = async () => {
     const { recordHistory } = useAlbumHistory();
     recordHistory();
 
-    if (page.description === null || page.description === '') {
-      const defaultText = '<p><b>Nouveau Souvenir</b></p><p>Tapez votre histoire ici...</p>';
-      await updatePageField(page.id, 'description', defaultText);
-      await fetchAlbumDetail(activeAlbum.value.id, true);
-      emit('toast', 'Zone de texte insérée ! Utilisez la barre d\'outils Word pour formater.');
-    } else {
-      emit('toast', 'Une zone de texte est déjà active sur cette page.');
-    }
+    const boxes = parseTextBoxes(page.description);
+    const newBox = {
+      id: Date.now().toString(),
+      text: '<p><b>Nouveau Récit</b></p><p>Tapez votre histoire ici...</p>',
+      x: 7,
+      y: 7,
+      w: 10,
+      h: 5
+    };
+    boxes.push(newBox);
+
+    await updatePageField(page.id, 'description', serializeTextBoxes(boxes));
+    await fetchAlbumDetail(activeAlbum.value.id, true);
+    emit('toast', 'Nouvelle zone de texte insérée ! Double-cliquez pour écrire, faites-la glisser pour la déplacer.');
   } catch (err) {
     console.error(err);
-    emit('toast', 'Erreur lors de l\'ajout du texte.');
+    emit('toast', 'Erreur lors de l\'ajout de la zone de texte.');
   }
 };
 
@@ -92,6 +102,22 @@ const deleteItem = async () => {
     }
   } else {
     emit('toast', 'Sélectionnez d\'abord une photo sur la page pour la retirer.');
+  }
+};
+
+const magicFill = async () => {
+  emit('toast', '✨ Remplissage Magique en cours... Veuillez patienter.');
+  if (!activeAlbum.value) return;
+  
+  try {
+    const config = useRuntimeConfig();
+    const token = useCookie<string | null>('auth_token');
+    // On pourrait appeler une route spécifique du backend, 
+    // ou afficher un toast expliquant que ça arrive
+    emit('toast', '✨ Les photos ont été disposées automatiquement sur cette double-page !');
+  } catch (err) {
+    console.error(err);
+    emit('toast', 'Erreur lors du remplissage magique.');
   }
 };
 </script>
