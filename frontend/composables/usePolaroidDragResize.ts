@@ -1,4 +1,5 @@
 import { useAlbumEditorStore } from './useAlbumEditorStore';
+import { getDefaultPhotoSlot } from '~/utils/photoSlots';
 
 export function usePolaroidDragResize(
   props: { photo: any; readonly?: boolean; },
@@ -8,9 +9,6 @@ export function usePolaroidDragResize(
 
   const onMousedown = (e: MouseEvent, startCropping: () => void) => {
     if (props.readonly) return;
-    if (e.detail === 2) {
-      e.preventDefault(); e.stopPropagation(); startCropping(); return;
-    }
     if (e.target.closest('button, .resize-handle, .crop-toolbar, .grid-resize-handle')) return;
 
     focusedPhotoId.value = props.photo.id;
@@ -20,23 +18,19 @@ export function usePolaroidDragResize(
     if (!wrapperEl) return;
 
     const wrapperRect = wrapperEl.getBoundingClientRect();
-    const cellWidth = wrapperRect.width / GRID_COLS;
-    const cellHeight = wrapperRect.height / GRID_ROWS;
+    const cellWidth = wrapperRect.width / GRID_COLS; const cellHeight = wrapperRect.height / GRID_ROWS;
 
     let colStart = props.photo.custom_x; let rowStart = props.photo.custom_y;
-    let spanW = props.photo.custom_width ?? 8; let spanH = props.photo.custom_height ?? 8;
-
+    let spanW = props.photo.custom_width; let spanH = props.photo.custom_height;
     if (colStart === null || rowStart === null) {
-      const order = props.photo.order ?? 0;
-      if (order === 0) { colStart = 2; rowStart = 2; spanW = 10; spanH = 8; }
-      else if (order === 1) { colStart = 13; rowStart = 2; spanW = 10; spanH = 8; }
-      else if (order === 2) { colStart = 2; rowStart = 11; spanW = 10; spanH = 8; }
-      else if (order === 3) { colStart = 13; rowStart = 11; spanW = 10; spanH = 8; }
-      else { colStart = 2 + (order % 4) * 4; rowStart = 2 + Math.floor(order / 4) * 4; }
+      const slot = getDefaultPhotoSlot(props.photo.order ?? 0);
+      colStart = slot.x; rowStart = slot.y;
+      if (spanW === null) spanW = slot.w;
+      if (spanH === null) spanH = slot.h;
     }
+    spanW = spanW ?? 8; spanH = spanH ?? 8;
 
-    const initialPixelX = (colStart - 1) * cellWidth;
-    const initialPixelY = (rowStart - 1) * cellHeight;
+    const initialPixelX = (colStart - 1) * cellWidth; const initialPixelY = (rowStart - 1) * cellHeight;
     let hasMoved = false;
 
     const onMousemove = (moveEvent: MouseEvent) => {
@@ -58,24 +52,42 @@ export function usePolaroidDragResize(
     };
 
     const onMouseup = async (upEvent: MouseEvent) => {
-      window.removeEventListener('mousemove', onMousemove);
-      window.removeEventListener('mouseup', onMouseup);
-
+      window.removeEventListener('mousemove', onMousemove); window.removeEventListener('mouseup', onMouseup);
       if (hasMoved) {
-        const dx = upEvent.clientX - startX; const dy = upEvent.clientY - startY;
-        const currentPixelX = initialPixelX + dx; const currentPixelY = initialPixelY + dy;
-        let col = Math.round(currentPixelX / cellWidth) + 1;
-        let row = Math.round(currentPixelY / cellHeight) + 1;
-        col = Math.max(1, Math.min(GRID_COLS - spanW + 1, col));
-        row = Math.max(1, Math.min(GRID_ROWS - spanH + 1, row));
+        const originalDisplay = frameEl.style.display;
+        frameEl.style.display = 'none';
+        const elementUnderMouse = document.elementFromPoint(upEvent.clientX, upEvent.clientY);
+        frameEl.style.display = originalDisplay;
 
-        await updatePhotoPosition(props.photo.id, col, row, spanW, spanH);
+        const targetCanvas = elementUnderMouse?.closest('.grid-canvas') as HTMLElement;
+        let col = props.photo.custom_x; let row = props.photo.custom_y;
+        let targetPageId: number | null = null;
+
+        if (targetCanvas) {
+          targetPageId = parseInt(targetCanvas.getAttribute('data-page-id') || '', 10) || null;
+          const targetRect = targetCanvas.getBoundingClientRect();
+          const dropX = upEvent.clientX - targetRect.left; const dropY = upEvent.clientY - targetRect.top;
+          const cellWidthTarget = targetRect.width / GRID_COLS; const cellHeightTarget = targetRect.height / GRID_ROWS;
+
+          col = Math.floor(dropX / cellWidthTarget) + 1 - Math.floor(spanW / 2);
+          row = Math.floor(dropY / cellHeightTarget) + 1 - Math.floor(spanH / 2);
+          col = Math.max(1, Math.min(GRID_COLS - spanW + 1, col));
+          row = Math.max(1, Math.min(GRID_ROWS - spanH + 1, row));
+        } else {
+          const dx = upEvent.clientX - startX; const dy = upEvent.clientY - startY;
+          const currentPixelX = initialPixelX + dx; const currentPixelY = initialPixelY + dy;
+          col = Math.round(currentPixelX / cellWidth) + 1; col = Math.max(1, Math.min(GRID_COLS - spanW + 1, col));
+          row = Math.round(currentPixelY / cellHeight) + 1; row = Math.max(1, Math.min(GRID_ROWS - spanH + 1, row));
+        }
+
+        const originPageId = props.photo.page;
+        const pageChanged = targetPageId !== null && targetPageId !== originPageId;
+
+        await updatePhotoPosition(props.photo.id, col, row, spanW, spanH, pageChanged ? targetPageId : null);
         if (activeAlbum.value) await fetchAlbumDetail(activeAlbum.value.id, true);
       }
     };
-
-    window.addEventListener('mousemove', onMousemove);
-    window.addEventListener('mouseup', onMouseup);
+    window.addEventListener('mousemove', onMousemove); window.addEventListener('mouseup', onMouseup);
   };
 
   const onResizeMousedown = (e: MouseEvent) => {
@@ -86,33 +98,25 @@ export function usePolaroidDragResize(
     if (!wrapperEl) return;
 
     const wrapperRect = wrapperEl.getBoundingClientRect();
-    const cellWidth = wrapperRect.width / GRID_COLS;
-    const cellHeight = wrapperRect.height / GRID_ROWS;
+    const cellWidth = wrapperRect.width / GRID_COLS; const cellHeight = wrapperRect.height / GRID_ROWS;
 
     let colStart = props.photo.custom_x; let rowStart = props.photo.custom_y;
-    let initialSpanW = props.photo.custom_width; let initialSpanH = props.photo.custom_height;
-
+    let spanW = props.photo.custom_width; let spanH = props.photo.custom_height;
     if (colStart === null || rowStart === null) {
-      const order = props.photo.order ?? 0;
-      if (order === 0) { colStart = 2; rowStart = 2; initialSpanW = 10; initialSpanH = 8; }
-      else if (order === 1) { colStart = 13; rowStart = 2; initialSpanW = 10; initialSpanH = 8; }
-      else if (order === 2) { colStart = 2; rowStart = 11; initialSpanW = 10; initialSpanH = 8; }
-      else if (order === 3) { colStart = 13; rowStart = 11; initialSpanW = 10; initialSpanH = 8; }
-      else {
-        colStart = 2 + (order % 4) * 4; rowStart = 2 + Math.floor(order / 4) * 4;
-        initialSpanW = 8; initialSpanH = 8;
-      }
+      const slot = getDefaultPhotoSlot(props.photo.order ?? 0);
+      colStart = slot.x; rowStart = slot.y;
+      if (spanW === null) spanW = slot.w;
+      if (spanH === null) spanH = slot.h;
     }
-
-    initialSpanW = initialSpanW ?? 8; initialSpanH = initialSpanH ?? 8;
-    let finalSpanW = initialSpanW; let finalSpanH = initialSpanH;
+    spanW = spanW ?? 8; spanH = spanH ?? 8;
+    let finalSpanW = spanW; let finalSpanH = spanH;
 
     const onMousemove = (moveEvent: MouseEvent) => {
       moveEvent.preventDefault();
       const dx = moveEvent.clientX - startX; const dy = moveEvent.clientY - startY;
       const deltaCellsW = Math.round(dx / cellWidth); const deltaCellsH = Math.round(dy / cellHeight);
-      finalSpanW = Math.max(2, Math.min(GRID_COLS - colStart + 1, initialSpanW + deltaCellsW));
-      finalSpanH = Math.max(2, Math.min(GRID_ROWS - rowStart + 1, initialSpanH + deltaCellsH));
+      finalSpanW = Math.max(2, Math.min(GRID_COLS - colStart + 1, spanW + deltaCellsW));
+      finalSpanH = Math.max(2, Math.min(GRID_ROWS - rowStart + 1, spanH + deltaCellsH));
 
       frameEl.style.gridColumnEnd = `${colStart + finalSpanW}`;
       frameEl.style.gridRowEnd = `${rowStart + finalSpanH}`;
@@ -120,18 +124,12 @@ export function usePolaroidDragResize(
     };
 
     const onMouseup = async () => {
-      window.removeEventListener('mousemove', onMousemove);
-      window.removeEventListener('mouseup', onMouseup);
+      window.removeEventListener('mousemove', onMousemove); window.removeEventListener('mouseup', onMouseup);
       await updatePhotoPosition(props.photo.id, colStart, rowStart, finalSpanW, finalSpanH);
       if (activeAlbum.value) await fetchAlbumDetail(activeAlbum.value.id, true);
     };
-
-    window.addEventListener('mousemove', onMousemove);
-    window.addEventListener('mouseup', onMouseup);
+    window.addEventListener('mousemove', onMousemove); window.addEventListener('mouseup', onMouseup);
   };
 
-  return {
-    onMousedown,
-    onResizeMousedown
-  };
+  return { onMousedown, onResizeMousedown };
 }
