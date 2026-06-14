@@ -435,3 +435,9 @@ FodyWeavers.xsd
 #bdd
 db.sqlite3
 
+# Media files
+backend/media/
+
+# Vim swap files
+*.swp
+

@@ -62,10 +62,10 @@ sois explicite : en lisant la branche on doit directement comprendre de quoi il 
 - Aucun fichier ne dépasse **300 lignes**.
 - Si un module grossit, il est éclaté en sous-modules avec un `__init__.py` d'agrégation.
 
-### Règle des 30 Lignes
+### Règle des 150 Lignes
 
 - Une fonction / méthode = une seule responsabilité.
-- Maximum **30 lignes** par fonction.
+- Maximum **150 lignes** par fonction.
 
 ### Nommage Sémantique
 
