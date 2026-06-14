@@ -10,6 +10,7 @@ from decouple import config
 from .models import Movie
 from .serializers import MovieSerializer
 from agenda.models import Event
+from rest_framework.request import Request
 from typing import Any
 from datetime import datetime
 
@@ -20,7 +21,7 @@ class MovieTMDBSearchView(APIView):
     """Vue pour rechercher des films sur TMDB."""
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         query = request.query_params.get('query')
         if not query:
             return Response({'error': 'Query required'}, status=400)
@@ -39,11 +40,11 @@ class MovieListCreateView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [JSONParser, MultiPartParser, FormParser]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         movies = Movie.objects.all()
         return Response(MovieSerializer(movies, many=True, context={'request': request}).data)
     
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         tmdb_id = request.data.get('tmdb_id')
         if not tmdb_id:
             return Response({'error': 'tmdb_id is required'}, status=400)
@@ -102,11 +103,11 @@ class MovieDetailView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [JSONParser, MultiPartParser, FormParser]
 
-    def get(self, request: Any, pk: int) -> Response:
+    def get(self, request: Request, pk: int) -> Response:
         movie = get_object_or_404(Movie, pk=pk)
         return Response(MovieSerializer(movie, context={'request': request}).data)
 
-    def patch(self, request: Any, pk: int) -> Response:
+    def patch(self, request: Request, pk: int) -> Response:
         movie = get_object_or_404(Movie, pk=pk)
         serializer = MovieSerializer(movie, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
@@ -114,7 +115,7 @@ class MovieDetailView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request: Any, pk: int) -> Response:
+    def delete(self, request: Request, pk: int) -> Response:
         movie = get_object_or_404(Movie, pk=pk)
         movie.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

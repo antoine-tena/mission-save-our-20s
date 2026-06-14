@@ -136,26 +136,5 @@ useSeoMeta({ title: 'Mon Profil — MSO20s' });
 </script>
 
 <style scoped>
-.social-profile-view { min-height: 100vh; background: #fafafa; padding-bottom: 4rem; position: relative; }
-.profile-grid-layout { max-width: 935px; margin: 0 auto; position: relative; z-index: 1; }
-.scrapbook-section { position: relative; padding: 2rem 0; min-height: 500px; }
-.scrapbook-content-grid { display: grid; grid-template-columns: 300px 1fr; gap: 3rem; position: relative; z-index: 2; }
-.mso-scrapbook--amani .scrapbook-content-grid { grid-template-columns: 1fr 300px; }
-.mso-scrapbook--antoine { background-color: #f4fafe; }
-.mso-scrapbook--amani { background-color: #fff0f9; }
-.mso-sticker { position: absolute; pointer-events: none; color: var(--clr-primary-500); }
-.hidden { display: none; }
-.fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.3s ease; }
-.fade-slide-enter-from { opacity: 0; transform: translateY(10px); }
-.fade-slide-leave-to { opacity: 0; transform: translateY(-10px); }
-.post-modal {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000;
-  display: flex; align-items: center; justify-content: center; padding: 2rem;
-  backdrop-filter: blur(8px);
-}
-.modal-card { max-width: 600px; width: 100%; position: relative; animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-@keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-.close-modal { position: absolute; top: -50px; right: -50px; color: white; background: none; border: none; font-size: 2.5rem; cursor: pointer; opacity: 0.8; transition: opacity 0.2s; }
-.close-modal:hover { opacity: 1; }
-@media (max-width: 768px) { .close-modal { right: 10px; top: -60px; } }
+@import '~/assets/css/profile.css';
 </style>

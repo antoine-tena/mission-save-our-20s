@@ -1,58 +1,77 @@
 <template>
-  <div class="calendar-page">
-    <div class="mso-scrapbook-bg"></div>
+  <div class="min-h-screen pt-[calc(var(--header-height)+3rem)] pb-24 bg-slate-50 overflow-hidden relative selection:bg-fuchsia-200">
+    <!-- Animated modern background -->
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-[20%] right-[-10%] w-[40rem] h-[40rem] bg-indigo-300/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 8s;"></div>
+      <div class="absolute bottom-[0%] left-[-10%] w-[30rem] h-[30rem] bg-fuchsia-300/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 10s;"></div>
+    </div>
 
-    <!-- Page Header (Hero style) -->
-    <header class="page-header container">
-      <div class="header-text">
-        <h1 class="page-title">Notre Agenda <Icon name="lucide:calendar" /></h1>
-        <p class="page-subtitle">Nos rendez-vous et moments clés.</p>
-      </div>
-      <button @click="openAddEvent" class="btn-add-hero">
-        <Icon name="lucide:plus" /> Ajouter une mission
-      </button>
-    </header>
-
-    <div class="ios-calendar-container container">
-      <!-- Header Style iPhone -->
-      <header class="ios-header">
-        <div class="header-left">
-          <span class="current-month">{{ monthName }}</span>
-          <span class="current-year">{{ currentYear }}</span>
+    <div class="container mx-auto px-4 relative z-10">
+      <!-- Page Header -->
+      <header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+        <div>
+          <h1 class="font-display text-5xl md:text-6xl font-bold text-slate-800 tracking-tight flex items-center gap-4">
+            Notre Agenda <Icon name="lucide:calendar" class="text-indigo-500 w-12 h-12" />
+          </h1>
+          <p class="text-indigo-600 font-semibold mt-2 text-lg uppercase tracking-widest">Nos rendez-vous et moments clés.</p>
         </div>
+        <button @click="openAddEvent" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-indigo-600 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:shadow-indigo-500/30 flex items-center gap-2 self-start md:self-end">
+          <Icon name="lucide:plus" class="w-5 h-5" /> Ajouter une mission
+        </button>
       </header>
 
-      <!-- Calendar Grid -->
-      <AgendaCalendarGrid 
-        :events="events"
-        :selected-date="selectedDate"
-        @day-click="handleDayClick"
-        @update-view="handleViewUpdate"
-      />
-
-      <!-- Events List (Integrated, not modal) -->
-      <section class="ios-events-list">
-        <div class="list-header">
-          <h3>{{ selectedDateLabel }}</h3>
-        </div>
+      <div class="backdrop-blur-xl bg-white/60 border border-white/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row">
         
-        <div v-if="selectedEvents.length > 0" class="events-scroll">
-          <div v-for="event in selectedEvents" :key="event.id" class="ios-event-card" @click="openEventDetail(event)">
-            <div class="event-time">
-              <span class="time-main">{{ formatTime(event.created_at) }}</span>
+        <!-- Left Side: Calendar Grid -->
+        <div class="lg:w-2/3 p-6 lg:p-8 border-b lg:border-b-0 lg:border-r border-slate-200/50">
+          <header class="flex items-center justify-between mb-8">
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-display font-bold text-slate-800 capitalize">{{ monthName }}</span>
+              <span class="text-xl text-slate-500 font-medium">{{ currentYear }}</span>
             </div>
-            <div class="event-details">
-              <h4 class="event-title">{{ event.title }}</h4>
-              <p v-if="event.location" class="event-location">
-                <Icon name="lucide:map-pin" /> {{ event.location }}
-              </p>
+            <!-- Pagination logic would be in AgendaCalendarGrid usually, 
+                 but we provide a beautiful container for it here -->
+          </header>
+
+          <AgendaCalendarGrid 
+            :events="events"
+            :selected-date="selectedDate"
+            @day-click="handleDayClick"
+            @update-view="handleViewUpdate"
+            class="w-full"
+          />
+        </div>
+
+        <!-- Right Side: Events List -->
+        <section class="lg:w-1/3 bg-slate-50/50 backdrop-blur-md p-6 lg:p-8 flex flex-col">
+          <div class="mb-6 pb-4 border-b border-slate-200">
+            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <Icon name="lucide:clock" class="text-indigo-500" />
+              {{ selectedDateLabel }}
+            </h3>
+          </div>
+          
+          <div v-if="selectedEvents.length > 0" class="flex-1 overflow-y-auto pr-2 space-y-4">
+            <div v-for="event in selectedEvents" :key="event.id" class="group bg-white border border-slate-100 p-4 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-100 transition-all cursor-pointer" @click="openEventDetail(event)">
+              <div class="flex items-start gap-4">
+                <div class="bg-indigo-50 text-indigo-600 font-bold px-3 py-1 rounded-lg text-sm whitespace-nowrap group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                  {{ formatTime(event.created_at) }}
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{{ event.title }}</h4>
+                  <p v-if="event.location" class="text-sm text-slate-500 flex items-center gap-1 mt-1">
+                    <Icon name="lucide:map-pin" class="w-3 h-3" /> {{ event.location }}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div v-else class="empty-state">
-          <p>Aucun événement prévu pour ce jour.</p>
-        </div>
-      </section>
+          <div v-else class="flex-1 flex flex-col items-center justify-center text-slate-400 gap-4">
+            <Icon name="lucide:calendar-x" class="w-16 h-16 opacity-20" />
+            <p class="text-center font-medium">Aucun événement prévu<br>pour ce jour.</p>
+          </div>
+        </section>
+      </div>
     </div>
 
     <!-- Modal for adding OR viewing details -->
@@ -68,220 +87,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { useCalendar } from '~/composables/useCalendar';
+import { useCalendarView } from '~/composables/useCalendarView';
 import type { MSOEvent } from '~/types';
 
 const { events, fetchEvents } = useCalendar();
 
-const selectedDate = ref<Date>(new Date());
-const showModal = ref(false);
-const modalMode = ref<'add' | 'detail'>('add');
-const modalEvents = ref<MSOEvent[]>([]);
-const viewDate = ref(new Date());
-
-const monthName = computed(() => {
-  return new Intl.DateTimeFormat('fr-FR', { month: 'long' }).format(viewDate.value);
-});
-
-const currentYear = computed(() => viewDate.value.getFullYear());
-
-const selectedEvents = computed(() => {
-  const dStr = selectedDate.value.toISOString().split('T')[0];
-  return events.value.filter(e => e.date === dStr);
-});
-
-const selectedDateLabel = computed(() => {
-  const today = new Date();
-  if (selectedDate.value.toDateString() === today.toDateString()) return "Aujourd'hui";
-  return new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).format(selectedDate.value);
-});
-
-const handleDayClick = (date: Date) => {
-  selectedDate.value = date;
-};
-
-const handleViewUpdate = (date: Date) => {
-  viewDate.value = date;
-};
-
-const openAddEvent = () => {
-  modalMode.value = 'add';
-  showModal.value = true;
-};
-
-const openEventDetail = (event: MSOEvent) => {
-  modalMode.value = 'detail';
-  modalEvents.value = [event];
-  showModal.value = true;
-};
+const {
+  selectedDate, showModal, modalMode, modalEvents, viewDate, monthName, currentYear,
+  selectedEvents, selectedDateLabel, handleDayClick, handleViewUpdate, openAddEvent, openEventDetail, formatTime
+} = useCalendarView(events);
 
 const handleEventAdded = () => {
   showModal.value = false;
   fetchEvents();
 };
 
-const formatTime = (dateStr: string) => {
-  const d = new Date(dateStr);
-  return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-};
-
 onMounted(fetchEvents);
 
 useSeoMeta({ title: 'Agenda — MSO20s' });
 </script>
-
-<style scoped>
-.calendar-page { 
-  min-height: 100vh; 
-  padding-top: calc(var(--header-height) + 3rem); 
-  padding-bottom: 6rem;
-}
-
-.mso-scrapbook-bg { 
-  position: fixed; 
-  inset: 0; 
-  background-color: #ffffff; 
-  background-image: radial-gradient(#ca75d615 1.5px, transparent 1.5px); 
-  background-size: 30px 30px; 
-  z-index: -1; 
-}
-
-/* Page Header / Hero */
-.page-header { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: flex-end; 
-  margin-bottom: 4rem; 
-}
-
-.page-title { 
-  font-family: var(--font-display); 
-  font-size: 3.5rem; 
-  color: var(--clr-neutral-900); 
-  letter-spacing: -1px;
-}
-
-.page-subtitle { 
-  color: var(--clr-primary-500); 
-  font-weight: 700; 
-  font-size: 1.1rem; 
-}
-
-.btn-add-hero {
-  background: var(--clr-neutral-900);
-  color: white;
-  border: none;
-  padding: 0.8rem 1.8rem;
-  border-radius: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-add-hero:hover {
-  background: var(--clr-primary-500);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(202, 117, 214, 0.2);
-}
-
-.ios-calendar-container {
-  max-width: 500px;
-  background: white;
-  border-radius: 30px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #f1f5f9;
-}
-
-/* Header iPhone Style */
-.ios-header {
-  padding: 2rem 2rem 1.5rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-left {
-  display: flex;
-  flex-direction: column;
-}
-
-.current-month {
-  font-size: 1.8rem;
-  font-weight: 800;
-  text-transform: capitalize;
-  color: #1c1c1e;
-}
-
-.current-year {
-  font-size: 1rem;
-  color: var(--clr-primary-500);
-  font-weight: 700;
-}
-
-/* Events List integrated */
-.ios-events-list {
-  flex: 1;
-  background: white;
-  padding: 1rem 2rem;
-  border-top: 1px solid #f1f5f9;
-}
-
-.list-header h3 {
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  color: #94a3b8;
-  letter-spacing: 0.5px;
-  margin-bottom: 1.5rem;
-}
-
-.ios-event-card {
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #f8fafc;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.ios-event-card:hover {
-  transform: translateX(5px);
-}
-
-.event-time {
-  min-width: 60px;
-  font-weight: 700;
-  color: #1c1c1e;
-  font-size: 0.9rem;
-}
-
-.event-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1c1c1e;
-  margin-bottom: 4px;
-}
-
-.event-location {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 4px;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 3rem 0;
-  color: #94a3b8;
-  font-style: italic;
-}
-</style>
