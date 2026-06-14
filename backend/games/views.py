@@ -6,12 +6,13 @@ from .models import GameType, GameSession
 from .serializers import GameTypeSerializer, GameSessionSerializer
 from django.db.models import F
 from typing import Any, List, Dict
+from rest_framework.request import Request
 
 class GameTypeListView(APIView):
     """Liste les types de jeux disponibles."""
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         types = GameType.objects.all()
         serializer = GameTypeSerializer(types, many=True)
         return Response(serializer.data)
@@ -20,12 +21,12 @@ class GameSessionListCreateView(APIView):
     """Liste et crée des sessions de jeu."""
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         sessions = GameSession.objects.all()
         serializer = GameSessionSerializer(sessions, many=True)
         return Response(serializer.data)
     
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         serializer = GameSessionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -36,7 +37,7 @@ class ScoreboardStatsView(APIView):
     """Calcule les statistiques globales du scoreboard."""
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         amani_wins = GameSession.objects.filter(amani_score__gt=F('antoine_score')).count()
         antoine_wins = GameSession.objects.filter(antoine_score__gt=F('amani_score')).count()
         draws = GameSession.objects.filter(amani_score=F('antoine_score')).count()

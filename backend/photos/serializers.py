@@ -34,6 +34,7 @@ class AlbumPageSerializer(serializers.ModelSerializer):
             'id', 'album', 'title', 'description', 'date', 
             'location', 'layout_type', 'background_color', 'sticker', 'order', 'is_auto_color', 'photos'
         ]
+        read_only_fields = ['album']
 
 class AlbumSerializer(serializers.ModelSerializer):
     pages = AlbumPageSerializer(many=True, read_only=True)

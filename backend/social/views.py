@@ -12,18 +12,19 @@ from .serializers import (
 )
 import os
 from typing import Any
+from rest_framework.request import Request
 
 class MyProfileView(APIView):
     """Vue pour voir et modifier son propre profil."""
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         profile, _ = Profile.objects.get_or_create(user=request.user)
         serializer = ProfileSerializer(profile, context={'request': request})
         return Response(serializer.data)
     
-    def patch(self, request: Any) -> Response:
+    def patch(self, request: Request) -> Response:
         profile, _ = Profile.objects.get_or_create(user=request.user)
         serializer = ProfileSerializer(profile, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
@@ -35,7 +36,7 @@ class PublicProfileView(APIView):
     """Vue pour voir le profil d'un autre utilisateur."""
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Any, username: str) -> Response:
+    def get(self, request: Request, username: str) -> Response:
         user = get_object_or_404(User, username=username)
         profile, _ = Profile.objects.get_or_create(user=user)
         serializer = ProfileSerializer(profile, context={'request': request})
@@ -46,7 +47,7 @@ class SocialPostListCreateView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         username = request.query_params.get('username')
         if username:
             posts = SocialPost.objects.filter(author__username=username)
@@ -55,7 +56,7 @@ class SocialPostListCreateView(APIView):
         serializer = SocialPostSerializer(posts, many=True, context={'request': request})
         return Response(serializer.data)
     
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         serializer = SocialPostSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(author=request.user)
@@ -66,7 +67,7 @@ class LikePostView(APIView):
     """Vue pour liker/unliker une publication."""
     permission_classes = [IsAuthenticated]
 
-    def post(self, request: Any, pk: int) -> Response:
+    def post(self, request: Request, pk: int) -> Response:
         post = get_object_or_404(SocialPost, pk=pk)
         if post.likes.filter(id=request.user.id).exists():
             post.likes.remove(request.user)
@@ -78,7 +79,7 @@ class UserListView(APIView):
     """Liste tous les utilisateurs sauf soi-même."""
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         users = User.objects.exclude(id=request.user.id)
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
@@ -87,12 +88,12 @@ class FriendRequestView(APIView):
     """Gère les demandes d'amis (envoi et liste)."""
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         requests = FriendRequest.objects.filter(to_user=request.user, accepted=False)
         serializer = FriendRequestSerializer(requests, many=True)
         return Response(serializer.data)
 
-    def post(self, request: Any, user_id: int) -> Response:
+    def post(self, request: Request, user_id: int) -> Response:
         to_user = get_object_or_404(User, id=user_id)
         if to_user == request.user:
             return Response({'error': 'Impossible de s\'ajouter soi-même.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -111,7 +112,7 @@ class HandleFriendRequestView(APIView):
     """Vue pour accepter ou décliner une demande d'ami."""
     permission_classes = [IsAuthenticated]
 
-    def post(self, request: Any, request_id: int) -> Response:
+    def post(self, request: Request, request_id: int) -> Response:
         friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=request.user)
         action = request.data.get('action')
         
@@ -163,7 +164,7 @@ class RichPostListCreateView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         """Liste toutes les publications riches avec leurs pièces jointes."""
         posts = RichPost.objects.all().prefetch_related('attachments')
         serializer = RichPostSerializer(posts, many=True, context={'request': request})
@@ -205,7 +206,7 @@ class RichPostListCreateView(APIView):
                 photo_obj.image.save(filename, uploaded_file, save=True)
             index += 1
 
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         """Crée une publication riche avec pièces jointes et synchro auto."""
         from cinema.models import Movie
         from django.utils import timezone

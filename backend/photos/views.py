@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from .models import Photo, Album, AlbumPage
 from .serializers import PhotoSerializer, AlbumSerializer, AlbumPageSerializer
+from rest_framework.request import Request
 from typing import Any
 
 class PhotoListCreateView(APIView):
@@ -14,7 +15,7 @@ class PhotoListCreateView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         photos = Photo.objects.filter(page__isnull=True).select_related('author')
         seen_images = set()
         unique_photos = []
@@ -25,7 +26,7 @@ class PhotoListCreateView(APIView):
         serializer = PhotoSerializer(unique_photos, many=True, context={'request': request})
         return Response(serializer.data)
 
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         serializer = PhotoSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             photo = serializer.save(author=request.user)
@@ -33,7 +34,7 @@ class PhotoListCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request: Any) -> Response:
+    def delete(self, request: Request) -> Response:
         Photo.objects.filter(page__isnull=True).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -41,12 +42,12 @@ class PhotoDetailDeleteView(APIView):
     """Vue pour supprimer ou modifier une photo spécifique."""
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request: Any, pk: int) -> Response:
+    def delete(self, request: Request, pk: int) -> Response:
         photo = get_object_or_404(Photo, pk=pk)
         Photo.objects.filter(image=photo.image).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def patch(self, request: Any, pk: int) -> Response:
+    def patch(self, request: Request, pk: int) -> Response:
         photo = get_object_or_404(Photo, pk=pk)
         if request.data.get('duplicate') is True:
             duplicate_photo = Photo.objects.create(
@@ -79,14 +80,14 @@ class PhotoMemoriesView(APIView):
     """Vue pour récupérer d'anciens souvenirs."""
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         memories = Photo.objects.order_by('?')[:4]
         serializer = PhotoSerializer(memories, many=True, context={'request': request})
         return Response(serializer.data)
 
 class HealthCheckView(APIView):
     permission_classes = [AllowAny]
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
 class AlbumListCreateView(APIView):
@@ -94,12 +95,12 @@ class AlbumListCreateView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         albums = Album.objects.filter(user=request.user).prefetch_related('pages__photos')
         serializer = AlbumSerializer(albums, many=True, context={'request': request})
         return Response(serializer.data)
 
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         serializer = AlbumSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(user=request.user)
@@ -114,12 +115,12 @@ class AlbumDetailDeleteUpdateView(APIView):
     def get_object(self, pk: int, user: Any) -> Album:
         return get_object_or_404(Album.objects.prefetch_related('pages__photos'), pk=pk, user=user)
 
-    def get(self, request: Any, pk: int) -> Response:
+    def get(self, request: Request, pk: int) -> Response:
         album = self.get_object(pk, request.user)
         serializer = AlbumSerializer(album, context={'request': request})
         return Response(serializer.data)
 
-    def patch(self, request: Any, pk: int) -> Response:
+    def patch(self, request: Request, pk: int) -> Response:
         album = self.get_object(pk, request.user)
         if 'cover_photo_id' in request.data:
             photo_id = request.data.get('cover_photo_id')
@@ -143,7 +144,7 @@ class AlbumDetailDeleteUpdateView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request: Any, pk: int) -> Response:
+    def delete(self, request: Request, pk: int) -> Response:
         album = self.get_object(pk, request.user)
         album.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -152,12 +153,12 @@ class AlbumPageListCreateView(APIView):
     """Vue pour lister et créer des pages pour un album."""
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Any, album_id: int) -> Response:
+    def get(self, request: Request, album_id: int) -> Response:
         pages = AlbumPage.objects.filter(album__id=album_id, album__user=request.user).prefetch_related('photos')
         serializer = AlbumPageSerializer(pages, many=True, context={'request': request})
         return Response(serializer.data)
 
-    def post(self, request: Any, album_id: int) -> Response:
+    def post(self, request: Request, album_id: int) -> Response:
         album = get_object_or_404(Album, id=album_id, user=request.user)
         order = AlbumPage.objects.filter(album=album).count()
         
@@ -185,12 +186,12 @@ class AlbumPageDetailDeleteUpdateView(APIView):
     def get_object(self, pk: int, user: Any) -> AlbumPage:
         return get_object_or_404(AlbumPage, pk=pk, album__user=user)
 
-    def get(self, request: Any, pk: int) -> Response:
+    def get(self, request: Request, pk: int) -> Response:
         page = self.get_object(pk, request.user)
         serializer = AlbumPageSerializer(page, context={'request': request})
         return Response(serializer.data)
 
-    def patch(self, request: Any, pk: int) -> Response:
+    def patch(self, request: Request, pk: int) -> Response:
         page = self.get_object(pk, request.user)
         serializer = AlbumPageSerializer(page, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
@@ -198,7 +199,7 @@ class AlbumPageDetailDeleteUpdateView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request: Any, pk: int) -> Response:
+    def delete(self, request: Request, pk: int) -> Response:
         page = self.get_object(pk, request.user)
         page.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -208,7 +209,7 @@ class AlbumPageReorderView(APIView):
     permission_classes = [IsAuthenticated]
 
     @transaction.atomic
-    def post(self, request: Any, album_id: int) -> Response:
+    def post(self, request: Request, album_id: int) -> Response:
         album = get_object_or_404(Album, id=album_id, user=request.user)
         page_ids = request.data.get('page_ids', [])
         if not isinstance(page_ids, list):
@@ -224,7 +225,7 @@ class AlbumPhotoUploadView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
-    def post(self, request: Any, page_id: int) -> Response:
+    def post(self, request: Request, page_id: int) -> Response:
         page = get_object_or_404(AlbumPage, id=page_id, album__user=request.user)
         uploaded_file = request.FILES.get('image')
         if not uploaded_file:
@@ -254,7 +255,7 @@ class AlbumAutoGenerateView(APIView):
     permission_classes = [IsAuthenticated]
 
     @transaction.atomic
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         from datetime import datetime
         photos = Photo.objects.filter(page__isnull=True).order_by('date_creation')
         if not photos.exists():
@@ -281,7 +282,7 @@ class AlbumAutoGenerateView(APIView):
                 for s_idx, p in enumerate(chunk):
                     p.page = page
                     p.order = s_idx
-                    p.save(update_fields=['page', 'order'])
+                Photo.objects.bulk_update(chunk, ['page', 'order'])
             created_albums.append(album)
 
         serializer = AlbumSerializer(created_albums, many=True, context={'request': request})
