@@ -28,10 +28,6 @@
             @full-wrap-drop="onFullWrapDrop" @delete-cover="onDeleteCover" @delete-back-cover="onDeleteBackCover"
             @toggle-wrap="toggleFullWrap" @dragstart-back-cover="onBackCoverDragStart"
           />
-          <AlbumSpreadColorPicker
-            :is-cover-spread="isCoverSpread" :left-page="leftPage" :right-page="rightPage" :preset-colors="presetColors"
-            @select-color="selectSpreadBackgroundColor" @trigger-custom-picker="triggerLeftColorPicker"
-          />
         </div>
         <AlbumPagePillToolbar
           :page="rightPage" :is-cover-spread="isCoverSpread" :is-left="false" :active-album="activeAlbum"

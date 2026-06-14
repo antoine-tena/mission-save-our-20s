@@ -1,5 +1,5 @@
 <template>
-  <div class="spread-carousel flex items-center gap-4 py-2 px-4 bg-gray-50/50 rounded-xl overflow-x-auto select-none max-w-full">
+  <div class="spread-carousel flex items-center justify-center gap-4 py-2 px-4 bg-gray-50/50 rounded-xl overflow-x-auto select-none max-w-full">
     
     <div v-for="(spread, idx) in spreadsList" :key="idx" class="flex items-center flex-shrink-0">
       

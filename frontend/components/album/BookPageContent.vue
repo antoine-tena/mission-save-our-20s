@@ -8,24 +8,32 @@
     <!-- Page Layout Container combining Rich Text & Photos Grid-Canvas -->
     <div v-else class="page-inner-container h-full w-full relative flex flex-col justify-start">
       
-      <!-- Word-like Rich Text Editorial Box (Rule/Journal style) -->
-      <AlbumRichTextEditorial :page="page" :readonly="readonly" />
-
-      <!-- 24x18 Snapping Canvas Grid for photos -->
+      <!-- 24x18 Snapping Canvas Grid for photos & movable text zones -->
       <div 
+        :data-page-id="page.id"
         class="grid-canvas flex-1 relative" 
-        :class="{ 'readonly': readonly, 'empty-grid-canvas': !page.photos || page.photos.length === 0 }"
+        :class="{ 'readonly': readonly, 'empty-grid-canvas': isPageEmpty }"
         @dragover.prevent
         @drop="readonly ? null : onDrop($event)"
       >
         <!-- Premium tactile empty canvas placeholder -->
-        <AlbumCanvasEmptyPlaceholder v-if="(!page.photos || page.photos.length === 0) && !readonly" />
+        <AlbumCanvasEmptyPlaceholder v-slot v-if="isPageEmpty && !readonly" />
 
+        <!-- Render Polaroid Photo cards -->
         <AlbumPolaroidPhoto 
           v-for="photo in page.photos" 
           :key="photo.id"
           :photo="photo"
           :page-id="page.id"
+          :readonly="readonly"
+        />
+
+        <!-- Render Movable Text Box cards (Filles) -->
+        <AlbumMovableTextBox
+          v-for="box in textBoxes"
+          :key="box.id"
+          :box="box"
+          :page="page"
           :readonly="readonly"
         />
       </div>
@@ -39,17 +47,22 @@ import { computed } from 'vue';
 import { useRuntimeConfig, useCookie } from '#app';
 import { useAlbumEditorStore } from '~/composables/useAlbumEditorStore';
 import { useAlbumHistory } from '~/composables/useAlbumHistory';
+import { parseTextBoxes } from '~/utils/textBoxes';
 
 const props = withDefaults(
-  defineProps<{
-    page: any;
-    readonly?: boolean;
-  }>(),
+  defineProps<{ page: any; readonly?: boolean; }>(),
   { readonly: false }
 );
 
 const { fetchAlbumDetail, draggedPhotoId, isPageRestricted } = useAlbumEditorStore();
 const isRestricted = computed(() => isPageRestricted(props.page.id));
+
+const textBoxes = computed(() => parseTextBoxes(props.page.description));
+const isPageEmpty = computed(() => {
+  const hasPhotos = props.page.photos && props.page.photos.length > 0;
+  const hasTexts = textBoxes.value.length > 0;
+  return !hasPhotos && !hasTexts;
+});
 
 const onDrop = async (e: DragEvent) => {
   const droppedIdRaw = e.dataTransfer?.getData('text/plain');
@@ -59,8 +72,7 @@ const onDrop = async (e: DragEvent) => {
 
   const wrapperEl = e.currentTarget as HTMLElement;
   const rect = wrapperEl.getBoundingClientRect();
-  const dropX = e.clientX - rect.left;
-  const dropY = e.clientY - rect.top;
+  const dropX = e.clientX - rect.left; const dropY = e.clientY - rect.top;
 
   const GRID_COLS = 24; const GRID_ROWS = 18;
   const cellWidth = rect.width / GRID_COLS; const cellHeight = rect.height / GRID_ROWS;
@@ -74,8 +86,7 @@ const onDrop = async (e: DragEvent) => {
   try {
     const { recordHistory } = useAlbumHistory();
     recordHistory();
-    const config = useRuntimeConfig();
-    const token = useCookie<string | null>('auth_token');
+    const config = useRuntimeConfig(); const token = useCookie<string | null>('auth_token');
 
     await $fetch(`${config.public.apiBase}/photos/${draggedPhotoId.value}/`, {
       method: 'PATCH', headers: { Authorization: `Token ${token.value}` },
@@ -85,9 +96,7 @@ const onDrop = async (e: DragEvent) => {
       }
     });
     await fetchAlbumDetail(props.page.album, true);
-  } catch (err) {
-    console.error('Failed to drop photo in page grid canvas:', err);
-  }
+  } catch (err) { console.error('Failed to drop photo in page grid canvas:', err); }
 };
 </script>
 
