@@ -11,20 +11,17 @@
         <NuxtLink to="/album" class="inline-flex items-center gap-2 text-slate-500 hover:text-amber-600 font-semibold mb-6 transition-colors group">
           <Icon name="lucide:arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Retour à la Bibliothèque
         </NuxtLink>
-        <h1 class="font-serif text-5xl md:text-6xl font-black text-slate-900 tracking-tight">
-          La Galerie des Moments
+        <h1 class="font-display text-5xl md:text-6xl font-bold text-slate-800 tracking-tight flex items-center gap-4">
+          La Galerie des Moments <Icon name="lucide:grid" class="text-amber-500 w-12 h-12" />
         </h1>
-        <p class="text-amber-700 font-semibold mt-4 text-lg flex items-center gap-3">
-          <span class="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse"></span>
-          {{ totalPhotos }} éclats de vie sauvegardés
-        </p>
+        <p class="text-amber-600 font-semibold mt-2 text-lg uppercase tracking-widest">{{ totalPhotos }} éclats de vie sauvegardés</p>
       </div>
 
       <div class="flex items-center self-start md:self-end">
         <button 
           type="button" 
           @click="showForm = !showForm"
-          class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-amber-600 hover:shadow-lg hover:shadow-amber-500/30 transition-all duration-300 flex items-center gap-2"
+          class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-amber-600 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 flex items-center gap-2"
           :class="{ 'bg-slate-200 !text-slate-700 hover:bg-slate-300': showForm }"
         >
           <Icon :name="showForm ? 'lucide:x' : 'lucide:plus'" class="w-5 h-5" />
