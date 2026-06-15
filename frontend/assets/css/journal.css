@@ -21,8 +21,8 @@
   z-index: -1;
 }
 
-/* Glass Card Common Definition */
-.glass-card {
+/* Glass Card Common Definition Scoped to Journal pages */
+.mso-journal .glass-card {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -1090,5 +1090,364 @@
   .lightbox-nav-btn {
     width: 44px;
     height: 44px;
+  }
+  
+  /* Stacking badges on extra small screens */
+  .post-header-row {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+  
+  @media (max-width: 580px) {
+    .post-header-row {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+    }
+    .post-header-row .flex-shrink-0 {
+      width: 100% !important;
+      align-items: flex-start !important;
+    }
+    .post-header-row .flex-shrink-0 .flex {
+      width: 100% !important;
+      flex-wrap: wrap !important;
+    }
+    .post-location-chip, .post-weather-chip {
+      max-width: 100% !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   7. LIVE PHONE SIMULATOR MOBILE SCALING OVERRIDES (DESKTOP)
+   ========================================================================== */
+
+.in-simulator .feed-post-card {
+  padding: 1.25rem 1rem !important;
+  border-radius: 18px !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.in-simulator .post-header-row {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 0.5rem !important;
+}
+
+.in-simulator .post-header-row .flex-shrink-0 {
+  width: 100% !important;
+  align-items: flex-start !important;
+}
+
+.in-simulator .post-header-row .flex-shrink-0 .flex {
+  width: 100% !important;
+  flex-wrap: wrap !important;
+}
+
+.in-simulator .post-location-chip,
+.in-simulator .post-weather-chip {
+  max-width: 100% !important;
+}
+
+.in-simulator .post-layout {
+  gap: 0.75rem !important;
+}
+
+.in-simulator .post-avatar-inner {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+.in-simulator .post-author-name {
+  font-size: 0.9rem !important;
+}
+
+.in-simulator .post-author-handle {
+  font-size: 0.75rem !important;
+}
+
+.in-simulator .post-timestamp {
+  font-size: 0.7rem !important;
+}
+
+.in-simulator .post-location-chip,
+.in-simulator .post-weather-chip {
+  padding: 0.2rem 0.5rem !important;
+  font-size: 0.7rem !important;
+}
+
+.in-simulator .post-title-text {
+  font-size: 1.15rem !important;
+}
+
+.in-simulator .post-caption-text {
+  font-size: 0.9rem !important;
+  line-height: 1.5 !important;
+}
+
+.in-simulator .weather-datetime-sub {
+  font-size: 0.55rem !important;
+}
+
+.in-simulator .media-grid-wrapper {
+  border-radius: 12px !important;
+}
+
+.in-simulator .doc-attachment-bar {
+  padding: 0.65rem 0.85rem !important;
+  border-radius: 12px !important;
+  gap: 0.75rem !important;
+}
+
+.in-simulator .doc-bar-icon-box {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+}
+
+.in-simulator .doc-bar-icon {
+  width: 1.1rem !important;
+  height: 1.1rem !important;
+}
+
+.in-simulator .doc-bar-name {
+  font-size: 0.8rem !important;
+}
+
+.in-simulator .doc-bar-download-btn {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+/* ==========================================================================
+   8. CREATIVE STUDIO WRITING CANVAS & NOTION PROPERTIES (DESKTOP/MOBILE)
+   ========================================================================== */
+
+/* Editor Canvas Card */
+.editor-canvas-card {
+  background: white;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 24px;
+  padding: 2.25rem;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.01);
+}
+
+.editor-writing-area {
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 1.5rem;
+}
+
+.editor-title-container {
+  margin-bottom: 1rem;
+}
+
+.editor-title-input {
+  width: 100%;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  padding: 0;
+  letter-spacing: -0.02em;
+}
+
+.editor-title-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Interactive helper Markdown Toolbar */
+.markdown-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.35rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.toolbar-tool-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toolbar-tool-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 18px;
+  background: #cbd5e1;
+  margin: 0 0.5rem;
+}
+
+/* Textarea & Gauges */
+.textarea-relative-wrapper {
+  position: relative;
+}
+
+.editor-textarea {
+  width: 100%;
+  min-height: 180px;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #1e293b;
+  padding: 0.25rem 0 2rem;
+  resize: none;
+}
+
+.editor-textarea::placeholder {
+  color: #94a3b8;
+}
+
+.editor-stats-overlay {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stat-bubble {
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+}
+
+.stat-gauge-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring__circle {
+  transition: stroke-dashoffset 0.35s;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* Notion-Style Properties Block */
+.properties-editor-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  background: rgba(248, 250, 252, 0.6);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 20px;
+  padding: 1.25rem 1.5rem;
+}
+
+.property-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  gap: 1rem;
+  min-height: 38px;
+}
+
+.property-label {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.property-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.property-value {
+  display: flex;
+  align-items: center;
+}
+
+.property-input-field {
+  width: 100%;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  padding: 0.35rem 0.5rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.property-input-field:hover, .property-input-field:focus {
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.property-input-autocomplete {
+  width: 100%;
+}
+
+.property-input-autocomplete input {
+  width: 100%;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  padding: 0.35rem 0.5rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.property-input-autocomplete input:hover, .property-input-autocomplete input:focus {
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.open-meteo-badge {
+  background: rgba(99, 102, 241, 0.08);
+  color: #6366f1;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 800;
+}
+
+.inline-automation-row {
+  border-top: 1px solid rgba(226, 232, 240, 0.5);
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .property-row {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+    align-items: flex-start;
   }
 }

@@ -41,10 +41,13 @@
       </div>
     </header>
 
+    <!-- Bulletproof layout spacer to force space under header -->
+    <div class="h-10 w-full relative z-10 flex-shrink-0"></div>
+
     <!-- Main Workspace (Dual-Pane Side-by-Side Professional Layout) -->
-    <main class="container mx-auto px-6 py-6 flex-1 relative z-10 max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start h-[calc(100vh-80px)] overflow-hidden">
-      <!-- LEFT SECTION: CREATIVE WRITING CANVAS (7 Cols on Desktop) -->
-      <section class="lg:col-span-7 flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+    <main class="container mx-auto px-6 pb-6 flex-1 relative z-10 max-w-7xl grid grid-cols-1 md:grid-cols-12 gap-8 items-start h-[calc(100vh-140px)] overflow-hidden">
+      <!-- LEFT SECTION: CREATIVE WRITING CANVAS (7 Cols on Desktop/Tablet) -->
+      <section class="md:col-span-7 flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
         <div class="editor-canvas-card">
           <!-- Text Editing Area -->
           <div class="editor-writing-area">
@@ -68,7 +71,7 @@
               <button type="button" class="toolbar-tool-btn" @click="wrapText('*', '*')" title="Italique (Ctrl+I)">
                 <Icon name="lucide:italic" class="w-4.5 h-4.5" />
               </button>
-              <button type="button" class="toolbar-tool-btn" @click="wrapText('> ', '')" title="Citation (Ctrl+Shift+U)">
+              <button type="button" class="toolbar-tool-btn" @click="wrapText('> ', '')" title="Citation">
                 <Icon name="lucide:quote" class="w-4.5 h-4.5" />
               </button>
               <button type="button" class="toolbar-tool-btn" @click="wrapText('`', '`')" title="Code">
@@ -131,6 +134,8 @@
                   v-model="location" 
                   placeholder="Ajouter un lieu principal..." 
                   class="property-input-autocomplete"
+                  :show-icon="false"
+                  @select="onLocationSelect"
                   @update:modelValue="queueDraftSave"
                 />
               </div>
@@ -204,10 +209,19 @@
               :class="{ 'drag-over': isDragOver }"
             >
               <Icon name="lucide:cloud-upload" class="dropzone-icon" />
-              <p v-if="!isDragOver">Glissez-deposez des clichés ou des fichiers ici</p>
+              <p v-if="!isDragOver">Glissez-déposez des clichés ou des fichiers ici</p>
               <p v-else class="text-indigo-500 font-bold">Lâchez pour charger !</p>
               <span class="dropzone-hint">Supporte Images, Vidéos MP4 et documents PDF (Max 10 Mo)</span>
             </div>
+
+            <input 
+              ref="fileInput" 
+              type="file" 
+              class="hidden" 
+              multiple 
+              accept="image/*,video/*,application/pdf" 
+              @change="handleFileChange" 
+            />
 
             <!-- Inline list of loaded files with captions -->
             <Transition name="slide-up">
@@ -223,7 +237,6 @@
                     </div>
                     <div class="file-name-overlay">{{ att.file.name }}</div>
                     
-                    <!-- Quick Delete button -->
                     <button type="button" class="quick-delete-btn" @click="removeAttachment(idx)" title="Supprimer">
                       <Icon name="lucide:x" class="w-4 h-4" />
                     </button>
@@ -254,17 +267,13 @@
         </div>
       </section>
 
-      <!-- RIGHT SECTION: LIVE MOBILE SANDBOX SIMULATOR (5 Cols on Desktop) -->
-      <section class="lg:col-span-5 h-full hidden lg:flex flex-col gap-4 items-center justify-center bg-slate-50/40 rounded-3xl border border-slate-200/50 p-6 relative">
-        <div class="preview-title-bar-top absolute top-6 left-6 right-6 flex items-center justify-between text-xs text-slate-400 font-extrabold uppercase tracking-widest">
+      <!-- RIGHT SECTION: LIVE MOBILE SANDBOX SIMULATOR (5 Cols on Desktop/Tablet - md breakpoint visible) -->
+      <section class="md:col-span-5 h-full hidden md:flex flex-col gap-4 items-center justify-center bg-slate-50/40 rounded-3xl border border-slate-200/50 p-6 relative">
+        <div class="preview-title-bar-top absolute top-6 left-6 right-6 flex items-center justify-center text-xs text-slate-400 font-extrabold uppercase tracking-widest">
           <span>Aperçu Mobile instantané</span>
-          <span class="flex items-center gap-1.5 text-indigo-500">
-            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
-            Synchronisé
-          </span>
         </div>
 
-        <div class="mobile-phone-simulator scale-95 origin-center">
+        <div class="mobile-phone-simulator scale-95 origin-center in-simulator">
           <div class="simulator-screen">
             <!-- Phone Notch / Status Bar -->
             <div class="simulator-status-bar">
@@ -278,7 +287,7 @@
 
             <!-- App Bar -->
             <div class="simulator-app-header">
-              <span class="font-display font-black text-slate-800 tracking-tight text-lg">MSO20s Journal</span>
+              <span class="font-display font-black text-slate-800 tracking-tight text-lg animate-pulse" style="animation-duration: 3s;">MSO20s Journal</span>
               <div class="flex items-center gap-2">
                 <Icon name="lucide:search" class="w-4 h-4 text-slate-500" />
                 <Icon name="lucide:bell" class="w-4 h-4 text-slate-500" />
@@ -294,8 +303,8 @@
       </section>
     </main>
 
-    <!-- Mobile-only floating Preview Toggle Button -->
-    <div class="lg:hidden fixed bottom-6 right-6 z-50">
+    <!-- Mobile-only floating Preview Toggle Button (Only active on small viewports < md) -->
+    <div class="md:hidden fixed bottom-6 right-6 z-50">
       <button 
         type="button" 
         class="mobile-preview-toggle-btn shadow-lg bg-indigo-600 text-white p-4 rounded-full flex items-center gap-2 font-bold"
@@ -309,20 +318,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { useRichPosts } from '~/composables/useRichPosts';
-import { useAuth } from '~/composables/useAuth';
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import JournalPostCard from '~/components/journal/JournalPostCard.vue';
 
-// Disable default global layout
-definePageMeta({
-  layout: false
-});
+definePageMeta({ layout: false });
 
 const { createRichPost } = useRichPosts();
 const { user } = useAuth();
 
-// Editor core fields
+// Core states
 const title = ref('');
 const caption = ref('');
 const location = ref('');
@@ -330,14 +334,18 @@ const eventDate = ref('');
 const eventTime = ref('');
 const attachments = ref<any[]>([]);
 
-// Layout local states
 const activeTab = ref<'editor' | 'preview'>('editor');
+const isSubmitting = ref(false);
 const isDragOver = ref(false);
 const fileInput = ref<HTMLInputElement>();
 const textareaRef = ref<HTMLTextAreaElement>();
-const isSubmitting = ref(false);
 
-// Draft auto-save states
+// GPS Coordinates and Live Weather for Mobile Simulator Preview
+const selectedLatitude = ref<number | null>(null);
+const selectedLongitude = ref<number | null>(null);
+const simulatorWeatherInfo = ref<string | null>(null);
+
+// Draft states
 const isSavingDraft = ref(false);
 const draftStatusText = ref('Brouillon à jour');
 let autoSaveTimeout: any = null;
@@ -350,10 +358,7 @@ const wordCount = computed(() => {
   return caption.value.trim().split(/\s+/).length;
 });
 
-const strokeDasharray = computed(() => {
-  const radius = 8;
-  return 2 * Math.PI * radius; // Approx 50.26
-});
+const strokeDasharray = computed(() => 2 * Math.PI * 8);
 
 const strokeDashoffset = computed(() => {
   const ratio = Math.min(charCount.value / maxChars, 1);
@@ -362,9 +367,9 @@ const strokeDashoffset = computed(() => {
 
 const gaugeColor = computed(() => {
   const ratio = charCount.value / maxChars;
-  if (ratio > 0.9) return '#ef4444'; // Red
-  if (ratio > 0.75) return '#f59e0b'; // Amber
-  return '#6366f1'; // Indigo
+  if (ratio > 0.9) return '#ef4444';
+  if (ratio > 0.75) return '#f59e0b';
+  return '#6366f1';
 });
 
 // Live Mock Post data feeding the Mobile Simulator
@@ -376,11 +381,9 @@ const mockPost = computed(() => {
     location: location.value,
     event_date: eventDate.value,
     event_time: eventTime.value,
-    weather_info: eventDate.value && location.value ? '☀️ 18.5°C - Ciel dégagé (Aperçu)' : null,
+    weather_info: simulatorWeatherInfo.value || (eventDate.value && location.value ? '☁️ Recherche météo...' : null),
     created_at: new Date().toISOString(),
-    author: {
-      username: user?.value?.username || 'Antoine'
-    },
+    author: { username: user?.value?.username || 'Antoine' },
     attachments: attachments.value.map((att, idx) => ({
       id: idx,
       file_url: att.previewUrl,
@@ -392,7 +395,6 @@ const mockPost = computed(() => {
   };
 });
 
-// Textarea auto-expanding heights
 const onTextareaInput = () => {
   adjustTextareaHeight();
   queueDraftSave();
@@ -405,20 +407,15 @@ const adjustTextareaHeight = () => {
   el.style.height = `${Math.min(el.scrollHeight, 400)}px`;
 };
 
-// Text helper manipulations for markdown format toolbar
 const wrapText = (before: string, after: string) => {
   const el = textareaRef.value;
   if (!el) return;
-  
   const start = el.selectionStart;
   const end = el.selectionEnd;
   const text = caption.value;
   const selected = text.substring(start, end);
-  
   caption.value = text.substring(0, start) + before + selected + after + text.substring(end);
   queueDraftSave();
-  
-  // Refocus and restore cursor
   nextTick(() => {
     el.focus();
     el.setSelectionRange(start + before.length, start + before.length + selected.length);
@@ -428,25 +425,20 @@ const wrapText = (before: string, after: string) => {
 const insertText = (str: string) => {
   const el = textareaRef.value;
   if (!el) return;
-  
   const start = el.selectionStart;
   const text = caption.value;
-  
   caption.value = text.substring(0, start) + str + text.substring(start);
   queueDraftSave();
-  
   nextTick(() => {
     el.focus();
     el.setSelectionRange(start + str.length, start + str.length);
   });
 };
 
-// Toggle mobile preview tab
 const toggleMobilePreview = () => {
   activeTab.value = activeTab.value === 'editor' ? 'preview' : 'editor';
 };
 
-// File handlers
 const triggerFileInput = () => {
   fileInput.value?.click();
 };
@@ -464,13 +456,7 @@ const processFiles = (files: FileList) => {
     } else if (ext === 'pdf') {
       fileType = 'PDF';
     }
-    attachments.value.push({
-      file,
-      previewUrl,
-      fileType,
-      caption: '',
-      location: ''
-    });
+    attachments.value.push({ file, previewUrl, fileType, caption: '', location: '' });
   }
   queueDraftSave();
 };
@@ -491,7 +477,6 @@ const removeAttachment = (index: number) => {
   queueDraftSave();
 };
 
-// Auto-save local draft system
 const queueDraftSave = () => {
   draftStatusText.value = 'Brouillon en cours de modification...';
   if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
@@ -501,17 +486,15 @@ const queueDraftSave = () => {
 const saveDraftToLocalStorage = () => {
   isSavingDraft.value = true;
   draftStatusText.value = 'Sauvegarde...';
-  
-  const draftData = {
+  localStorage.setItem('mso_journal_draft_zen_v2', JSON.stringify({
     title: title.value,
     caption: caption.value,
     location: location.value,
     eventDate: eventDate.value,
-    eventTime: eventTime.value
-  };
-
-  localStorage.setItem('mso_journal_draft_zen_v2', JSON.stringify(draftData));
-  
+    eventTime: eventTime.value,
+    lat: selectedLatitude.value,
+    lon: selectedLongitude.value
+  }));
   setTimeout(() => {
     isSavingDraft.value = false;
     draftStatusText.value = 'Brouillon enregistré localement';
@@ -528,9 +511,14 @@ const loadDraftFromLocalStorage = () => {
       location.value = data.location || '';
       eventDate.value = data.eventDate || '';
       eventTime.value = data.eventTime || '';
+      selectedLatitude.value = data.lat || null;
+      selectedLongitude.value = data.lon || null;
       
       setTimeout(() => {
         adjustTextareaHeight();
+        if (selectedLatitude.value && selectedLongitude.value) {
+          fetchLiveWeatherForSimulator();
+        }
       }, 100);
     } catch (e) {
       console.error('Erreur de chargement du brouillon:', e);
@@ -540,11 +528,8 @@ const loadDraftFromLocalStorage = () => {
 
 const clearDraftConfirm = () => {
   if (confirm('Voulez-vous vraiment effacer entièrement votre brouillon actuel ?')) {
-    title.value = '';
-    caption.value = '';
-    location.value = '';
-    eventDate.value = '';
-    eventTime.value = '';
+    title.value = ''; caption.value = ''; location.value = ''; eventDate.value = ''; eventTime.value = '';
+    selectedLatitude.value = null; selectedLongitude.value = null; simulatorWeatherInfo.value = null;
     attachments.value.forEach(att => URL.revokeObjectURL(att.previewUrl));
     attachments.value = [];
     localStorage.removeItem('mso_journal_draft_zen_v2');
@@ -553,11 +538,161 @@ const clearDraftConfirm = () => {
   }
 };
 
-// Form submission handler
+// Open-Meteo Local coordinate resolver fallback (matches Django backend resolving)
+const localResolveCoordinates = (locationName: string): { lat: number; lon: number } | null => {
+  if (!locationName) return null;
+  const name = locationName.trim().toLowerCase();
+  const gpsMap: Record<string, [number, number]> = {
+    "semnoz": [45.7981, 6.1042],
+    "crêt de châtillon": [45.7981, 6.1042],
+    "lac d'annecy": [45.8992, 6.1294],
+    "annecy": [45.8992, 6.1294],
+    "cinéma pathé": [45.9032, 6.1214],
+    "cinéma pathé annecy": [45.9032, 6.1214],
+    "pathé": [45.9032, 6.1214],
+    "cinema": [45.9032, 6.1214],
+    "cinéma": [45.9032, 6.1214],
+    "col de la forclaz": [45.8111, 6.2435],
+    "forclaz": [45.8111, 6.2435],
+    "aravis": [45.87, 6.35],
+    "bivouac aravis": [45.87, 6.35],
+    "chamonix": [45.92, 6.87],
+    "aiguille du midi": [45.92, 6.87]
+  };
+  
+  for (const [key, coords] of Object.entries(gpsMap)) {
+    if (name.includes(key)) {
+      return { lat: coords[0], lon: coords[1] };
+    }
+  }
+  return null;
+};
+
+// Open-Meteo Real-time Live Weather Retriever for Mobile Simulator
+const onLocationSelect = (data: { latitude: number; longitude: number; display_name: string }) => {
+  selectedLatitude.value = data.latitude;
+  selectedLongitude.value = data.longitude;
+  fetchLiveWeatherForSimulator();
+  queueDraftSave();
+};
+
+const fetchLiveWeatherForSimulator = async () => {
+  let lat = selectedLatitude.value;
+  let lon = selectedLongitude.value;
+  
+  // If no coordinates yet, try to resolve locally from input string (user typed)
+  if (!lat || !lon) {
+    const coords = localResolveCoordinates(location.value);
+    if (coords) {
+      lat = coords.lat;
+      lon = coords.lon;
+    }
+  }
+
+  if (!lat || !lon || !eventDate.value) {
+    simulatorWeatherInfo.value = null;
+    return;
+  }
+  
+  simulatorWeatherInfo.value = '☁️ Recherche météo...';
+  
+  try {
+    const dateStr = eventDate.value;
+    const todayStr = new Date().toISOString().split('T')[0];
+    const deltaDays = Math.floor((new Date(todayStr).getTime() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
+    
+    let url = "";
+    if (0 <= deltaDays && deltaDays <= 90) {
+      url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&past_days=${deltaDays}&hourly=temperature_2m,weather_code`;
+    } else {
+      url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${dateStr}&end_date=${dateStr}&hourly=temperature_2m,weather_code`;
+    }
+    
+    const res = await fetch(url);
+    if (!res.ok) {
+      simulatorWeatherInfo.value = null;
+      return;
+    }
+    const data = await res.json();
+    const hourly = data.hourly || {};
+    const times = hourly.time || [];
+    const temps = hourly.temperature_2m || [];
+    const codes = hourly.weather_code || [];
+    
+    if (!times.length || !temps.length || !codes.length) {
+      simulatorWeatherInfo.value = null;
+      return;
+    }
+    
+    let index = 0;
+    if (eventTime.value) {
+      const timePrefix = eventTime.value.substring(0, 2);
+      const foundIdx = times.findIndex((t: string) => t.startsWith(`${dateStr}T${timePrefix}:`));
+      if (foundIdx !== -1) index = foundIdx;
+    }
+    
+    let temp = temps[index];
+    let code = codes[index];
+    
+    if (index === 0 && !eventTime.value) {
+      // Average temp
+      temp = temps.reduce((a: number, b: number) => a + b, 0) / temps.length;
+      // Dominant weather code
+      const counts = codes.reduce((acc: any, val: number) => {
+        acc[val] = (acc[val] || 0) + 1;
+        return acc;
+      }, {});
+      const sortedCodes = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+      code = parseInt(sortedCodes[0], 10);
+    }
+    
+    const WMO_MAP: any = {
+      0: ['☀️', 'Ciel dégagé'],
+      1: ['🌤️', 'Principalement dégagé'],
+      2: ['⛅', 'Partiellement nuageux'],
+      3: ['☁️', 'Nuageux'],
+      45: ['🌫️', 'Brouillard'],
+      48: ['🌫️', 'Brouillard givrant'],
+      51: ['🌧️', 'Bruine légère'],
+      53: ['🌧️', 'Bruine modérée'],
+      55: ['🌧️', 'Bruine dense'],
+      56: ['🌧️', 'Bruine verglaçante'],
+      57: ['🌧️', 'Bruine verglaçante'],
+      61: ['🌧️', 'Pluie faible'],
+      63: ['🌧️', 'Pluie modérée'],
+      65: ['🌧️', 'Pluie forte'],
+      66: ['🌧️', 'Pluie verglaçante'],
+      67: ['🌧️', 'Pluie verglaçante'],
+      71: ['❄️', 'Neige légère'],
+      73: ['❄️', 'Neige modérée'],
+      75: ['❄️', 'Neige forte'],
+      77: ['❄️', 'Grains de neige'],
+      80: ['🌦️', 'Averses de pluie'],
+      81: ['🌦️', 'Averses de pluie'],
+      82: ['🌦️', 'Averses de pluie'],
+      85: ['❄️', 'Averses de neige'],
+      86: ['❄️', 'Averses de neige'],
+      95: ['⛈️', 'Orage'],
+      96: ['⛈️', 'Orage avec grêle'],
+      99: ['⛈️', 'Orage avec grêle']
+    };
+    
+    const [emoji, desc] = WMO_MAP[code] || ['🌡️', 'Météo générale'];
+    simulatorWeatherInfo.value = `${emoji} ${temp.toFixed(1)}°C - ${desc} (Direct)`;
+  } catch (e) {
+    console.error('Erreur lors du fetch météo de simulation :', e);
+    simulatorWeatherInfo.value = null;
+  }
+};
+
+// Re-fetch live weather as soon as location, eventDate, or eventTime changes!
+watch([eventDate, eventTime, location], () => {
+  fetchLiveWeatherForSimulator();
+});
+
 const handleSubmit = async () => {
   isSubmitting.value = true;
   const fd = new FormData();
-  
   fd.append('title', title.value);
   fd.append('caption', caption.value);
   fd.append('location', location.value);
@@ -571,42 +706,50 @@ const handleSubmit = async () => {
   });
 
   if (await createRichPost(fd)) {
-    // Clear draft storage and local states
     localStorage.removeItem('mso_journal_draft_zen_v2');
     attachments.value.forEach(att => URL.revokeObjectURL(att.previewUrl));
     attachments.value = [];
-    
-    // Redirect back to main feed
     navigateTo('/journal');
   } else {
     isSubmitting.value = false;
   }
 };
 
+const preventGlobalDragDrop = (e: DragEvent) => {
+  if (e.target && !(e.target as HTMLElement).closest('.dropzone-zen')) {
+    e.preventDefault();
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'none';
+      e.dataTransfer.dropEffect = 'none';
+    }
+  }
+};
+
 onMounted(() => {
   loadDraftFromLocalStorage();
-  
-  // Set default date to today if empty draft
   if (!eventDate.value) {
-    const today = new Date().toISOString().split('T')[0];
-    eventDate.value = today;
+    eventDate.value = new Date().toISOString().split('T')[0];
   }
+  window.addEventListener('dragover', preventGlobalDragDrop);
+  window.addEventListener('drop', preventGlobalDragDrop);
 });
 
 onBeforeUnmount(() => {
   if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
   attachments.value.forEach(att => URL.revokeObjectURL(att.previewUrl));
+  window.removeEventListener('dragover', preventGlobalDragDrop);
+  window.removeEventListener('drop', preventGlobalDragDrop);
 });
 
 useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
 </script>
 
-<style scoped>
+<style>
 @import '~/assets/css/journal.css';
 
-/* Custom Workspace elements styling */
 .writing-zen-mode {
   padding-top: 0 !important;
+  padding-bottom: 0 !important;
   height: 100vh;
   overflow: hidden;
   display: flex;
@@ -614,7 +757,7 @@ useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
 }
 
 .zen-header {
-  border-b: 1px solid rgba(226, 232, 240, 0.5);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
   z-index: 100;
 }
 
@@ -647,481 +790,519 @@ useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 
-.draft-autosave-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #64748b;
-  background: #f1f5f9;
-  padding: 0.45rem 1rem;
-  border-radius: 9999px;
-  transition: all 0.2s;
-}
-
-.draft-autosave-indicator.saving {
-  color: #6366f1;
-  background: rgba(99, 102, 241, 0.08);
-}
-
-.publish-top-btn {
-  background: #0f172a;
-  color: white;
-  border: none;
-  padding: 0.55rem 1.35rem;
-  border-radius: 9999px;
-  font-size: 0.9rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
-}
-
-.publish-top-btn:hover:not(:disabled) {
-  background: #6366f1;
-  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.25);
-  transform: translateY(-1px);
-}
-
-.publish-top-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* Tabs only for small screens */
-.tabs-navigation-bar {
-  display: none;
-}
-
 @media (max-width: 1023px) {
-  .tabs-navigation-bar {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.35rem;
-    background: #f1f5f9;
-    border-radius: 14px;
-    width: fit-content;
-    border: 1px solid rgba(226, 232, 240, 0.5);
+  .writing-zen-mode {
+    height: auto !important;
+    overflow: auto !important;
   }
-}
-
-.tab-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1.25rem;
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: #64748b;
-  border-radius: 10px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.tab-nav-item:hover {
-  color: #0f172a;
-}
-
-.tab-nav-item.active {
-  color: #6366f1;
-  background: white;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
-}
-
-/* Editor Canvas Card */
-.editor-canvas-card {
-  background: white;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 24px;
-  padding: 2.25rem;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.01);
-}
-
-.editor-writing-area {
-  border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 1.5rem;
-}
-
-.editor-title-container {
-  margin-bottom: 1rem;
-}
-
-.editor-title-input {
-  width: 100%;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  font-family: var(--font-display);
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #0f172a;
-  padding: 0;
-  letter-spacing: -0.02em;
-}
-
-.editor-title-input::placeholder {
-  color: #94a3b8;
-}
-
-/* Interactive helper Markdown Toolbar */
-.markdown-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  padding: 0.35rem;
-  border-radius: 12px;
-  margin-bottom: 1rem;
-}
-
-.toolbar-tool-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #64748b;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.toolbar-tool-btn:hover {
-  background: #f1f5f9;
-  color: #0f172a;
-}
-
-.toolbar-divider {
-  width: 1px;
-  height: 18px;
-  background: #cbd5e1;
-  margin: 0 0.5rem;
-}
-
-/* Textarea & Gauges */
-.textarea-relative-wrapper {
-  position: relative;
-}
-
-.editor-textarea {
-  width: 100%;
-  min-height: 180px;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  font-family: var(--font-body);
-  font-size: 1.1rem;
-  line-height: 1.7;
-  color: #1e293b;
-  padding: 0.25rem 0 2rem;
-  resize: none;
-}
-
-.editor-textarea::placeholder {
-  color: #94a3b8;
-}
-
-.editor-stats-overlay {
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.stat-bubble {
-  font-size: 0.775rem;
-  font-weight: 700;
-  color: #64748b;
-  background: #f1f5f9;
-  padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
-}
-
-.stat-gauge-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.progress-ring__circle {
-  transition: stroke-dashoffset 0.35s;
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
-}
-
-/* Drag and drop zone */
-.dropzone-zen {
-  border: 2px dashed #cbd5e1;
-  border-radius: 18px;
-  padding: 2.25rem 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  background: rgba(99, 102, 241, 0.01);
-}
-
-.dropzone-zen:hover, .dropzone-zen.drag-over {
-  border-color: #6366f1;
-  background: rgba(99, 102, 241, 0.03);
-}
-
-.dropzone-icon {
-  font-size: 2.25rem;
-  color: #6366f1;
-  margin-bottom: 0.5rem;
-  transition: transform 0.25s;
-}
-
-.dropzone-zen:hover .dropzone-icon {
-  transform: translateY(-2px);
-}
-
-.dropzone-zen p {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #475569;
-}
-
-.dropzone-zen p span {
-  color: #6366f1;
-  text-decoration: underline;
-}
-
-.dropzone-hint {
-  display: block;
-  font-size: 0.775rem;
-  color: #94a3b8;
-  margin-top: 0.35rem;
-  font-weight: 600;
-}
-
-.attachments-upload-header-row {
-  border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 0.75rem;
-}
-
-.upload-trigger-inline-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: #6366f1;
-  background: rgba(99, 102, 241, 0.06);
-  border: none;
-  padding: 0.45rem 0.85rem;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.upload-trigger-inline-btn:hover {
-  background: rgba(99, 102, 241, 0.12);
-  transform: scale(1.02);
-}
-
-/* Smartphone Simulator */
-.mobile-phone-simulator {
-  width: 320px;
-  background: #0f172a;
-  border: 10px solid #1e293b;
-  border-radius: 36px;
-  box-shadow: 
-    0 25px 60px -15px rgba(15, 23, 42, 0.25),
-    0 0 0 1px rgba(255,255,255,0.03);
-  overflow: hidden;
-  height: 600px;
-  display: flex;
-  flex-direction: column;
-}
-
-.simulator-screen {
-  flex: 1;
-  background: #f8fafc;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.simulator-status-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.4rem 1.25rem 0.2rem;
-  background: white;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.status-icons {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.simulator-app-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1.25rem 0.5rem;
-  background: white;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.simulator-content-area {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.75rem;
-}
-
-/* Notion-style Properties Block */
-.properties-editor-box {
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-  background: rgba(248, 250, 252, 0.6);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 20px;
-  padding: 1.25rem 1.5rem;
-}
-
-.property-row {
-  display: grid;
-  grid-template-columns: 180px 1fr;
-  align-items: center;
-  gap: 1rem;
-  min-height: 38px;
-}
-
-.property-label {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #64748b;
-}
-
-.property-icon {
-  width: 1rem;
-  height: 1rem;
-}
-
-.property-value {
-  display: flex;
-  align-items: center;
-}
-
-.property-input-field {
-  width: 100%;
-  border: none !important;
-  background: transparent !important;
-  font-size: 0.9rem !important;
-  font-weight: 700 !important;
-  color: #1e293b !important;
-  padding: 0.35rem 0.5rem !important;
-  outline: none !important;
-  box-shadow: none !important;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-
-.property-input-field:hover, .property-input-field:focus {
-  background: rgba(15, 23, 42, 0.03);
-}
-
-.property-input-autocomplete {
-  width: 100%;
-}
-
-.property-input-autocomplete :deep(input) {
-  width: 100%;
-  border: none !important;
-  background: transparent !important;
-  font-size: 0.9rem !important;
-  font-weight: 700 !important;
-  color: #1e293b !important;
-  padding: 0.35rem 0.5rem !important;
-  outline: none !important;
-  box-shadow: none !important;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-
-.property-input-autocomplete :deep(input:hover), .property-input-autocomplete :deep(input:focus) {
-  background: rgba(15, 23, 42, 0.03);
-}
-
-.open-meteo-badge {
-  background: rgba(99, 102, 241, 0.08);
-  color: #6366f1;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-weight: 800;
-}
-
-.inline-automation-row {
-  border-top: 1px solid rgba(226, 232, 240, 0.5);
-  margin-top: 0.25rem;
-  padding-top: 0.75rem;
-}
-
-@media (max-width: 640px) {
-  .property-row {
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
-    align-items: flex-start;
-  }
-}
-
-/* Custom Scrollbars */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 99px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Floating mobile preview action */
-.mobile-preview-toggle-btn {
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.mobile-preview-toggle-btn:hover {
-  transform: scale(1.05);
-}
-
-@media (max-width: 1023px) {
   main {
     height: auto !important;
     overflow: visible !important;
   }
+}
+
+/* Local Styles of create.vue for complete, bulletproof layout security */
+.editor-canvas-card {
+  background: white !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 24px !important;
+  padding: 2.25rem !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.01) !important;
+}
+
+.editor-writing-area {
+  border-bottom: 1px solid #f1f5f9 !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.editor-title-container {
+  margin-bottom: 1rem !important;
+}
+
+.editor-title-input {
+  width: 100% !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-family: var(--font-display) !important;
+  font-size: 1.75rem !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  padding: 0 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.editor-title-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Interactive Formatting Toolbar */
+.markdown-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 0.35rem !important;
+  border-radius: 12px !important;
+  margin-bottom: 1rem !important;
+}
+
+.toolbar-tool-btn {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #64748b !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+.toolbar-tool-btn:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.toolbar-divider {
+  width: 1px !important;
+  height: 18px !important;
+  background: #cbd5e1 !important;
+  margin: 0 0.5rem !important;
+}
+
+.textarea-relative-wrapper {
+  position: relative !important;
+}
+
+.editor-textarea {
+  width: 100% !important;
+  min-height: 180px !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-family: var(--font-body) !important;
+  font-size: 1.1rem !important;
+  line-height: 1.7 !important;
+  color: #1e293b !important;
+  padding: 0.25rem 0 2rem !important;
+  resize: none !important;
+}
+
+.editor-textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.editor-stats-overlay {
+  position: absolute !important;
+  bottom: 0px !important;
+  right: 0px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+}
+
+.stat-bubble {
+  font-size: 0.775rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  background: #f1f5f9 !important;
+  padding: 0.25rem 0.65rem !important;
+  border-radius: 9999px !important;
+}
+
+.stat-gauge-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.progress-ring__circle {
+  transition: stroke-dashoffset 0.35s !important;
+  transform: rotate(-90deg) !important;
+  transform-origin: 50% 50% !important;
+}
+
+/* Notion-style Properties Block */
+.properties-editor-box {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.625rem !important;
+  background: rgba(248, 250, 252, 0.6) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 20px !important;
+  padding: 1.25rem 1.5rem !important;
+}
+
+.property-row {
+  display: grid !important;
+  grid-template-columns: 180px 1fr !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  min-height: 38px !important;
+}
+
+.property-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+}
+
+.property-icon {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+.property-value {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.property-input-field {
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  padding: 0.35rem 0.5rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+  transition: background 0.2s !important;
+}
+
+.property-input-field:hover, .property-input-field:focus {
+  background: rgba(15, 23, 42, 0.03) !important;
+}
+
+.property-input-autocomplete {
+  width: 100% !important;
+}
+
+.property-input-autocomplete input {
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  padding: 0.35rem 0.5rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+  transition: background 0.2s !important;
+}
+
+.property-input-autocomplete input:hover, .property-input-autocomplete input:focus {
+  background: rgba(15, 23, 42, 0.03) !important;
+}
+
+.open-meteo-badge {
+  background: rgba(99, 102, 241, 0.08) !important;
+  color: #6366f1 !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+  font-weight: 800 !important;
+}
+
+.inline-automation-row {
+  border-top: 1px solid rgba(226, 232, 240, 0.5) !important;
+  margin-top: 0.25rem !important;
+  padding-top: 0.75rem !important;
+}
+
+@media (max-width: 640px) {
+  .property-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.25rem !important;
+    align-items: flex-start !important;
+  }
+}
+
+/* Smartphone Simulator */
+.mobile-phone-simulator {
+  width: 320px !important;
+  background: #0f172a !important;
+  border: 10px solid #1e293b !important;
+  border-radius: 36px !important;
+  box-shadow: 
+    0 25px 60px -15px rgba(15, 23, 42, 0.25) !important,
+    0 0 0 1px rgba(255,255,255,0.03) !important;
+  overflow: hidden !important;
+  height: 600px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.simulator-screen {
+  flex: 1 !important;
+  background: #f8fafc !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.simulator-status-bar {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0.4rem 1.25rem 0.2rem !important;
+  background: white !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+}
+
+.status-icons {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+}
+
+.simulator-app-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0.75rem 1.25rem 0.5rem !important;
+  background: white !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.simulator-content-area {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 0.75rem !important;
+}
+
+/* Media & Docs Upload Deck Local Fallback styling */
+.composer-attachments-section {
+  margin-top: 1.5rem !important;
+  padding-top: 1.25rem !important;
+  border-top: 1px solid #f1f5f9 !important;
+}
+
+.attachments-upload-header-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  padding-bottom: 0.75rem !important;
+}
+
+.attachments-heading {
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: #64748b !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.upload-trigger-inline-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  font-size: 0.8rem !important;
+  font-weight: 800 !important;
+  color: #6366f1 !important;
+  background: rgba(99, 102, 241, 0.06) !important;
+  border: none !important;
+  padding: 0.45rem 0.85rem !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+.upload-trigger-inline-btn:hover {
+  background: rgba(99, 102, 241, 0.12) !important;
+  transform: scale(1.02) !important;
+}
+
+.dropzone-zen {
+  border: 2px dashed #cbd5e1 !important;
+  border-radius: 18px !important;
+  padding: 2.25rem 2rem !important;
+  text-align: center !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+  background: rgba(99, 102, 241, 0.01) !important;
+}
+
+.dropzone-zen:hover, .dropzone-zen.drag-over {
+  border-color: #6366f1 !important;
+  background: rgba(99, 102, 241, 0.03) !important;
+}
+
+.dropzone-icon {
+  font-size: 2.25rem !important;
+  color: #6366f1 !important;
+  margin-bottom: 0.5rem !important;
+  transition: transform 0.25s !important;
+}
+
+.dropzone-zen:hover .dropzone-icon {
+  transform: translateY(-2px) !important;
+}
+
+.dropzone-zen p {
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #475569 !important;
+}
+
+.dropzone-zen p span {
+  color: #6366f1 !important;
+  text-decoration: underline !important;
+}
+
+.dropzone-hint {
+  display: block !important;
+  font-size: 0.775rem !important;
+  color: #94a3b8 !important;
+  margin-top: 0.35rem !important;
+  font-weight: 600 !important;
+}
+
+.composer-attachments-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem !important;
+}
+
+.composer-att-card {
+  display: flex !important;
+  gap: 1.25rem !important;
+  padding: 1rem !important;
+  background: #f8fafc !important;
+  border: 1px solid #f1f5f9 !important;
+  border-radius: 16px !important;
+  align-items: center !important;
+}
+
+.att-media-preview {
+  width: 80px !important;
+  height: 80px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  background: #e2e8f0 !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
+}
+
+.att-preview-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.att-preview-placeholder {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #f1f5f9 !important;
+}
+
+.file-name-overlay {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  background: rgba(15, 23, 42, 0.85) !important;
+  color: white !important;
+  font-size: 0.6rem !important;
+  padding: 3px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-weight: 600 !important;
+}
+
+.quick-delete-btn {
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  background: rgba(239, 68, 68, 0.9) !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
+}
+
+.quick-delete-btn:hover {
+  background: #ef4444 !important;
+  transform: scale(1.1) !important;
+}
+
+.att-inputs-column {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+}
+
+.att-caption-input {
+  width: 100% !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  padding: 0.45rem 0.75rem !important;
+  font-size: 0.85rem !important;
+  background: white !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s !important;
+}
+
+.att-caption-input:focus {
+  border-color: #6366f1 !important;
+}
+
+.att-loc-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  padding: 0.35rem 0.65rem !important;
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  max-width: 240px !important;
+}
+
+.att-location-input {
+  flex: 1 !important;
+}
+
+.att-location-input :deep(input) {
+  width: 100% !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
 }
 </style>
