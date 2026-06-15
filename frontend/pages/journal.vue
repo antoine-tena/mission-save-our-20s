@@ -16,28 +16,17 @@
       subtitle-class="text-indigo-600"
     >
       <template #actions>
-        <button 
-          type="button" 
+        <NuxtLink 
+          to="/journal/create" 
           class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-indigo-600 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:shadow-indigo-500/30 flex items-center gap-2"
-          :class="{ '!bg-indigo-600 !shadow-indigo-500/30': showForm }" 
-          @click="showForm = !showForm"
         >
-          <Icon :name="showForm ? 'lucide:x' : 'lucide:plus'" class="w-5 h-5" />
-          <span>{{ showForm ? 'Fermer le carnet' : 'Nouvelle page' }}</span>
-        </button>
+          <Icon name="lucide:plus" class="w-5 h-5" />
+          <span>Nouvelle page</span>
+        </NuxtLink>
       </template>
     </PageHero>
 
     <div class="container journal-body">
-      <!-- Rich Post Form -->
-      <Transition name="slide-down">
-        <JournalCreateForm 
-          v-if="showForm" 
-          ref="createFormRef" 
-          @submit="onFormSubmit" 
-        />
-      </Transition>
-
       <!-- Rich Posts Feed -->
       <div v-if="isLoading" class="loader-container">
         <Icon name="lucide:loader-2" class="spin main-loader" />
@@ -62,24 +51,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { useRichPosts } from '~/composables/useRichPosts';
 import JournalPostCard from '~/components/journal/JournalPostCard.vue';
-import JournalCreateForm from '~/components/journal/JournalCreateForm.vue';
 
-const { richPosts, isLoading, fetchRichPosts, createRichPost } = useRichPosts();
-
-const showForm = ref(false);
-const createFormRef = ref<any>(null);
-
-const onFormSubmit = async (fd: FormData) => {
-  if (await createRichPost(fd)) {
-    createFormRef.value?.resetForm();
-    showForm.value = false;
-  } else {
-    createFormRef.value.isSubmitting = false; // Reset loading state in form if error
-  }
-};
+const { richPosts, isLoading, fetchRichPosts } = useRichPosts();
 
 onMounted(fetchRichPosts);
 useSeoMeta({ title: 'Le Journal — MSO20s' });
