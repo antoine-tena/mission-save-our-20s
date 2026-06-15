@@ -30,6 +30,11 @@
             <Icon name="lucide:map-pin" class="chip-icon" />
             <span>{{ post.location }}</span>
           </div>
+
+          <!-- Weather Badge -->
+          <div v-if="post.weather_info" class="post-weather-chip" :title="post.weather_info">
+            <span>{{ post.weather_info }}</span>
+          </div>
         </header>
 
         <!-- Post Body -->
