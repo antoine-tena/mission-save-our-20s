@@ -29,4 +29,9 @@ html, body, #__nuxt {
   padding: 0;
   height: 100%;
 }
+
+/* Redéfinir la hauteur de l'ancien header horizontal à 0px pour adapter automatiquement toutes les pages existantes ! */
+:root {
+  --header-height: 0px !important;
+}
 </style>
