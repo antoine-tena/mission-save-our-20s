@@ -10,7 +10,7 @@
     </div>
 
     <!-- 2. CENTER NAVIGATION ICONS -->
-    <nav class="flex-1 w-full flex flex-col items-center justify-center gap-2">
+    <nav class="flex-1 w-full flex flex-col items-center justify-center gap-1">
       <NuxtLink 
         v-for="item in navItems" 
         :key="item.to" 
@@ -27,7 +27,7 @@
     </nav>
 
     <!-- 3. BOTTOM USER & LOGOUT ICONS -->
-    <div class="w-full flex flex-col items-center gap-2 mt-auto pt-4 border-t border-gray-100 flex-shrink-0">
+    <div class="w-full flex flex-col items-center gap-1 mt-auto pt-4 border-t border-gray-100 flex-shrink-0">
       <!-- Profile Link -->
       <NuxtLink 
         to="/profile" 
