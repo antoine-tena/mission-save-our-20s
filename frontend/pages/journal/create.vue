@@ -7,7 +7,7 @@
     </div>
 
     <!-- Mère/Daughter Custom Zen Header -->
-    <ZenEditorHeader 
+    <JournalZenEditorHeader 
       :draft-status-text="draftStatusText"
       :is-saving-draft="isSavingDraft"
       :is-submitting="isSubmitting"
@@ -24,7 +24,7 @@
       <section class="lg:col-span-7 flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
         <div class="editor-canvas-card">
           <!-- Text and Notion Property Row (Fille) -->
-          <ZenEditorForm 
+          <JournalZenEditorForm 
             ref="editorFormRef"
             v-model:title="title"
             v-model:caption="caption"
@@ -41,7 +41,7 @@
           />
 
           <!-- Media Attachments Row (Fille) -->
-          <ZenEditorAttachments 
+          <JournalZenEditorAttachments 
             v-model="attachments" 
             @update:modelValue="queueDraftSave"
           />
@@ -49,7 +49,7 @@
       </section>
 
       <!-- RIGHT SECTION: LIVE MOBILE SANDBOX SIMULATOR (Fille) -->
-      <ZenEditorSimulator :mock-post="mockPost" />
+      <JournalZenEditorSimulator :mock-post="mockPost" />
     </main>
 
     <!-- Mobile-only floating Preview Toggle Button -->
@@ -68,10 +68,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import ZenEditorHeader from '~/components/journal/ZenEditorHeader.vue';
-import ZenEditorForm from '~/components/journal/ZenEditorForm.vue';
-import ZenEditorAttachments from '~/components/journal/ZenEditorAttachments.vue';
-import ZenEditorSimulator from '~/components/journal/ZenEditorSimulator.vue';
 
 definePageMeta({ layout: false });
 
