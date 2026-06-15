@@ -262,6 +262,10 @@ useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
 }
 
 @media (max-width: 1023px) {
+  .writing-zen-mode {
+    height: auto !important;
+    overflow: auto !important;
+  }
   main {
     height: auto !important;
     overflow: visible !important;

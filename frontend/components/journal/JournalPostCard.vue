@@ -254,8 +254,15 @@ const formatFullDate = (dateStr: string) => {
 
 const formatEventDate = (dateStr: string) => {
   if (!dateStr) return '';
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    const monthIdx = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    const date = new Date(year, monthIdx, day);
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  return new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
 const formatEventTime = (timeStr: string) => {
