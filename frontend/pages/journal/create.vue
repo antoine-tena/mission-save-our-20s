@@ -264,7 +264,7 @@
           <span>Aperçu Mobile instantané</span>
         </div>
 
-        <div class="mobile-phone-simulator scale-95 origin-center">
+        <div class="mobile-phone-simulator scale-95 origin-center in-simulator">
           <div class="simulator-screen">
             <!-- Phone Notch / Status Bar -->
             <div class="simulator-status-bar">
