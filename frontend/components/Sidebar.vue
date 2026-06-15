@@ -10,7 +10,7 @@
     </div>
 
     <!-- 2. CENTER NAVIGATION ICONS -->
-    <nav class="flex-1 w-full flex flex-col items-center gap-4">
+    <nav class="flex-1 w-full flex flex-col items-center justify-center gap-4">
       <NuxtLink 
         v-for="item in navItems" 
         :key="item.to" 
