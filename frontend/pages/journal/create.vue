@@ -619,7 +619,7 @@ const preventGlobalDragDrop = (e: DragEvent) => {
 useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
 </script>
 
-<style scoped>
+<style>
 @import '~/assets/css/journal.css';
 
 /* Custom Workspace elements styling */
