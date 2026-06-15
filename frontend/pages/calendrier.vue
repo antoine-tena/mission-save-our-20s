@@ -6,20 +6,22 @@
       <div class="absolute bottom-[0%] left-[-10%] w-[30rem] h-[30rem] bg-fuchsia-300/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 10s;"></div>
     </div>
 
-    <div class="container mx-auto px-4 relative z-10">
-      <!-- Page Header -->
-      <header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-        <div>
-          <h1 class="font-display text-5xl md:text-6xl font-bold text-slate-800 tracking-tight flex items-center gap-4">
-            Notre Agenda <Icon name="lucide:calendar" class="text-indigo-500 w-12 h-12" />
-          </h1>
-          <p class="text-indigo-600 font-semibold mt-2 text-lg uppercase tracking-widest">Nos rendez-vous et moments clés.</p>
-        </div>
-        <button @click="openAddEvent" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-indigo-600 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:shadow-indigo-500/30 flex items-center gap-2 self-start md:self-end">
+    <!-- Page Hero -->
+    <PageHero
+      title="Notre Agenda"
+      icon="lucide:calendar"
+      icon-class="text-indigo-500"
+      subtitle="Nos rendez-vous et moments clés."
+      subtitle-class="text-indigo-600"
+    >
+      <template #actions>
+        <button @click="openAddEvent" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-indigo-600 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:shadow-indigo-500/30 flex items-center gap-2">
           <Icon name="lucide:plus" class="w-5 h-5" /> Ajouter une mission
         </button>
-      </header>
+      </template>
+    </PageHero>
 
+    <div class="container mx-auto px-4 relative z-10">
       <div class="backdrop-blur-xl bg-white/60 border border-white/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row">
         
         <!-- Left Side: Calendar Grid -->

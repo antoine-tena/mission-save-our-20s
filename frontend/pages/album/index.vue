@@ -6,22 +6,24 @@
       <div class="absolute bottom-[5%] left-[5%] w-[35rem] h-[35rem] bg-orange-200/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 10s;"></div>
     </div>
 
-    <header class="container mx-auto px-4 relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 border-b border-slate-200 pb-8">
-      <div>
-        <h1 class="font-display text-5xl md:text-6xl font-bold text-slate-800 tracking-tight flex items-center gap-4">
-          Vos Carnets d'Albums <Icon name="lucide:book-open-check" class="text-amber-500 w-12 h-12" />
-        </h1>
-        <p class="text-amber-600 font-semibold mt-2 text-lg uppercase tracking-widest">Créez, assemblez et feuilletez vos plus beaux souvenirs.</p>
-      </div>
-      <div class="flex items-center gap-4 self-start md:self-end">
+    <!-- Page Hero -->
+    <PageHero
+      title="Vos Carnets d'Albums"
+      icon="lucide:book-open-check"
+      icon-class="text-amber-500"
+      subtitle="Créez, assemblez et feuilletez vos plus beaux souvenirs."
+      subtitle-class="text-amber-600"
+      border
+    >
+      <template #actions>
         <NuxtLink to="/album/photos" class="bg-white border border-slate-200 text-slate-700 px-8 py-4 rounded-full font-bold hover:text-amber-600 hover:border-amber-600 hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-xl flex items-center gap-2">
           <Icon name="lucide:grid" class="w-5 h-5" /> Galerie des Moments
         </NuxtLink>
         <button type="button" @click="showCreateModal = true" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-amber-600 hover:shadow-xl hover:shadow-amber-500/30 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
           <Icon name="lucide:plus" class="w-5 h-5" /> Créer un Album
         </button>
-      </div>
-    </header>
+      </template>
+    </PageHero>
 
     <div class="container mx-auto px-4 relative z-10">
       <!-- Quick Auto-Generate Banner -->
