@@ -1,7 +1,7 @@
 <template>
   <aside class="w-[76px] h-screen flex flex-col justify-between items-center border-r border-gray-200 bg-white py-6 px-3 sticky top-0 left-0 z-50 flex-shrink-0 shadow-sm">
     <!-- 1. TOP LOGO BLOCK -->
-    <div class="w-full flex items-center justify-center mb-10 flex-shrink-0">
+    <div class="w-full flex items-center justify-center mt-6 mb-10 flex-shrink-0">
       <NuxtLink to="/" class="group flex items-center justify-center" aria-label="Accueil MSO20s">
         <div class="logo-icon-box flex items-center justify-center w-12 h-12 bg-fuchsia-500 text-white rounded-2xl shadow-lg shadow-fuchsia-500/25 transition-all duration-300 group-hover:rotate-[-6deg] group-hover:scale-110">
           <Icon name="lucide:camera" class="w-6 h-6" />
@@ -27,7 +27,7 @@
     </nav>
 
     <!-- 3. BOTTOM USER & LOGOUT ICONS -->
-    <div class="w-full flex flex-col items-center gap-1 mt-auto pt-4 border-t border-gray-100 flex-shrink-0">
+    <div class="w-full flex flex-col items-center gap-1 mt-auto pt-4 mb-6 border-t border-gray-100 flex-shrink-0">
       <!-- Profile Link -->
       <NuxtLink 
         to="/profile" 
