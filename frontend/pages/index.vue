@@ -1,5 +1,5 @@
 <template>
-  <main class="relative min-h-screen flex flex-col items-center pt-[calc(var(--header-height)+4rem)] pb-24 overflow-hidden bg-slate-50 selection:bg-fuchsia-200">
+  <main class="relative min-h-screen flex flex-col items-center pb-24 overflow-hidden bg-slate-50 selection:bg-fuchsia-200" style="padding-top: calc(var(--header-height) + 4rem)">
     <!-- Modern Background Blobs -->
     <div class="absolute inset-0 overflow-hidden -z-10 pointer-events-none">
       <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-fuchsia-300/30 blur-[100px] animate-pulse" style="animation-duration: 8s;"></div>

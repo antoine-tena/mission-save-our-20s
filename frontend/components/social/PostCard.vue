@@ -1,7 +1,10 @@
 <template>
   <article class="post-item glass-card">
     <div class="post-item-header">
-      <img :src="avatar || '/default-avatar.png'" class="small-avatar" />
+      <img v-if="avatar" :src="avatar" class="small-avatar" />
+      <div v-else class="small-avatar fallback-avatar-small">
+        <Icon name="lucide:user" class="fallback-icon-small" />
+      </div>
       <div class="post-meta">
         <span class="post-author">{{ post.author.username }}</span>
         <time class="post-time">{{ formatDate(post.created_at) }}</time>
@@ -46,6 +49,8 @@ defineEmits<{
 .post-item { padding: 0; overflow: hidden; }
 .post-item-header { padding: 16px; display: flex; align-items: center; gap: 12px; }
 .small-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.fallback-avatar-small { background: #fff0f9; color: #ca75d6; display: flex; align-items: center; justify-content: center; }
+.fallback-icon-small { font-size: 1.1rem; }
 .post-author { font-weight: 700; color: #1a202c; }
 .post-time { font-size: 12px; color: #a0aec0; display: block; }
 .post-caption { padding: 0 16px 12px; font-size: 15px; line-height: 1.5; color: #333; }

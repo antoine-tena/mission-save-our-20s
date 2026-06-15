@@ -59,7 +59,7 @@ input[type="text"]:focus, textarea:focus { outline: none; border-color: #6366f1;
 .post-card { padding: 2.5rem; border: 1px solid rgba(0,0,0,0.04); }
 .post-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 1rem; }
 .author-info { display: flex; gap: 12px; align-items: center; }
-.avatar-box { width: 40px; height: 40px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #64748b; }
+.avatar-box { width: 40px; height: 40px; border-radius: 50%; background: #fff0f9; display: flex; align-items: center; justify-content: center; color: #ca75d6; }
 .meta-text { display: flex; flex-direction: column; }
 .author-name { font-weight: 800; color: #1e293b; font-size: 1rem; text-transform: capitalize; }
 .post-date { font-size: 0.75rem; color: #94a3b8; }
@@ -68,7 +68,7 @@ input[type="text"]:focus, textarea:focus { outline: none; border-color: #6366f1;
 .post-title { font-family: var(--font-display); font-size: 1.8rem; color: #1e293b; margin-bottom: 1rem; }
 .post-caption { font-size: 1.1rem; line-height: 1.6; color: #334155; margin-bottom: 2rem; white-space: pre-line; }
 
-.post-attachments-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+.post-attachments-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
 .attachment-media-card { display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.6); border: 1px solid #f1f5f9; }
 .media-display-box { width: 100%; position: relative; background: #000; display: flex; align-items: center; justify-content: center; max-height: 500px; overflow: hidden; }
 .media-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; }

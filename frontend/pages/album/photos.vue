@@ -1,37 +1,35 @@
 <template>
-  <div class="min-h-screen pt-[calc(var(--header-height)+3rem)] pb-24 bg-slate-50 overflow-hidden relative selection:bg-amber-200">
+  <div class="min-h-screen pb-24 bg-slate-50 overflow-hidden relative selection:bg-amber-200" style="padding-top: calc(var(--header-height) + 3rem)">
     <!-- Animated modern background -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
       <div class="absolute top-[20%] right-[-5%] w-[40rem] h-[40rem] bg-orange-200/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 9s;"></div>
       <div class="absolute bottom-[10%] left-[-5%] w-[35rem] h-[35rem] bg-amber-200/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 7s;"></div>
     </div>
 
-    <header class="container mx-auto px-4 relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-slate-200 pb-8">
-      <div>
-        <NuxtLink to="/album" class="inline-flex items-center gap-2 text-slate-500 hover:text-amber-600 font-semibold mb-6 transition-colors group">
-          <Icon name="lucide:arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Retour à la Bibliothèque
-        </NuxtLink>
-        <h1 class="font-serif text-5xl md:text-6xl font-black text-slate-900 tracking-tight">
-          La Galerie des Moments
-        </h1>
-        <p class="text-amber-700 font-semibold mt-4 text-lg flex items-center gap-3">
-          <span class="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse"></span>
-          {{ totalPhotos }} éclats de vie sauvegardés
-        </p>
-      </div>
-
-      <div class="flex items-center self-start md:self-end">
+    <!-- Page Hero -->
+    <PageHero
+      title="La Galerie des Moments"
+      icon="lucide:grid"
+      icon-class="text-amber-500"
+      :subtitle="`${totalPhotos} éclats de vie sauvegardés`"
+      subtitle-class="text-amber-600"
+      back-to="/album"
+      back-text="Retour à la Bibliothèque"
+      back-hover-class="hover:text-amber-600"
+      border
+    >
+      <template #actions>
         <button 
           type="button" 
           @click="showForm = !showForm"
-          class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-amber-600 hover:shadow-lg hover:shadow-amber-500/30 transition-all duration-300 flex items-center gap-2"
+          class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-amber-600 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 flex items-center gap-2"
           :class="{ 'bg-slate-200 !text-slate-700 hover:bg-slate-300': showForm }"
         >
           <Icon :name="showForm ? 'lucide:x' : 'lucide:plus'" class="w-5 h-5" />
           {{ showForm ? 'Annuler' : 'Fixer un instant' }}
         </button>
-      </div>
-    </header>
+      </template>
+    </PageHero>
 
     <div class="container mx-auto px-4 relative z-10">
       <!-- Archive Photo Upload Form -->

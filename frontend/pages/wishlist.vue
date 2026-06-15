@@ -1,24 +1,27 @@
 <template>
-  <div class="min-h-screen pt-[calc(var(--header-height)+3rem)] pb-24 bg-slate-50 overflow-hidden relative selection:bg-fuchsia-200">
+  <div class="min-h-screen pb-24 bg-slate-50 overflow-hidden relative selection:bg-fuchsia-200" style="padding-top: calc(var(--header-height) + 3rem)">
     <!-- Animated modern background -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
       <div class="absolute top-[5%] right-[10%] w-[30rem] h-[30rem] bg-fuchsia-300/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 7s;"></div>
       <div class="absolute bottom-[10%] left-[5%] w-[40rem] h-[40rem] bg-indigo-300/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 9s;"></div>
     </div>
 
-    <div class="container mx-auto px-4 relative z-10">
-      <header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-        <div>
-          <h1 class="font-display text-5xl md:text-6xl font-bold text-slate-800 tracking-tight flex items-center gap-4">
-            Notre Wishlist <Icon name="lucide:clipboard-list" class="text-fuchsia-500 w-12 h-12" />
-          </h1>
-          <p class="text-fuchsia-600 font-semibold mt-2 text-lg uppercase tracking-widest">Toutes ces choses qu'on veut vivre ensemble.</p>
-        </div>
-        <button @click="openCreateForm" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-fuchsia-600 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:shadow-fuchsia-500/30 flex items-center gap-2 self-start md:self-end">
+    <!-- Page Hero -->
+    <PageHero
+      title="Notre Wishlist"
+      icon="lucide:clipboard-list"
+      icon-class="text-fuchsia-500"
+      subtitle="Toutes ces choses qu'on veut vivre ensemble."
+      subtitle-class="text-fuchsia-600"
+    >
+      <template #actions>
+        <button @click="openCreateForm" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-fuchsia-600 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:shadow-fuchsia-500/30 flex items-center gap-2">
           <Icon name="lucide:plus" class="w-5 h-5" /> Ajouter une envie
         </button>
-      </header>
+      </template>
+    </PageHero>
 
+    <div class="container mx-auto px-4 relative z-10">
       <div class="flex flex-col xl:flex-row gap-8">
         <div class="xl:w-1/4">
           <div class="sticky top-[calc(var(--header-height)+2rem)] backdrop-blur-xl bg-white/60 border border-white/50 p-6 rounded-3xl shadow-xl">

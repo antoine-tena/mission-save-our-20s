@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen pt-[calc(var(--header-height)+2rem)] pb-24 bg-slate-900 overflow-hidden relative selection:bg-fuchsia-500/30">
+  <div class="min-h-screen pb-24 bg-slate-900 overflow-hidden relative selection:bg-fuchsia-500/30" style="padding-top: calc(var(--header-height) + 2rem)">
     <!-- Animated background -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
       <div class="absolute top-[10%] left-[20%] w-96 h-96 bg-fuchsia-600/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 4s;"></div>
