@@ -222,8 +222,6 @@ useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
 </script>
 
 <style>
-@import '~/assets/css/journal.css';
-
 .writing-zen-mode {
   padding-top: 0 !important;
   padding-bottom: 0 !important;

@@ -7,7 +7,7 @@ export default defineNuxtConfig({
 
   modules: ['@nuxt/icon'],
 
-  css: ['~/assets/css/global.css'],
+  css: ['~/assets/css/global.css', '~/assets/css/journal.css'],
 
   vite: {
     plugins: [

@@ -62,5 +62,5 @@ useSeoMeta({ title: 'Le Journal — MSO20s' });
 </script>
 
 <style>
-@import '~/assets/css/journal.css';
+/* Les styles sont gérés globalement dans nuxt.config.ts */
 </style>
