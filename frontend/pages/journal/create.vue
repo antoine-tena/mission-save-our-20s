@@ -131,6 +131,7 @@
                   v-model="location" 
                   placeholder="Ajouter un lieu principal..." 
                   class="property-input-autocomplete"
+                  :show-icon="false"
                   @update:modelValue="queueDraftSave"
                 />
               </div>
