@@ -627,4 +627,231 @@ useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
     overflow: visible !important;
   }
 }
+
+/* Local Styles of create.vue for complete, bulletproof layout security */
+.editor-canvas-card {
+  background: white !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 24px !important;
+  padding: 2.25rem !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.01) !important;
+}
+
+.editor-writing-area {
+  border-bottom: 1px solid #f1f5f9 !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.editor-title-container {
+  margin-bottom: 1rem !important;
+}
+
+.editor-title-input {
+  width: 100% !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-family: var(--font-display) !important;
+  font-size: 1.75rem !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  padding: 0 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.editor-title-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Interactive Formatting Toolbar */
+.markdown-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 0.35rem !important;
+  border-radius: 12px !important;
+  margin-bottom: 1rem !important;
+}
+
+.toolbar-tool-btn {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #64748b !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+.toolbar-tool-btn:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.toolbar-divider {
+  width: 1px !important;
+  height: 18px !important;
+  background: #cbd5e1 !important;
+  margin: 0 0.5rem !important;
+}
+
+.textarea-relative-wrapper {
+  position: relative !important;
+}
+
+.editor-textarea {
+  width: 100% !important;
+  min-height: 180px !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-family: var(--font-body) !important;
+  font-size: 1.1rem !important;
+  line-height: 1.7 !important;
+  color: #1e293b !important;
+  padding: 0.25rem 0 2rem !important;
+  resize: none !important;
+}
+
+.editor-textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.editor-stats-overlay {
+  position: absolute !important;
+  bottom: 0px !important;
+  right: 0px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+}
+
+.stat-bubble {
+  font-size: 0.775rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  background: #f1f5f9 !important;
+  padding: 0.25rem 0.65rem !important;
+  border-radius: 9999px !important;
+}
+
+.stat-gauge-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.progress-ring__circle {
+  transition: stroke-dashoffset 0.35s !important;
+  transform: rotate(-90deg) !important;
+  transform-origin: 50% 50% !important;
+}
+
+/* Notion-style Properties Block */
+.properties-editor-box {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.625rem !important;
+  background: rgba(248, 250, 252, 0.6) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 20px !important;
+  padding: 1.25rem 1.5rem !important;
+}
+
+.property-row {
+  display: grid !important;
+  grid-template-columns: 180px 1fr !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  min-height: 38px !important;
+}
+
+.property-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+}
+
+.property-icon {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+.property-value {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.property-input-field {
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  padding: 0.35rem 0.5rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+  transition: background 0.2s !important;
+}
+
+.property-input-field:hover, .property-input-field:focus {
+  background: rgba(15, 23, 42, 0.03) !important;
+}
+
+.property-input-autocomplete {
+  width: 100% !important;
+}
+
+.property-input-autocomplete input {
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  padding: 0.35rem 0.5rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+  transition: background 0.2s !important;
+}
+
+.property-input-autocomplete input:hover, .property-input-autocomplete input:focus {
+  background: rgba(15, 23, 42, 0.03) !important;
+}
+
+.open-meteo-badge {
+  background: rgba(99, 102, 241, 0.08) !important;
+  color: #6366f1 !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+  font-weight: 800 !important;
+}
+
+.inline-automation-row {
+  border-top: 1px solid rgba(226, 232, 240, 0.5) !important;
+  margin-top: 0.25rem !important;
+  padding-top: 0.75rem !important;
+}
+
+@media (max-width: 640px) {
+  .property-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.25rem !important;
+    align-items: flex-start !important;
+  }
+}
 </style>
