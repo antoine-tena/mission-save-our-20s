@@ -135,6 +135,7 @@
                   placeholder="Ajouter un lieu principal..." 
                   class="property-input-autocomplete"
                   :show-icon="false"
+                  @select="onLocationSelect"
                   @update:modelValue="queueDraftSave"
                 />
               </div>
@@ -317,7 +318,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import JournalPostCard from '~/components/journal/JournalPostCard.vue';
 
 definePageMeta({ layout: false });
@@ -338,6 +339,11 @@ const isSubmitting = ref(false);
 const isDragOver = ref(false);
 const fileInput = ref<HTMLInputElement>();
 const textareaRef = ref<HTMLTextAreaElement>();
+
+// GPS Coordinates and Live Weather for Mobile Simulator Preview
+const selectedLatitude = ref<number | null>(null);
+const selectedLongitude = ref<number | null>(null);
+const simulatorWeatherInfo = ref<string | null>(null);
 
 // Draft states
 const isSavingDraft = ref(false);
@@ -375,7 +381,7 @@ const mockPost = computed(() => {
     location: location.value,
     event_date: eventDate.value,
     event_time: eventTime.value,
-    weather_info: eventDate.value && location.value ? '☀️ 18.5°C - Ciel dégagé (Aperçu)' : null,
+    weather_info: simulatorWeatherInfo.value || (eventDate.value && location.value ? '☁️ Recherche météo...' : null),
     created_at: new Date().toISOString(),
     author: { username: user?.value?.username || 'Antoine' },
     attachments: attachments.value.map((att, idx) => ({
@@ -481,7 +487,13 @@ const saveDraftToLocalStorage = () => {
   isSavingDraft.value = true;
   draftStatusText.value = 'Sauvegarde...';
   localStorage.setItem('mso_journal_draft_zen_v2', JSON.stringify({
-    title: title.value, caption: caption.value, location: location.value, eventDate: eventDate.value, eventTime: eventTime.value
+    title: title.value,
+    caption: caption.value,
+    location: location.value,
+    eventDate: eventDate.value,
+    eventTime: eventTime.value,
+    lat: selectedLatitude.value,
+    lon: selectedLongitude.value
   }));
   setTimeout(() => {
     isSavingDraft.value = false;
@@ -499,7 +511,15 @@ const loadDraftFromLocalStorage = () => {
       location.value = data.location || '';
       eventDate.value = data.eventDate || '';
       eventTime.value = data.eventTime || '';
-      setTimeout(() => adjustTextareaHeight(), 100);
+      selectedLatitude.value = data.lat || null;
+      selectedLongitude.value = data.lon || null;
+      
+      setTimeout(() => {
+        adjustTextareaHeight();
+        if (selectedLatitude.value && selectedLongitude.value) {
+          fetchLiveWeatherForSimulator();
+        }
+      }, 100);
     } catch (e) {
       console.error('Erreur de chargement du brouillon:', e);
     }
@@ -509,6 +529,7 @@ const loadDraftFromLocalStorage = () => {
 const clearDraftConfirm = () => {
   if (confirm('Voulez-vous vraiment effacer entièrement votre brouillon actuel ?')) {
     title.value = ''; caption.value = ''; location.value = ''; eventDate.value = ''; eventTime.value = '';
+    selectedLatitude.value = null; selectedLongitude.value = null; simulatorWeatherInfo.value = null;
     attachments.value.forEach(att => URL.revokeObjectURL(att.previewUrl));
     attachments.value = [];
     localStorage.removeItem('mso_journal_draft_zen_v2');
@@ -516,6 +537,118 @@ const clearDraftConfirm = () => {
     if (textareaRef.value) textareaRef.value.style.height = 'auto';
   }
 };
+
+// Open-Meteo Real-time Live Weather Retriever for Mobile Simulator
+const onLocationSelect = (data: { latitude: number; longitude: number; display_name: string }) => {
+  selectedLatitude.value = data.latitude;
+  selectedLongitude.value = data.longitude;
+  fetchLiveWeatherForSimulator();
+  queueDraftSave();
+};
+
+const fetchLiveWeatherForSimulator = async () => {
+  if (!selectedLatitude.value || !selectedLongitude.value || !eventDate.value) {
+    simulatorWeatherInfo.value = null;
+    return;
+  }
+  
+  simulatorWeatherInfo.value = '☁️ Recherche météo...';
+  
+  try {
+    const lat = selectedLatitude.value;
+    const lon = selectedLongitude.value;
+    const dateStr = eventDate.value;
+    
+    const todayStr = new Date().toISOString().split('T')[0];
+    const deltaDays = Math.floor((new Date(todayStr).getTime() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
+    
+    let url = "";
+    if (0 <= deltaDays && deltaDays <= 90) {
+      url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&past_days=${deltaDays}&hourly=temperature_2m,weather_code`;
+    } else {
+      url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${dateStr}&end_date=${dateStr}&hourly=temperature_2m,weather_code`;
+    }
+    
+    const res = await fetch(url);
+    if (!res.ok) {
+      simulatorWeatherInfo.value = null;
+      return;
+    }
+    const data = await res.json();
+    const hourly = data.hourly || {};
+    const times = hourly.time || [];
+    const temps = hourly.temperature_2m || [];
+    const codes = hourly.weather_code || [];
+    
+    if (!times.length || !temps.length || !codes.length) {
+      simulatorWeatherInfo.value = null;
+      return;
+    }
+    
+    let index = 0;
+    if (eventTime.value) {
+      const timePrefix = eventTime.value.substring(0, 2);
+      const foundIdx = times.findIndex((t: string) => t.startsWith(`${dateStr}T${timePrefix}:`));
+      if (foundIdx !== -1) index = foundIdx;
+    }
+    
+    let temp = temps[index];
+    let code = codes[index];
+    
+    if (index === 0 && !eventTime.value) {
+      // Average temp
+      temp = temps.reduce((a: number, b: number) => a + b, 0) / temps.length;
+      // Dominant weather code
+      const counts = codes.reduce((acc: any, val: number) => {
+        acc[val] = (acc[val] || 0) + 1;
+        return acc;
+      }, {});
+      const sortedCodes = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+      code = parseInt(sortedCodes[0], 10);
+    }
+    
+    const WMO_MAP: any = {
+      0: ['☀️', 'Ciel dégagé'],
+      1: ['🌤️', 'Principalement dégagé'],
+      2: ['⛅', 'Partiellement nuageux'],
+      3: ['☁️', 'Nuageux'],
+      45: ['🌫️', 'Brouillard'],
+      48: ['🌫️', 'Brouillard givrant'],
+      51: ['🌧️', 'Bruine légère'],
+      53: ['🌧️', 'Bruine modérée'],
+      55: ['🌧️', 'Bruine dense'],
+      56: ['🌧️', 'Bruine verglaçante'],
+      57: ['🌧️', 'Bruine verglaçante'],
+      61: ['🌧️', 'Pluie faible'],
+      63: ['🌧️', 'Pluie modérée'],
+      65: ['🌧️', 'Pluie forte'],
+      66: ['🌧️', 'Pluie verglaçante'],
+      67: ['🌧️', 'Pluie verglaçante'],
+      71: ['❄️', 'Neige légère'],
+      73: ['❄️', 'Neige modérée'],
+      75: ['❄️', 'Neige forte'],
+      77: ['❄️', 'Grains de neige'],
+      80: ['🌦️', 'Averses de pluie'],
+      81: ['🌦️', 'Averses de pluie'],
+      82: ['🌦️', 'Averses de pluie'],
+      85: ['❄️', 'Averses de neige'],
+      86: ['❄️', 'Averses de neige'],
+      95: ['⛈️', 'Orage'],
+      96: ['⛈️', 'Orage avec grêle'],
+      99: ['⛈️', 'Orage avec grêle']
+    };
+    
+    const [emoji, desc] = WMO_MAP[code] || ['🌡️', 'Météo générale'];
+    simulatorWeatherInfo.value = `${emoji} ${temp.toFixed(1)}°C - ${desc} (Direct)`;
+  } catch (e) {
+    console.error('Erreur lors du fetch météo de simulation :', e);
+    simulatorWeatherInfo.value = null;
+  }
+};
+
+watch([eventDate, eventTime], () => {
+  fetchLiveWeatherForSimulator();
+});
 
 const handleSubmit = async () => {
   isSubmitting.value = true;
