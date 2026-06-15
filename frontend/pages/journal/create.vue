@@ -591,12 +591,30 @@ onMounted(() => {
     const today = new Date().toISOString().split('T')[0];
     eventDate.value = today;
   }
+
+  // Prevent default browser drag and drop navigation globally
+  window.addEventListener('dragover', preventGlobalDragDrop);
+  window.addEventListener('drop', preventGlobalDragDrop);
 });
 
 onBeforeUnmount(() => {
   if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
   attachments.value.forEach(att => URL.revokeObjectURL(att.previewUrl));
+  
+  window.removeEventListener('dragover', preventGlobalDragDrop);
+  window.removeEventListener('drop', preventGlobalDragDrop);
 });
+
+const preventGlobalDragDrop = (e: DragEvent) => {
+  // Prevent browser from opening files if dropped outside the target zone
+  if (e.target && !(e.target as HTMLElement).closest('.dropzone-zen')) {
+    e.preventDefault();
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'none';
+      e.dataTransfer.dropEffect = 'none';
+    }
+  }
+};
 
 useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
 </script>
