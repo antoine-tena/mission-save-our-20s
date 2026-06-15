@@ -85,6 +85,6 @@ onMounted(fetchRichPosts);
 useSeoMeta({ title: 'Le Journal — MSO20s' });
 </script>
 
-<style scoped>
+<style>
 @import '~/assets/css/journal.css';
 </style>
