@@ -179,8 +179,8 @@ class RichPostListCreateView(APIView):
             if file_key not in request_files:
                 break
             uploaded_file = request_files[file_key]
-            att_caption = request_data.get(f'caption_{index}', '')
-            att_location = request_data.get(f'location_{index}', '')
+            att_caption = request_data.get(f'caption_{index}') or ''
+            att_location = request_data.get(f'location_{index}') or ''
             filename = uploaded_file.name
             ext = os.path.splitext(filename)[1].lower()
             if ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
@@ -210,7 +210,9 @@ class RichPostListCreateView(APIView):
         """Crée une publication riche avec pièces jointes et synchro auto."""
         from cinema.models import Movie
         from django.utils import timezone
-        title, caption, loc = request.data.get('title', ''), request.data.get('caption', ''), request.data.get('location', '')
+        title = request.data.get('title') or ''
+        caption = request.data.get('caption') or ''
+        loc = request.data.get('location') or ''
         rich_post = RichPost.objects.create(author=request.user, title=title, caption=caption, location=loc)
         self._create_attachments(rich_post, request.data, request.FILES)
 
