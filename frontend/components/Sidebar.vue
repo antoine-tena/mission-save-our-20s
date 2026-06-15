@@ -27,7 +27,7 @@
     </nav>
 
     <!-- 3. BOTTOM USER & LOGOUT ICONS -->
-    <div class="w-full flex flex-col items-center gap-4 mt-auto pt-6 border-t border-gray-100 flex-shrink-0">
+    <div class="w-full flex flex-col items-center gap-2 mt-auto pt-4 border-t border-gray-100 flex-shrink-0">
       <!-- Profile Link -->
       <NuxtLink 
         to="/profile" 
