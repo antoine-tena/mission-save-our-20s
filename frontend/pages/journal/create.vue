@@ -538,6 +538,36 @@ const clearDraftConfirm = () => {
   }
 };
 
+// Open-Meteo Local coordinate resolver fallback (matches Django backend resolving)
+const localResolveCoordinates = (locationName: string): { lat: number; lon: number } | null => {
+  if (!locationName) return null;
+  const name = locationName.trim().toLowerCase();
+  const gpsMap: Record<string, [number, number]> = {
+    "semnoz": [45.7981, 6.1042],
+    "crêt de châtillon": [45.7981, 6.1042],
+    "lac d'annecy": [45.8992, 6.1294],
+    "annecy": [45.8992, 6.1294],
+    "cinéma pathé": [45.9032, 6.1214],
+    "cinéma pathé annecy": [45.9032, 6.1214],
+    "pathé": [45.9032, 6.1214],
+    "cinema": [45.9032, 6.1214],
+    "cinéma": [45.9032, 6.1214],
+    "col de la forclaz": [45.8111, 6.2435],
+    "forclaz": [45.8111, 6.2435],
+    "aravis": [45.87, 6.35],
+    "bivouac aravis": [45.87, 6.35],
+    "chamonix": [45.92, 6.87],
+    "aiguille du midi": [45.92, 6.87]
+  };
+  
+  for (const [key, coords] of Object.entries(gpsMap)) {
+    if (name.includes(key)) {
+      return { lat: coords[0], lon: coords[1] };
+    }
+  }
+  return null;
+};
+
 // Open-Meteo Real-time Live Weather Retriever for Mobile Simulator
 const onLocationSelect = (data: { latitude: number; longitude: number; display_name: string }) => {
   selectedLatitude.value = data.latitude;
@@ -547,7 +577,19 @@ const onLocationSelect = (data: { latitude: number; longitude: number; display_n
 };
 
 const fetchLiveWeatherForSimulator = async () => {
-  if (!selectedLatitude.value || !selectedLongitude.value || !eventDate.value) {
+  let lat = selectedLatitude.value;
+  let lon = selectedLongitude.value;
+  
+  // If no coordinates yet, try to resolve locally from input string (user typed)
+  if (!lat || !lon) {
+    const coords = localResolveCoordinates(location.value);
+    if (coords) {
+      lat = coords.lat;
+      lon = coords.lon;
+    }
+  }
+
+  if (!lat || !lon || !eventDate.value) {
     simulatorWeatherInfo.value = null;
     return;
   }
@@ -555,10 +597,7 @@ const fetchLiveWeatherForSimulator = async () => {
   simulatorWeatherInfo.value = '☁️ Recherche météo...';
   
   try {
-    const lat = selectedLatitude.value;
-    const lon = selectedLongitude.value;
     const dateStr = eventDate.value;
-    
     const todayStr = new Date().toISOString().split('T')[0];
     const deltaDays = Math.floor((new Date(todayStr).getTime() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
     
@@ -646,7 +685,8 @@ const fetchLiveWeatherForSimulator = async () => {
   }
 };
 
-watch([eventDate, eventTime], () => {
+// Re-fetch live weather as soon as location, eventDate, or eventTime changes!
+watch([eventDate, eventTime, location], () => {
   fetchLiveWeatherForSimulator();
 });
 
@@ -742,52 +782,6 @@ useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
   background: #22c55e;
   border-radius: 50%;
   animation: pulseLight 2s infinite;
-}
-
-.draft-autosave-indicator {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 0.45rem !important;
-  font-size: 0.8rem !important;
-  font-weight: 700 !important;
-  color: #64748b !important;
-  background: #f1f5f9 !important;
-  padding: 0.45rem 1rem !important;
-  border-radius: 9999px !important;
-  transition: all 0.2s !important;
-}
-
-.draft-autosave-indicator.saving {
-  color: #6366f1 !important;
-  background: rgba(99, 102, 241, 0.08) !important;
-}
-
-.publish-top-btn {
-  background: #0f172a !important;
-  color: white !important;
-  border: none !important;
-  padding: 0.55rem 1.35rem !important;
-  border-radius: 9999px !important;
-  font-size: 0.9rem !important;
-  font-weight: 800 !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.45rem !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
-}
-
-.publish-top-btn:hover:not(:disabled) {
-  background: #6366f1 !important;
-  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.25) !important;
-  transform: translateY(-1px) !important;
-}
-
-.publish-top-btn:disabled {
-  opacity: 0.4 !important;
-  cursor: not-allowed !important;
-  box-shadow: none !important;
 }
 
 @keyframes pulseLight {
