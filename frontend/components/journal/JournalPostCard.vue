@@ -25,15 +25,25 @@
             <span class="post-timestamp" :title="formatFullDate(post.created_at)">{{ formatRelativeTime(post.created_at) }}</span>
           </div>
 
-          <!-- Location Badge -->
-          <div v-if="post.location" class="post-location-chip" :title="post.location">
-            <Icon name="lucide:map-pin" class="chip-icon" />
-            <span>{{ post.location }}</span>
-          </div>
+          <!-- Badges & Weather DateTime Column -->
+          <div class="flex flex-col items-end gap-1 flex-shrink-0">
+            <div class="flex items-center gap-2">
+              <!-- Location Badge -->
+              <div v-if="post.location" class="post-location-chip" :title="post.location">
+                <Icon name="lucide:map-pin" class="chip-icon" />
+                <span>{{ post.location }}</span>
+              </div>
 
-          <!-- Weather Badge -->
-          <div v-if="post.weather_info" class="post-weather-chip" :title="post.weather_info">
-            <span>{{ post.weather_info }}</span>
+              <!-- Weather Badge -->
+              <div v-if="post.weather_info" class="post-weather-chip" :title="post.weather_info">
+                <span>{{ post.weather_info }}</span>
+              </div>
+            </div>
+            
+            <!-- Tiny Weather Timestamp Caption -->
+            <span v-if="post.weather_info && post.event_date" class="weather-datetime-sub">
+              Météo du {{ formatEventDate(post.event_date) }}{{ post.event_time ? ' à ' + formatEventTime(post.event_time) : '' }}
+            </span>
           </div>
         </header>
 
@@ -240,5 +250,16 @@ const formatFullDate = (dateStr: string) => {
     hour: '2-digit',
     minute: '2-digit'
   });
+};
+
+const formatEventDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
+const formatEventTime = (timeStr: string) => {
+  if (!timeStr) return '';
+  return timeStr.substring(0, 5); // Take "HH:MM" from "HH:MM:SS" or "HH:MM"
 };
 </script>
