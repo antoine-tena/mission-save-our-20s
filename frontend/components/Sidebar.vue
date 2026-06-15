@@ -2,7 +2,7 @@
   <aside class="w-[72px] xl:w-60 h-screen flex flex-col justify-between items-center xl:items-start border-r border-gray-200 bg-white p-3 xl:p-6 sticky top-0 left-0 z-50 flex-shrink-0">
     <!-- 1. TOP LOGO BLOCK -->
     <div class="w-full flex items-center justify-center xl:justify-start py-6 xl:py-4 mb-6">
-      <NuxtLink to="/journal" class="sidebar-logo-link group flex items-center gap-3.5 text-decoration-none">
+      <NuxtLink to="/" class="sidebar-logo-link group flex items-center gap-3.5 text-decoration-none" aria-label="Accueil MSO20s">
         <div class="logo-icon-box flex items-center justify-center w-11 h-11 bg-fuchsia-500 text-white rounded-xl shadow-lg shadow-fuchsia-500/30 transition-transform group-hover:rotate-[-5deg] group-hover:scale-110">
           <Icon name="lucide:camera" class="w-5.5 h-5.5" />
         </div>
