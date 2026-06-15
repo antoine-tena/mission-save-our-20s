@@ -625,6 +625,7 @@ useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
 /* Custom Workspace elements styling */
 .writing-zen-mode {
   padding-top: 0 !important;
+  padding-bottom: 0 !important;
   height: 100vh;
   overflow: hidden;
   display: flex;
