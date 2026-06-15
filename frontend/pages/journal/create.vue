@@ -257,12 +257,8 @@
 
       <!-- RIGHT SECTION: LIVE MOBILE SANDBOX SIMULATOR (5 Cols on Desktop) -->
       <section class="lg:col-span-5 h-full hidden lg:flex flex-col gap-4 items-center justify-center bg-slate-50/40 rounded-3xl border border-slate-200/50 p-6 relative">
-        <div class="preview-title-bar-top absolute top-6 left-6 right-6 flex items-center justify-between text-xs text-slate-400 font-extrabold uppercase tracking-widest">
+        <div class="preview-title-bar-top absolute top-6 left-6 right-6 flex items-center justify-center text-xs text-slate-400 font-extrabold uppercase tracking-widest">
           <span>Aperçu Mobile instantané</span>
-          <span class="flex items-center gap-1.5 text-indigo-500">
-            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
-            Synchronisé
-          </span>
         </div>
 
         <div class="mobile-phone-simulator scale-95 origin-center">
