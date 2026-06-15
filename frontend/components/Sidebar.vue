@@ -1,62 +1,55 @@
 <template>
-  <aside class="group/sidebar w-[72px] hover:w-60 h-screen flex flex-col justify-between items-start border-r border-gray-200 bg-white p-3 hover:p-6 sticky top-0 left-0 z-50 flex-shrink-0 transition-all duration-150 ease-out shadow-sm hover:shadow-xl">
+  <aside class="w-[76px] h-screen flex flex-col justify-between items-center border-r border-gray-200 bg-white py-6 px-3 sticky top-0 left-0 z-50 flex-shrink-0 shadow-sm">
     <!-- 1. TOP LOGO BLOCK -->
-    <div class="w-full flex items-center justify-start py-6 xl:py-4 mb-12 pl-1 hover:pl-0 transition-all duration-150">
-      <NuxtLink to="/" class="sidebar-logo-link group flex items-center gap-3.5 text-decoration-none" aria-label="Accueil MSO20s">
-        <div class="logo-icon-box flex items-center justify-center w-11 h-11 bg-fuchsia-500 text-white rounded-xl shadow-lg shadow-fuchsia-500/30 transition-transform group-hover:rotate-[-5deg] group-hover:scale-110 flex-shrink-0">
-          <Icon name="lucide:camera" class="w-5.5 h-5.5" />
-        </div>
-        <div class="opacity-0 w-0 max-w-0 overflow-hidden group-hover/sidebar:opacity-100 group-hover/sidebar:w-auto group-hover/sidebar:max-w-xs flex flex-col leading-none transition-all duration-150 ease-out">
-          <span class="font-display font-black text-xl text-slate-900 tracking-tight leading-none">MSO20s</span>
-          <span class="text-[9px] font-extrabold text-fuchsia-500 tracking-wider uppercase mt-1 leading-none whitespace-nowrap">Mission Save Our 20s</span>
+    <div class="w-full flex items-center justify-center mb-10 flex-shrink-0">
+      <NuxtLink to="/" class="group flex items-center justify-center" aria-label="Accueil MSO20s">
+        <div class="logo-icon-box flex items-center justify-center w-12 h-12 bg-fuchsia-500 text-white rounded-2xl shadow-lg shadow-fuchsia-500/25 transition-all duration-300 group-hover:rotate-[-6deg] group-hover:scale-110">
+          <Icon name="lucide:camera" class="w-6 h-6" />
         </div>
       </NuxtLink>
     </div>
 
-    <!-- 2. CENTER NAVIGATION BLOCK -->
-    <nav class="flex-1 w-full flex flex-col gap-1.5">
+    <!-- 2. CENTER NAVIGATION ICONS -->
+    <nav class="flex-1 w-full flex flex-col items-center gap-4">
       <NuxtLink 
         v-for="item in navItems" 
         :key="item.to" 
         :to="item.to" 
-        class="sidebar-nav-item group" 
+        class="sidebar-icon-item group relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200" 
         active-class="active"
+        :title="item.label"
       >
-        <div class="nav-item-content w-full">
-          <Icon :name="item.icon" class="nav-icon flex-shrink-0" />
-          <span class="nav-label">{{ item.label }}</span>
-        </div>
-        <!-- Subtly highlight the active page -->
-        <div class="active-indicator"></div>
+        <Icon :name="item.icon" class="nav-icon" />
+        
+        <!-- Premium Tooltip on hover (appears on the right) -->
+        <span class="tooltip-bubble">{{ item.label }}</span>
       </NuxtLink>
     </nav>
 
-    <!-- 3. BOTTOM USER & SETTINGS BLOCK -->
-    <div class="w-full flex flex-col gap-2.5 mt-auto pt-6 border-t border-gray-100/80">
+    <!-- 3. BOTTOM USER & LOGOUT ICONS -->
+    <div class="w-full flex flex-col items-center gap-4 mt-auto pt-6 border-t border-gray-100 flex-shrink-0">
       <!-- Profile Link -->
       <NuxtLink 
         to="/profile" 
-        class="sidebar-nav-item group" 
+        class="sidebar-icon-item group relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200" 
         active-class="active"
+        title="Profil"
       >
-        <div class="nav-item-content w-full">
-          <div class="avatar-circle flex-shrink-0">
-            <span class="avatar-initials">{{ userInitial }}</span>
-          </div>
-          <span class="nav-label font-bold text-slate-800">{{ username }}</span>
+        <div class="avatar-circle">
+          <span class="avatar-initials">{{ userInitial }}</span>
         </div>
+        <span class="tooltip-bubble">Profil</span>
       </NuxtLink>
 
       <!-- Logout Button -->
       <button 
         type="button" 
         @click="handleLogout" 
-        class="sidebar-nav-item logout-btn group w-full text-left"
+        class="sidebar-icon-item logout-btn group relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200"
+        title="Déconnexion"
       >
-        <div class="nav-item-content w-full">
-          <Icon name="lucide:log-out" class="nav-icon text-slate-500 group-hover:text-red-500 flex-shrink-0" />
-          <span class="nav-label text-slate-600 group-hover:text-red-500">Déconnexion</span>
-        </div>
+        <Icon name="lucide:log-out" class="nav-icon text-slate-400 group-hover:text-red-500" />
+        <span class="tooltip-bubble">Déconnexion</span>
       </button>
     </div>
   </aside>
@@ -90,105 +83,105 @@ const handleLogout = async () => {
 </script>
 
 <style scoped>
-.sidebar-nav-item {
+.sidebar-icon-item {
+  color: #64748b;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 0.85rem;
-  border-radius: 14px;
-  color: #475569;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 0.95rem;
-  transition: all 0.15s ease-out;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
-  cursor: pointer;
-  border: none;
   background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
-.sidebar-nav-item:hover {
+.nav-icon {
+  width: 1.45rem;
+  height: 1.45rem;
+  color: #64748b;
+  transition: transform 0.2s, color 0.2s;
+}
+
+/* Hover effect: soft grey background pill */
+.sidebar-icon-item:hover {
   color: #0f172a;
   background: #f1f5f9;
 }
 
-.nav-item-content {
-  display: flex;
-  align-items: center;
-  gap: 1.15rem;
-}
-
-.nav-icon {
-  width: 1.4rem;
-  height: 1.4rem;
-  color: #64748b;
-  transition: transform 0.15s, color 0.15s;
-}
-
-.sidebar-nav-item:hover .nav-icon {
-  transform: scale(1.05);
+.sidebar-icon-item:hover .nav-icon {
+  transform: scale(1.1);
   color: #0f172a;
 }
 
-.sidebar-nav-item.active {
+/* Active state: fuchsia colored pill with glowing background */
+.sidebar-icon-item.active {
   color: #ca75d6;
-  background: rgba(202, 117, 214, 0.05);
+  background: rgba(202, 117, 214, 0.08);
 }
 
-.sidebar-nav-item.active .nav-icon {
+.sidebar-icon-item.active .nav-icon {
   color: #ca75d6;
   stroke-width: 2.5px;
 }
 
-/* Elegant text labels sliding fade-in */
-.nav-label {
-  opacity: 0;
-  max-width: 0;
-  width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  transition: all 0.15s ease-out;
-}
-
-.group\/sidebar:hover .nav-label {
-  opacity: 1;
-  max-width: 150px;
-  width: auto;
-  margin-left: 0.25rem;
-}
-
+/* Avatar styling */
 .avatar-circle {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
   border: 1.5px solid #ca75d6;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.sidebar-icon-item:hover .avatar-circle {
+  transform: scale(1.08);
 }
 
 .avatar-initials {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 800;
   color: #ca75d6;
 }
 
-.active-indicator {
+/* High-end hovering Tooltip Bubble appearing on the right */
+.tooltip-bubble {
   position: absolute;
-  right: 0px;
-  top: 15%;
-  bottom: 15%;
-  width: 3px;
-  background: #ca75d6;
-  border-radius: 4px 0 0 4px;
+  left: 64px;
+  top: 50%;
+  transform: translateY(-50%) translateX(-8px);
+  background: #0f172a;
+  color: white;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.775rem;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
   opacity: 0;
-  transition: opacity 0.15s;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  transition: opacity 0.15s, transform 0.15s;
+  z-index: 100;
 }
 
-.sidebar-nav-item.active .active-indicator {
+/* Tiny triangle arrow on left of tooltip */
+.tooltip-bubble::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #0f172a transparent transparent;
+}
+
+.sidebar-icon-item:hover .tooltip-bubble {
   opacity: 1;
+  transform: translateY(-50%) translateX(0);
 }
 
 .logout-btn:hover {
