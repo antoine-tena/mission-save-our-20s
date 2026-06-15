@@ -2,6 +2,12 @@
   <div class="mso-journal">
     <div class="journal-bg"></div>
     
+    <!-- Animated modern background -->
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-[20%] right-[-10%] w-[40rem] h-[40rem] bg-indigo-300/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 8s;"></div>
+      <div class="absolute bottom-[0%] left-[-10%] w-[30rem] h-[30rem] bg-fuchsia-300/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 10s;"></div>
+    </div>
+    
     <PageHero
       title="Le Journal Collaboratif"
       icon="lucide:book-open"
