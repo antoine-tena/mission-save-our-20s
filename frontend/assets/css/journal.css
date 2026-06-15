@@ -21,8 +21,8 @@
   z-index: -1;
 }
 
-/* Glass Card Common Definition */
-.glass-card {
+/* Glass Card Common Definition Scoped to Journal pages */
+.mso-journal .glass-card {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
