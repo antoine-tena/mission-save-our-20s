@@ -105,6 +105,9 @@ class RichPost(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
     caption = models.TextField(blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
+    event_date = models.DateField(blank=True, null=True)
+    event_time = models.TimeField(blank=True, null=True)
+    weather_info = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

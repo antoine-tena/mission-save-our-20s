@@ -559,6 +559,27 @@
   border-color: rgba(99, 102, 241, 0.15);
 }
 
+/* Weather Badge Chip */
+.post-weather-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(99, 102, 241, 0.04);
+  color: #4f46e5;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid rgba(99, 102, 241, 0.08);
+  transition: all 0.2s;
+}
+
+.post-weather-chip:hover {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.15);
+  transform: translateY(-0.5px);
+}
+
 .chip-icon {
   width: 0.85rem;
   height: 0.85rem;

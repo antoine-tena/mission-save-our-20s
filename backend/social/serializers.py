@@ -117,5 +117,5 @@ class RichPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RichPost
-        fields = ['id', 'author', 'title', 'caption', 'location', 'created_at', 'attachments']
+        fields = ['id', 'author', 'title', 'caption', 'location', 'created_at', 'attachments', 'event_date', 'event_time', 'weather_info']
 
