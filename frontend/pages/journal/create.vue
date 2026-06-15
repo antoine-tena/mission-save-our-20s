@@ -584,7 +584,7 @@ useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
 }
 
 .zen-header {
-  border-b: 1px solid rgba(226, 232, 240, 0.5);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
   z-index: 100;
 }
 
