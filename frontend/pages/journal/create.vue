@@ -42,7 +42,7 @@
     </header>
 
     <!-- Main Workspace (Dual-Pane Side-by-Side Professional Layout) -->
-    <main class="container mx-auto px-6 py-6 flex-1 relative z-10 max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start h-[calc(100vh-80px)] overflow-hidden">
+    <main class="container mx-auto px-6 pt-10 pb-6 flex-1 relative z-10 max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start h-[calc(100vh-80px)] overflow-hidden">
       <!-- LEFT SECTION: CREATIVE WRITING CANVAS (7 Cols on Desktop) -->
       <section class="lg:col-span-7 flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
         <div class="editor-canvas-card">
