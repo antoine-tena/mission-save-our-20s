@@ -118,65 +118,65 @@
             </div>
           </div>
 
-          <!-- EMBEDDED METADATA BLOCK (Lieu, Date, Heure, Météo automatisée) -->
-          <div class="metadata-form-grid p-6 rounded-2xl bg-slate-50/80 border border-slate-100 flex flex-col gap-5 mt-6">
-            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Icon name="lucide:sliders-horizontal" class="w-4 h-4 text-indigo-500" />
-              Détails temporels et localisation
-            </h4>
-            
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-              <!-- Lieu principal -->
-              <div class="md:col-span-6 flex flex-col gap-1.5">
-                <label class="text-xs font-extrabold text-slate-600 flex items-center gap-1">
-                  <Icon name="lucide:map-pin" class="w-3.5 h-3.5 text-slate-400" />
-                  Lieu principal (Bivouac, Lac, Sommet...)
-                </label>
-                <div class="location-field-wrapper-embedded">
-                  <LocationAutocomplete 
-                    v-model="location" 
-                    placeholder="Où était-ce ?" 
-                    class="composer-location-input-field-embedded"
-                    @update:modelValue="queueDraftSave"
-                  />
-                </div>
+          <!-- NOTION-STYLE COMPACT PROPERTIES GRID (Lieu, Date, Heure, Open-Meteo) -->
+          <div class="properties-editor-box mt-6">
+            <!-- Property Row: Lieu -->
+            <div class="property-row">
+              <div class="property-label">
+                <Icon name="lucide:map-pin" class="property-icon text-indigo-500" />
+                <span>Lieu de l'aventure</span>
               </div>
+              <div class="property-value">
+                <LocationAutocomplete 
+                  v-model="location" 
+                  placeholder="Ajouter un lieu principal..." 
+                  class="property-input-autocomplete"
+                  @update:modelValue="queueDraftSave"
+                />
+              </div>
+            </div>
 
-              <!-- Date de l'aventure -->
-              <div class="md:col-span-3 flex flex-col gap-1.5">
-                <label class="text-xs font-extrabold text-slate-600 flex items-center gap-1">
-                  <Icon name="lucide:calendar" class="w-3.5 h-3.5 text-slate-400" />
-                  Date du souvenir
-                </label>
+            <!-- Property Row: Date -->
+            <div class="property-row">
+              <div class="property-label">
+                <Icon name="lucide:calendar" class="property-icon text-fuchsia-500" />
+                <span>Date du souvenir</span>
+              </div>
+              <div class="property-value">
                 <input 
                   type="date" 
                   v-model="eventDate" 
-                  class="embedded-metadata-input"
-                  @input="queueDraftSave" 
-                />
-              </div>
-
-              <!-- Heure précise -->
-              <div class="md:col-span-3 flex flex-col gap-1.5">
-                <label class="text-xs font-extrabold text-slate-600 flex items-center gap-1">
-                  <Icon name="lucide:clock" class="w-3.5 h-3.5 text-slate-400" />
-                  Heure précise <span class="text-slate-400 font-medium">(optionnel)</span>
-                </label>
-                <input 
-                  type="time" 
-                  v-model="eventTime" 
-                  class="embedded-metadata-input"
+                  class="property-input-field"
                   @input="queueDraftSave" 
                 />
               </div>
             </div>
 
-            <!-- Open-Meteo Automatic enrichment banner -->
-            <div class="weather-automation-notice flex items-start gap-2.5 p-3.5 rounded-xl bg-indigo-50/50 border border-indigo-100/50 text-xs text-slate-600">
-              <Icon name="lucide:cloud-lightning" class="w-5 h-5 text-indigo-500 flex-shrink-0 animate-pulse mt-0.5" />
-              <div>
-                <span class="font-bold text-slate-800">Intelligence Météo MSO20s :</span>
-                En validant ce lieu et cette date, notre service interrogera automatiquement les archives de <strong>Open-Meteo</strong> pour récupérer et graver la météo exacte (température moyenne et icône ciel) de cette journée passée !
+            <!-- Property Row: Heure -->
+            <div class="property-row">
+              <div class="property-label">
+                <Icon name="lucide:clock" class="property-icon text-amber-500" />
+                <span>Heure précise (opt.)</span>
+              </div>
+              <div class="property-value">
+                <input 
+                  type="time" 
+                  v-model="eventTime" 
+                  class="property-input-field"
+                  @input="queueDraftSave" 
+                />
+              </div>
+            </div>
+
+            <!-- Tiny inline Open-Meteo automation row -->
+            <div class="property-row inline-automation-row">
+              <div class="property-label">
+                <Icon name="lucide:cloud-lightning" class="property-icon text-sky-500 animate-pulse" />
+                <span>Données Météo</span>
+              </div>
+              <div class="property-value text-xs text-slate-500 font-semibold flex items-center gap-1.5 pl-2">
+                <span>Calcul historique réel via</span>
+                <span class="open-meteo-badge">Open-Meteo API</span>
               </div>
             </div>
           </div>
@@ -204,7 +204,7 @@
               :class="{ 'drag-over': isDragOver }"
             >
               <Icon name="lucide:cloud-upload" class="dropzone-icon" />
-              <p v-if="!isDragOver">Glissez-déposez des clichés ou des fichiers ici</p>
+              <p v-if="!isDragOver">Glissez-deposez des clichés ou des fichiers ici</p>
               <p v-else class="text-indigo-500 font-bold">Lâchez pour charger !</p>
               <span class="dropzone-hint">Supporte Images, Vidéos MP4 et documents PDF (Max 10 Mo)</span>
             </div>
@@ -379,7 +379,7 @@ const mockPost = computed(() => {
     weather_info: eventDate.value && location.value ? '☀️ 18.5°C - Ciel dégagé (Aperçu)' : null,
     created_at: new Date().toISOString(),
     author: {
-      username: user.value?.username || 'Antoine'
+      username: user?.value?.username || 'Antoine'
     },
     attachments: attachments.value.map((att, idx) => ({
       id: idx,
@@ -989,50 +989,104 @@ useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
   padding: 0.75rem;
 }
 
-/* Embedded metadata inputs */
-.location-field-wrapper-embedded {
-  background: white;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 0.65rem 0.85rem;
-  transition: border-color 0.2s;
+/* Notion-style Properties Block */
+.properties-editor-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  background: rgba(248, 250, 252, 0.6);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 20px;
+  padding: 1.25rem 1.5rem;
 }
 
-.location-field-wrapper-embedded:focus-within {
-  border-color: #6366f1;
+.property-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  gap: 1rem;
+  min-height: 38px;
 }
 
-.composer-location-input-field-embedded :deep(input) {
+.property-label {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.property-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.property-value {
+  display: flex;
+  align-items: center;
+}
+
+.property-input-field {
   width: 100%;
   border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
   background: transparent !important;
-  padding: 0 !important;
-  font-size: 0.875rem !important;
-  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
   color: #1e293b !important;
-}
-
-.embedded-metadata-input {
-  background: white !important;
-  border: 1.5px solid #e2e8f0 !important;
-  border-radius: 12px !important;
-  padding: 0.65rem 0.85rem !important;
-  font-size: 0.875rem !important;
-  font-weight: 600 !important;
-  color: #1e293b !important;
+  padding: 0.35rem 0.5rem !important;
   outline: none !important;
   box-shadow: none !important;
-  transition: border-color 0.2s;
+  border-radius: 8px;
+  transition: background 0.2s;
 }
 
-.embedded-metadata-input:focus {
-  border-color: #6366f1 !important;
+.property-input-field:hover, .property-input-field:focus {
+  background: rgba(15, 23, 42, 0.03);
 }
 
-.weather-automation-notice {
-  line-height: 1.5;
+.property-input-autocomplete {
+  width: 100%;
+}
+
+.property-input-autocomplete :deep(input) {
+  width: 100%;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  padding: 0.35rem 0.5rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.property-input-autocomplete :deep(input:hover), .property-input-autocomplete :deep(input:focus) {
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.open-meteo-badge {
+  background: rgba(99, 102, 241, 0.08);
+  color: #6366f1;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 800;
+}
+
+.inline-automation-row {
+  border-top: 1px solid rgba(226, 232, 240, 0.5);
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .property-row {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+    align-items: flex-start;
+  }
 }
 
 /* Custom Scrollbars */
