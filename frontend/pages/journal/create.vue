@@ -45,9 +45,9 @@
     <div class="h-10 w-full relative z-10 flex-shrink-0"></div>
 
     <!-- Main Workspace (Dual-Pane Side-by-Side Professional Layout) -->
-    <main class="container mx-auto px-6 pb-6 flex-1 relative z-10 max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start h-[calc(100vh-140px)] overflow-hidden">
-      <!-- LEFT SECTION: CREATIVE WRITING CANVAS (7 Cols on Desktop) -->
-      <section class="lg:col-span-7 flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+    <main class="container mx-auto px-6 pb-6 flex-1 relative z-10 max-w-7xl grid grid-cols-1 md:grid-cols-12 gap-8 items-start h-[calc(100vh-140px)] overflow-hidden">
+      <!-- LEFT SECTION: CREATIVE WRITING CANVAS (7 Cols on Desktop/Tablet) -->
+      <section class="md:col-span-7 flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
         <div class="editor-canvas-card">
           <!-- Text Editing Area -->
           <div class="editor-writing-area">
@@ -266,8 +266,8 @@
         </div>
       </section>
 
-      <!-- RIGHT SECTION: LIVE MOBILE SANDBOX SIMULATOR (5 Cols on Desktop) -->
-      <section class="lg:col-span-5 h-full hidden lg:flex flex-col gap-4 items-center justify-center bg-slate-50/40 rounded-3xl border border-slate-200/50 p-6 relative">
+      <!-- RIGHT SECTION: LIVE MOBILE SANDBOX SIMULATOR (5 Cols on Desktop/Tablet - md breakpoint visible) -->
+      <section class="md:col-span-5 h-full hidden md:flex flex-col gap-4 items-center justify-center bg-slate-50/40 rounded-3xl border border-slate-200/50 p-6 relative">
         <div class="preview-title-bar-top absolute top-6 left-6 right-6 flex items-center justify-center text-xs text-slate-400 font-extrabold uppercase tracking-widest">
           <span>Aperçu Mobile instantané</span>
         </div>
@@ -302,8 +302,8 @@
       </section>
     </main>
 
-    <!-- Mobile-only floating Preview Toggle Button -->
-    <div class="lg:hidden fixed bottom-6 right-6 z-50">
+    <!-- Mobile-only floating Preview Toggle Button (Only active on small viewports < md) -->
+    <div class="md:hidden fixed bottom-6 right-6 z-50">
       <button 
         type="button" 
         class="mobile-preview-toggle-btn shadow-lg bg-indigo-600 text-white p-4 rounded-full flex items-center gap-2 font-bold"
@@ -853,5 +853,60 @@ useSeoMeta({ title: 'MSO20s Creative Studio - Écrire' });
     gap: 0.25rem !important;
     align-items: flex-start !important;
   }
+}
+
+/* Smartphone Simulator */
+.mobile-phone-simulator {
+  width: 320px !important;
+  background: #0f172a !important;
+  border: 10px solid #1e293b !important;
+  border-radius: 36px !important;
+  box-shadow: 
+    0 25px 60px -15px rgba(15, 23, 42, 0.25) !important,
+    0 0 0 1px rgba(255,255,255,0.03) !important;
+  overflow: hidden !important;
+  height: 600px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.simulator-screen {
+  flex: 1 !important;
+  background: #f8fafc !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.simulator-status-bar {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0.4rem 1.25rem 0.2rem !important;
+  background: white !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+}
+
+.status-icons {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+}
+
+.simulator-app-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0.75rem 1.25rem 0.5rem !important;
+  background: white !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.simulator-content-area {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 0.75rem !important;
 }
 </style>
