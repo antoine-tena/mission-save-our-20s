@@ -114,8 +114,31 @@ class RichPostAttachmentSerializer(serializers.ModelSerializer):
 class RichPostSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     attachments = RichPostAttachmentSerializer(many=True, read_only=True)
+    likes_count = serializers.SerializerMethodField()
+    is_liked_by_me = serializers.SerializerMethodField()
+    is_bookmarked_by_me = serializers.SerializerMethodField()
 
     class Meta:
         model = RichPost
-        fields = ['id', 'author', 'title', 'caption', 'location', 'created_at', 'attachments', 'event_date', 'event_time', 'weather_info']
+        fields = [
+            'id', 'author', 'title', 'caption', 'location', 'created_at', 
+            'attachments', 'event_date', 'event_time', 'weather_info',
+            'likes_count', 'is_liked_by_me', 'is_bookmarked_by_me'
+        ]
+
+    def get_likes_count(self, obj: RichPost) -> int:
+        return obj.likes.count()
+
+    def get_is_liked_by_me(self, obj: RichPost) -> bool:
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.likes.filter(id=request.user.id).exists()
+        return False
+
+    def get_is_bookmarked_by_me(self, obj: RichPost) -> bool:
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.bookmarks.filter(id=request.user.id).exists()
+        return False
+
 
