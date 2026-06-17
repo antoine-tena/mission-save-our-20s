@@ -6,7 +6,7 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'friends_count')
     search_fields = ('user__username', 'bio')
 
-    def friends_count(self, obj):
+    def friends_count(self, obj: Profile) -> int:
         return obj.friends.count()
 
 @admin.register(SocialPost)
@@ -14,7 +14,7 @@ class SocialPostAdmin(admin.ModelAdmin):
     list_display = ('author', 'created_at', 'likes_count')
     list_filter = ('created_at', 'author')
     
-    def likes_count(self, obj):
+    def likes_count(self, obj: SocialPost) -> int:
         return obj.likes.count()
 
 @admin.register(FriendRequest)

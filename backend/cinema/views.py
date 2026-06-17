@@ -28,9 +28,9 @@ class MovieTMDBSearchView(APIView):
         try:
             url = f"{TMDB_BASE_URL}/search/movie"
             params = {'api_key': TMDB_API_KEY, 'language': 'fr-FR', 'query': query}
-            res = requests.get(url, params=params, timeout=10)
-            res.raise_for_status()
-            results = res.json().get('results', [])
+            api_response = requests.get(url, params=params, timeout=10)
+            api_response.raise_for_status()
+            results = api_response.json().get('results', [])
             return Response([{"id": r.get('id'), "title": r.get('title'), "release_year": r.get('release_date', '')[:4], "poster_path": r.get('poster_path')} for r in results])
         except Exception as e:
             return Response({'error': str(e)}, status=502)
