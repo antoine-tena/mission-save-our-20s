@@ -2,9 +2,7 @@ import { ref, computed } from 'vue';
 import type { GameType, GameSession, ScoreboardStats } from '~/types';
 
 export const useGames = () => {
-  const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://127.0.0.1:8000/api';
-  const { token } = useAuth();
+  const api = useApi();
 
   const sessions = ref<GameSession[]>([]);
   const gameTypes = ref<GameType[]>([]);
@@ -15,11 +13,10 @@ export const useGames = () => {
   const fetchAllData = async () => {
     isFetching.value = true;
     try {
-      const headers = { Authorization: `Token ${token.value}` };
       const [typesData, sessionsData, statsData] = await Promise.all([
-        $fetch<GameType[]>(`${apiBase}/games/types/`, { headers }),
-        $fetch<GameSession[]>(`${apiBase}/games/sessions/`, { headers }),
-        $fetch<ScoreboardStats>(`${apiBase}/games/stats/`, { headers })
+        api.get<GameType[]>('/games/types/'),
+        api.get<GameSession[]>('/games/sessions/'),
+        api.get<ScoreboardStats>('/games/stats/')
       ]);
       gameTypes.value = typesData;
       sessions.value = sessionsData;
@@ -34,11 +31,7 @@ export const useGames = () => {
   const createSession = async (sessionData: any) => {
     isSubmitting.value = true;
     try {
-      await $fetch(`${apiBase}/games/sessions/`, {
-        method: 'POST',
-        headers: { Authorization: `Token ${token.value}` },
-        body: sessionData
-      });
+      await api.post('/games/sessions/', sessionData);
       await fetchAllData();
       return true;
     } catch (err) {
