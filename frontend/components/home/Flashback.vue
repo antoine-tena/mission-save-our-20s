@@ -16,15 +16,11 @@
 
 <script setup lang="ts">
 import type { Photo } from '~/types';
+import { formatDateYear } from '~/utils/formatters';
 
 defineProps<{
   memories: Photo[]
 }>();
-
-const formatDateYear = (dateStr: string) => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-};
 </script>
 
 <style scoped>

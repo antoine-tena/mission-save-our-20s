@@ -36,7 +36,7 @@
             </div>
             <p v-if="selectedPhoto.description" class="meta-desc">{{ selectedPhoto.description }}</p>
             <div class="meta-small-details">
-              <span>Ajouté le {{ formatDate(selectedPhoto.date_creation) }}</span>
+              <span>Ajouté le {{ formatDateShort(selectedPhoto.date_creation) }}</span>
               <span v-if="selectedPhoto.author_name"> • Par {{ selectedPhoto.author_name }}</span>
             </div>
           </div>
@@ -49,6 +49,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import type { Photo } from '~/types';
+import { formatDateShort } from '~/utils/formatters';
 
 const props = defineProps<{ photos: Photo[]; }>();
 const emit = defineEmits(['delete']);
@@ -67,10 +68,6 @@ const triggerDelete = () => {
     emit('delete', selectedPhoto.value);
     selectedPhoto.value = null;
   }
-};
-
-const formatDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 </script>
 

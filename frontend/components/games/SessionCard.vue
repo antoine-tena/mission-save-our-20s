@@ -19,8 +19,8 @@
 
 <script setup lang="ts">
 import type { GameSession } from '~/types';
+import { formatDateShort } from '~/utils/formatters';
 defineProps<{ session: GameSession; }>();
-const formatDateShort = (d: string) => new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
 const getWinnerClass = (w: string) => ({ 'Amani': 'winner-amani', 'Antoine': 'winner-antoine' }[w] || 'winner-draw');
 </script>
 

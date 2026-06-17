@@ -9,6 +9,21 @@ export function formatDate(dateString: string): string {
   }).format(date);
 }
 
+export function formatDateShort(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+export function formatDateDateTime(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+export function formatDateYear(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+}
+
 export function renderMarkdown(text: string): string {
   if (!text) return '';
   
