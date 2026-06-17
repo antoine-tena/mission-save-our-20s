@@ -7,6 +7,12 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.request import Request
+from typing import Optional
+
+def _get_user_avatar_url(request: Request, user: User) -> Optional[str]:
+    if hasattr(user, 'profile') and user.profile.avatar:
+        return request.build_absolute_uri(user.profile.avatar.url)
+    return None
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -37,7 +43,8 @@ def register(request: Request) -> Response:
         'user': {
             'id': user.id,
             'username': user.username,
-            'email': user.email
+            'email': user.email,
+            'avatar_url': _get_user_avatar_url(request, user)
         }
     }, status=status.HTTP_201_CREATED)
 
@@ -59,7 +66,8 @@ def login(request: Request) -> Response:
         'user': {
             'id': user.id,
             'username': user.username,
-            'email': user.email
+            'email': user.email,
+            'avatar_url': _get_user_avatar_url(request, user)
         }
     })
 
@@ -76,5 +84,6 @@ def get_user(request: Request) -> Response:
     return Response({
         'id': user.id,
         'username': user.username,
-        'email': user.email
+        'email': user.email,
+        'avatar_url': _get_user_avatar_url(request, user)
     })
