@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Movie
 from typing import Optional
+from social.utils import get_absolute_media_url
 
 class MovieSerializer(serializers.ModelSerializer):
     poster_url = serializers.SerializerMethodField()
@@ -22,7 +23,4 @@ class MovieSerializer(serializers.ModelSerializer):
         }
 
     def get_poster_url(self, obj: Movie) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.poster and request:
-            return request.build_absolute_uri(obj.poster.url)
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.poster)

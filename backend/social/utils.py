@@ -115,3 +115,12 @@ def fetch_open_meteo_weather(lat: float, lon: float, event_date: date, event_tim
     except Exception as e:
         print(f"Erreur lors de la récupération de la météo Open-Meteo : {e}")
         return None
+
+def get_absolute_media_url(request: Any, file_field: Any) -> Optional[str]:
+    """Construit l'URL absolue d'un champ de fichier Django s'il est renseigné."""
+    if file_field and request:
+        try:
+            return request.build_absolute_uri(file_field.url)
+        except ValueError:
+            return None
+    return None
