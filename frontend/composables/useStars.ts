@@ -2,9 +2,7 @@ import { ref } from 'vue';
 import type { StargazingSpot, CelestialBody } from '~/types';
 
 export const useStars = () => {
-  const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://127.0.0.1:8000/api';
-  const { token } = useAuth();
+  const api = useApi();
 
   const spots = ref<StargazingSpot[]>([]);
   const isLoading = ref(false);
@@ -12,10 +10,7 @@ export const useStars = () => {
   const fetchSpots = async () => {
     isLoading.value = true;
     try {
-      const data = await $fetch<StargazingSpot[]>(`${apiBase}/stargazing/`, {
-        headers: { Authorization: `Token ${token.value}` }
-      });
-      spots.value = data;
+      spots.value = await api.get<StargazingSpot[]>('/stargazing/');
     } catch (err) {
       console.error('Stars load error:', err);
     } finally {
@@ -25,11 +20,7 @@ export const useStars = () => {
 
   const saveSpot = async (spotData: Partial<StargazingSpot>) => {
     try {
-      await $fetch(`${apiBase}/stargazing/`, {
-        method: 'POST',
-        headers: { Authorization: `Token ${token.value}` },
-        body: spotData
-      });
+      await api.post('/stargazing/', spotData);
       await fetchSpots();
       return true;
     } catch (err) {

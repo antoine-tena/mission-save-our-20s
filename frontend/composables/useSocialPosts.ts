@@ -1,33 +1,28 @@
 import { ref } from 'vue';
 import type { SocialPost } from '~/types';
 
-export const useSocialPosts = (apiBase: string, token: any) => {
+export const useSocialPosts = () => {
+  const api = useApi();
   const posts = ref<SocialPost[]>([]);
 
   const fetchPosts = async (username?: string) => {
     try {
-      let url = `${apiBase}/social/posts/`;
+      let url = '/social/posts/';
       if (username) url += `?username=${username}`;
-      posts.value = await $fetch<SocialPost[]>(url, {
-        headers: { Authorization: `Token ${token.value}` }
-      });
+      posts.value = await api.get<SocialPost[]>(url);
     } catch (err) { console.error(err); }
   };
 
   const createPost = async (formData: FormData) => {
     try {
-      await $fetch(`${apiBase}/social/posts/`, {
-        method: 'POST', headers: { Authorization: `Token ${token.value}` }, body: formData
-      });
+      await api.post('/social/posts/', formData);
       return true;
     } catch (err) { console.error(err); return false; }
   };
 
   const likePost = async (id: number) => {
     try {
-      const data = await $fetch<{ liked: boolean }>(`${apiBase}/social/posts/${id}/like/`, {
-        method: 'POST', headers: { Authorization: `Token ${token.value}` }
-      });
+      const data = await api.post<{ liked: boolean }>(`/social/posts/${id}/like/`);
       const post = posts.value.find(p => p.id === id);
       if (post) {
         post.is_liked = data.liked;

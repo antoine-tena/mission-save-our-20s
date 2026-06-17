@@ -2,9 +2,7 @@ import { ref } from 'vue';
 import type { RichPost } from '~/types';
 
 export const useRichPosts = () => {
-  const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://localhost:8000/api';
-  const token = useCookie<string | null>('auth_token');
+  const api = useApi();
 
   const richPosts = ref<RichPost[]>([]);
   const isLoading = ref(false);
@@ -12,9 +10,7 @@ export const useRichPosts = () => {
   const fetchRichPosts = async () => {
     isLoading.value = true;
     try {
-      richPosts.value = await $fetch<RichPost[]>(`${apiBase}/social/rich-posts/`, {
-        headers: { Authorization: `Token ${token.value}` }
-      });
+      richPosts.value = await api.get<RichPost[]>('/social/rich-posts/');
     } catch (err) {
       console.error(err);
     } finally {
@@ -24,11 +20,7 @@ export const useRichPosts = () => {
 
   const createRichPost = async (formData: FormData) => {
     try {
-      await $fetch(`${apiBase}/social/rich-posts/`, {
-        method: 'POST',
-        headers: { Authorization: `Token ${token.value}` },
-        body: formData
-      });
+      await api.post('/social/rich-posts/', formData);
       await fetchRichPosts();
       return true;
     } catch (err) {
@@ -39,10 +31,7 @@ export const useRichPosts = () => {
 
   const toggleLikeRichPost = async (id: number) => {
     try {
-      const response = await $fetch<{ status: string; likes_count: number }>(`${apiBase}/social/journal/${id}/like/`, {
-        method: 'POST',
-        headers: { Authorization: `Token ${token.value}` }
-      });
+      const response = await api.post<{ status: string; likes_count: number }>(`/social/journal/${id}/like/`);
       richPosts.value = richPosts.value.map(post => {
         if (post.id === id) {
           return {
@@ -62,10 +51,7 @@ export const useRichPosts = () => {
 
   const toggleBookmarkRichPost = async (id: number) => {
     try {
-      const response = await $fetch<{ status: string; is_bookmarked: boolean }>(`${apiBase}/social/journal/${id}/bookmark/`, {
-        method: 'POST',
-        headers: { Authorization: `Token ${token.value}` }
-      });
+      const response = await api.post<{ status: string; is_bookmarked: boolean }>(`/social/journal/${id}/bookmark/`);
       richPosts.value = richPosts.value.map(post => {
         if (post.id === id) {
           return {
@@ -84,10 +70,7 @@ export const useRichPosts = () => {
 
   const deleteRichPost = async (id: number) => {
     try {
-      await $fetch(`${apiBase}/social/journal/${id}/`, {
-        method: 'DELETE',
-        headers: { Authorization: `Token ${token.value}` }
-      });
+      await api.delete(`/social/journal/${id}/`);
       richPosts.value = richPosts.value.filter(post => post.id !== id);
       return true;
     } catch (err) {
@@ -98,14 +81,7 @@ export const useRichPosts = () => {
 
   const updateRichPost = async (id: number, payload: any) => {
     try {
-      const updatedPost = await $fetch<RichPost>(`${apiBase}/social/journal/${id}/`, {
-        method: 'PATCH',
-        headers: { 
-          Authorization: `Token ${token.value}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
+      const updatedPost = await api.patch<RichPost>(`/social/journal/${id}/`, payload);
       richPosts.value = richPosts.value.map(post => post.id === id ? updatedPost : post);
       return true;
     } catch (err) {
