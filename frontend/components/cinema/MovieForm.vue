@@ -1,6 +1,5 @@
 <template>
-  <section class="add-movie-section card glass-card">
-    <div class="tape-effect"></div>
+  <ScrapbookCard class="add-movie-section">
     <h2 class="card-title">{{ isEditing ? 'Modifier la Séance' : 'Nouvelle Séance' }}</h2>
     <form @submit.prevent="$emit('submit')" class="movie-form">
       <CinemaMovieFormBase
@@ -34,7 +33,7 @@
         </button>
       </div>
     </form>
-  </section>
+  </ScrapbookCard>
 </template>
 
 <script setup lang="ts">
@@ -52,8 +51,7 @@ const onMovieSelect = (s: TMDBSuggestion) => {
 </script>
 
 <style scoped>
-.add-movie-section { margin-bottom: 4rem; padding: 3rem; position: relative; }
-.tape-effect { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 120px; height: 35px; background: rgba(202, 117, 214, 0.2); clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%); }
+.add-movie-section { margin-bottom: 4rem; }
 .form-title { font-family: var(--font-display); font-size: 1.8rem; margin-bottom: 2rem; text-align: center; }
 .form-actions { display: flex; flex-direction: column; gap: 1rem; align-items: center; margin-top: 2rem; }
 .mso-btn-primary { background: #1a1a1a; color: white; border: none; padding: 1rem 2.5rem; border-radius: 50px; font-weight: 800; cursor: pointer; transition: all 0.3s; width: 100%; }
