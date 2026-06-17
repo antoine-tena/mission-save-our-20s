@@ -4,9 +4,7 @@
       <!-- Left Column: Avatar & Threads-style connection line -->
       <div class="post-left-col">
         <div class="post-avatar-wrapper">
-          <div class="post-avatar-inner">
-            <Icon name="lucide:user" class="avatar-icon" />
-          </div>
+          <ProfileAvatar size="lg" class="post-avatar-inner" :avatar-url="post.author.avatar_url" :username="post.author.username" />
           <!-- Glowing status dot -->
           <div class="avatar-status-dot"></div>
         </div>

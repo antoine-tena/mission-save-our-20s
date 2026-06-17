@@ -1,10 +1,7 @@
 <template>
   <div class="hero-main-group">
     <div class="avatar-container">
-      <img v-if="avatarUrl" :src="avatarUrl" alt="Avatar" class="main-avatar" />
-      <div v-else class="main-avatar fallback-avatar">
-        <Icon name="lucide:user" class="fallback-icon" />
-      </div>
+      <ProfileAvatar size="xl" class="main-avatar" :avatar-url="avatarUrl" :username="username" />
       <button v-if="isOwnProfile" class="avatar-edit-badge" @click="$emit('editAvatar')">
         <Icon name="lucide:camera" />
       </button>
