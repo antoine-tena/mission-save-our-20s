@@ -16,7 +16,7 @@
       </Transition>
     </div>
 
-    <CinemaMovieCardPoster :poster-url="movie.poster_url" :title="movie.title" :date="formatDate(movie.date_seen)" />
+    <CinemaMovieCardPoster :poster-url="movie.poster_url" :title="movie.title" :date="formatDateDateTime(movie.date_seen)" />
     <div class="movie-details">
       <header class="movie-header">
         <h2 class="movie-title">{{ movie.title }}</h2>
@@ -48,14 +48,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import type { Movie } from '~/types';
+import { formatDateDateTime } from '~/utils/formatters';
 
 const props = defineProps<{ movie: Movie }>();
 const emit = defineEmits(['edit', 'delete']);
 
 const showDetails = ref(false);
 const showMenu = ref(false);
-
-const formatDate = (d: string) => new Date(d).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 const onEdit = () => {
   showMenu.value = false;
