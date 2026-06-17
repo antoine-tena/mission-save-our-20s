@@ -25,12 +25,12 @@
               </div>
               <div class="scrapbook-content-grid">
                 <template v-if="profileUsername === 'antoine'">
-                  <AntoineProfileStats :points="profile?.points || 0" />
-                  <AntoineProfileMain />
+                  <ProfileStatsCard :points="profile?.points || 0" username="antoine" />
+                  <ProfileHighlightCard username="antoine" />
                 </template>
                 <template v-else-if="profileUsername === 'amani'">
-                  <AmaniProfileMain />
-                  <AmaniProfileStats :points="profile?.points || 0" />
+                  <ProfileHighlightCard username="amani" />
+                  <ProfileStatsCard :points="profile?.points || 0" username="amani" />
                 </template>
                 <template v-else>
                   <div class="glass-card p-8 text-center">
