@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Photo, Album, AlbumPage
 from django.contrib.auth.models import User
 from typing import Optional, Any
+from social.utils import get_absolute_media_url
 
 class PhotoSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
@@ -21,22 +22,10 @@ class PhotoSerializer(serializers.ModelSerializer):
         }
     
     def get_image_url(self, obj: Photo) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.image and request:
-            try:
-                return request.build_absolute_uri(obj.image.url)
-            except ValueError:
-                return None
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.image)
 
     def get_thumbnail_url(self, obj: Photo) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.thumbnail and request:
-            try:
-                return request.build_absolute_uri(obj.thumbnail.url)
-            except ValueError:
-                return None
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.thumbnail)
 
 class AlbumPageSerializer(serializers.ModelSerializer):
     photos = PhotoSerializer(many=True, read_only=True)
@@ -72,19 +61,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         }
 
     def get_cover_photo_url(self, obj: Album) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.cover_photo and request:
-            try:
-                return request.build_absolute_uri(obj.cover_photo.url)
-            except ValueError:
-                return None
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.cover_photo)
 
     def get_back_cover_photo_url(self, obj: Album) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.back_cover_photo and request:
-            try:
-                return request.build_absolute_uri(obj.back_cover_photo.url)
-            except ValueError:
-                return None
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.back_cover_photo)
