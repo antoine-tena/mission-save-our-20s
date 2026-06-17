@@ -1,9 +1,6 @@
 <template>
   <div class="creator-header">
-    <img v-if="avatar" :src="avatar" class="small-avatar" />
-    <div v-else class="small-avatar fallback-avatar-small">
-      <Icon name="lucide:user" class="fallback-icon-small" />
-    </div>
+    <ProfileAvatar size="md" class="small-avatar" :avatar-url="avatar" />
     <textarea 
       :value="caption" 
       placeholder="Quoi de neuf dans votre mission ?" 

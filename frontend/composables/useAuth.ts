@@ -80,6 +80,12 @@ export const useAuth = () => {
     }
   };
 
+  const updateUserAvatar = (avatarUrl: string | null) => {
+    if (user.value) {
+      user.value = { ...user.value, avatar_url: avatarUrl };
+    }
+  };
+
   return {
     user: readonly(user),
     token: readonly(token),
@@ -87,6 +93,7 @@ export const useAuth = () => {
     register,
     login,
     logout,
-    fetchUser
+    fetchUser,
+    updateUserAvatar
   };
 };

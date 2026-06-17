@@ -2,9 +2,7 @@
   <div class="mso-actions">
     <template v-if="isAuthenticated">
       <NuxtLink to="/profile" class="mso-user-pill">
-        <div class="mso-user-pill__avatar">
-          <Icon name="lucide:user" />
-        </div>
+        <ProfileAvatar size="sm" class="mso-user-pill__avatar" :username="username" />
         <span class="mso-user-pill__name">{{ username }}</span>
       </NuxtLink>
       <button class="mso-btn-logout" @click="$emit('logout')" title="Déconnexion">

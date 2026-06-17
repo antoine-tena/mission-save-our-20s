@@ -4,9 +4,17 @@ from .models import Profile, SocialPost, FriendRequest, RichPost, RichPostAttach
 from typing import Optional, Any
 
 class UserSerializer(serializers.ModelSerializer):
+    avatar_url = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = ['id', 'username', 'email', 'avatar_url']
+
+    def get_avatar_url(self, obj: User) -> Optional[str]:
+        request = self.context.get('request')
+        if hasattr(obj, 'profile') and obj.profile.avatar and request:
+            return request.build_absolute_uri(obj.profile.avatar.url)
+        return None
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

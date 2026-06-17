@@ -35,9 +35,7 @@
         active-class="active"
         title="Profil"
       >
-        <div class="avatar-circle">
-          <span class="avatar-initials">{{ userInitial }}</span>
-        </div>
+        <ProfileAvatar size="sm" class="avatar-circle" />
         <span class="tooltip-bubble">Profil</span>
       </NuxtLink>
 
@@ -59,9 +57,6 @@
 import { computed } from 'vue';
 
 const { user, logout } = useAuth();
-
-const username = computed(() => user.value?.username || 'antoine');
-const userInitial = computed(() => username.value.charAt(0).toUpperCase());
 
 const navItems = [
   { to: '/journal', label: 'Journal', icon: 'lucide:home' },
@@ -126,25 +121,12 @@ const handleLogout = async () => {
 
 /* Avatar styling */
 .avatar-circle {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
   border: 1.5px solid #ca75d6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: transform 0.2s;
 }
 
 .sidebar-icon-item:hover .avatar-circle {
   transform: scale(1.08);
-}
-
-.avatar-initials {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: #ca75d6;
 }
 
 /* High-end hovering Tooltip Bubble appearing on the right */

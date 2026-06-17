@@ -1,10 +1,7 @@
 <template>
   <article class="post-item glass-card">
     <div class="post-item-header">
-      <img v-if="avatar" :src="avatar" class="small-avatar" />
-      <div v-else class="small-avatar fallback-avatar-small">
-        <Icon name="lucide:user" class="fallback-icon-small" />
-      </div>
+      <ProfileAvatar size="md" class="small-avatar" :avatar-url="avatar || post.author.avatar_url" :username="post.author.username" />
       <div class="post-meta">
         <span class="post-author">{{ post.author.username }}</span>
         <time class="post-time">{{ formatDate(post.created_at) }}</time>

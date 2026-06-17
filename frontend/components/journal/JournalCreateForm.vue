@@ -4,9 +4,7 @@
       <!-- Composer Header/User Row -->
       <div class="composer-header">
         <div class="user-avatar-wrapper">
-          <div class="composer-avatar">
-            <Icon name="lucide:user" class="avatar-icon" />
-          </div>
+          <ProfileAvatar size="lg" class="composer-avatar" />
           <div class="composer-avatar-glowing-ring"></div>
         </div>
         
