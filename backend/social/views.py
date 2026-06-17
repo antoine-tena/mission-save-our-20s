@@ -14,6 +14,26 @@ import os
 from typing import Any
 from rest_framework.request import Request
 from .utils import resolve_coordinates, fetch_open_meteo_weather
+
+class BaseToggleM2MView(APIView):
+    """Classe de base générique pour basculer (toggle) des relations Many-to-Many."""
+    permission_classes = [IsAuthenticated]
+    model = None
+    relation_name = None
+
+    def post(self, request: Request, pk: int) -> Response:
+        obj = get_object_or_404(self.model, pk=pk)
+        relation = getattr(obj, self.relation_name)
+        
+        if relation.filter(id=request.user.id).exists():
+            relation.remove(request.user)
+            return self.get_response(obj, added=False)
+        else:
+            relation.add(request.user)
+            return self.get_response(obj, added=True)
+
+    def get_response(self, obj: Any, added: bool) -> Response:
+        return Response({"active": added})
 class MyProfileView(APIView):
     """Vue pour voir et modifier son propre profil."""
     permission_classes = [IsAuthenticated]
@@ -55,16 +75,13 @@ class SocialPostListCreateView(APIView):
             serializer.save(author=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-class LikePostView(APIView):
+class LikePostView(BaseToggleM2MView):
     """Vue pour liker/unliker une publication."""
-    permission_classes = [IsAuthenticated]
-    def post(self, request: Request, pk: int) -> Response:
-        post = get_object_or_404(SocialPost, pk=pk)
-        if post.likes.filter(id=request.user.id).exists():
-            post.likes.remove(request.user)
-            return Response({'liked': False})
-        post.likes.add(request.user)
-        return Response({'liked': True})
+    model = SocialPost
+    relation_name = 'likes'
+
+    def get_response(self, obj: SocialPost, added: bool) -> Response:
+        return Response({'liked': added})
 class UserListView(APIView):
     """Liste tous les utilisateurs sauf soi-même."""
     permission_classes = [IsAuthenticated]
@@ -220,41 +237,27 @@ class RichPostListCreateView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class RichPostLikeToggleView(APIView):
+class RichPostLikeToggleView(BaseToggleM2MView):
     """Vue pour liker/unliker une publication riche."""
-    permission_classes = [IsAuthenticated]
+    model = RichPost
+    relation_name = 'likes'
 
-    def post(self, request: Request, pk: int) -> Response:
-        post = get_object_or_404(RichPost, pk=pk)
-        if post.likes.filter(id=request.user.id).exists():
-            post.likes.remove(request.user)
-            return Response({
-                'status': 'unliked',
-                'likes_count': post.likes.count()
-            })
-        post.likes.add(request.user)
+    def get_response(self, obj: RichPost, added: bool) -> Response:
         return Response({
-            'status': 'liked',
-            'likes_count': post.likes.count()
+            'status': 'liked' if added else 'unliked',
+            'likes_count': obj.likes.count()
         })
 
 
-class RichPostBookmarkToggleView(APIView):
+class RichPostBookmarkToggleView(BaseToggleM2MView):
     """Vue pour ajouter/retirer une publication riche des favoris."""
-    permission_classes = [IsAuthenticated]
+    model = RichPost
+    relation_name = 'bookmarks'
 
-    def post(self, request: Request, pk: int) -> Response:
-        post = get_object_or_404(RichPost, pk=pk)
-        if post.bookmarks.filter(id=request.user.id).exists():
-            post.bookmarks.remove(request.user)
-            return Response({
-                'status': 'unbookmarked',
-                'is_bookmarked': False
-            })
-        post.bookmarks.add(request.user)
+    def get_response(self, obj: RichPost, added: bool) -> Response:
         return Response({
-            'status': 'bookmarked',
-            'is_bookmarked': True
+            'status': 'bookmarked' if added else 'unbookmarked',
+            'is_bookmarked': added
         })
 
 
