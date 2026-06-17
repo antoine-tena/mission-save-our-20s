@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, SocialPost, FriendRequest
+from .models import Profile, SocialPost, FriendRequest, SavedLocation
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -21,3 +21,9 @@ class SocialPostAdmin(admin.ModelAdmin):
 class FriendRequestAdmin(admin.ModelAdmin):
     list_display = ('from_user', 'to_user', 'created_at', 'accepted')
     list_filter = ('accepted', 'created_at')
+
+@admin.register(SavedLocation)
+class SavedLocationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'latitude', 'longitude', 'created_at')
+    search_fields = ('name',)
+    list_filter = ('created_at',)
