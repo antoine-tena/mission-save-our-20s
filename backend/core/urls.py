@@ -7,7 +7,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from photos.views import (
     PhotoListCreateView, PhotoDetailDeleteView, 
-    PhotoMemoriesView, HealthCheckView,
+    PhotoMemoriesView, HealthCheckView
+)
+from photos.album_views import (
     AlbumListCreateView, AlbumDetailDeleteUpdateView,
     AlbumPageListCreateView, AlbumPageDetailDeleteUpdateView,
     AlbumPageReorderView, AlbumPhotoUploadView,

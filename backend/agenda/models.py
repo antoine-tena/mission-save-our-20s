@@ -10,5 +10,5 @@ class Event(models.Model):
     class Meta:
         ordering = ['-date']
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.title} - {self.date}"

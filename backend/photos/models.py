@@ -127,7 +127,7 @@ class Photo(models.Model):
     def __str__(self) -> str:
         return self.titre or self.caption or f"Photo {self.id}"
 
-    def make_thumbnail(self):
+    def make_thumbnail(self) -> None:
         """Créer une miniature 400x400 via Pillow."""
         if not self.image:
             return
@@ -151,7 +151,7 @@ class Photo(models.Model):
             
         self.thumbnail.save(thumb_filename, ContentFile(thumb_io.getvalue()), save=False)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: Any, **kwargs: Any) -> None:
         # Générer la miniature si elle n'existe pas et qu'une image est présente
         if self.image and not self.thumbnail:
             try:
@@ -171,7 +171,7 @@ class Photo(models.Model):
                     gps_info[sub_decoded] = value[t]
         return gps_info
 
-    def _convert_to_degrees(self, value) -> float:
+    def _convert_to_degrees(self, value: Any) -> float:
         """Convertit les tuples EXIF en degrés décimaux."""
         d = float(value[0])
         m = float(value[1])

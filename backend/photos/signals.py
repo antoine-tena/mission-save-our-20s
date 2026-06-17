@@ -2,9 +2,10 @@ from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from .models import Photo, Album
 import os
+from typing import Any, Type, Optional
 
 @receiver(post_delete, sender=Photo)
-def auto_delete_file_on_delete(sender, instance, **kwargs):
+def auto_delete_file_on_delete(sender: Type[Photo], instance: Photo, **kwargs: Any) -> None:
     """
     Supprime le fichier physique du disque quand l'objet Photo est supprimé de la BDD.
     """
@@ -16,7 +17,7 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
                 print(f"Erreur lors de la suppression du fichier image: {e}")
 
 @receiver(post_delete, sender=Album)
-def auto_delete_cover_on_delete(sender, instance, **kwargs):
+def auto_delete_cover_on_delete(sender: Type[Album], instance: Album, **kwargs: Any) -> None:
     """
     Supprime les fichiers physiques des couvertures quand l'Album est supprimé de la BDD.
     """
@@ -29,7 +30,7 @@ def auto_delete_cover_on_delete(sender, instance, **kwargs):
                     print(f"Erreur lors de la suppression de la couverture d'album: {e}")
 
 @receiver(pre_save, sender=Photo)
-def auto_delete_file_on_change(sender, instance, **kwargs):
+def auto_delete_file_on_change(sender: Type[Photo], instance: Photo, **kwargs: Any) -> Optional[bool]:
     """
     Supprime l'ancien fichier s'il est remplacé par un nouveau.
     """
@@ -48,9 +49,10 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
                 os.remove(old_file.path)
             except Exception as e:
                 pass
+    return None
 
 @receiver(pre_save, sender=Album)
-def auto_delete_cover_on_change(sender, instance, **kwargs):
+def auto_delete_cover_on_change(sender: Type[Album], instance: Album, **kwargs: Any) -> Optional[bool]:
     if not instance.pk:
         return False
     try:
@@ -67,3 +69,4 @@ def auto_delete_cover_on_change(sender, instance, **kwargs):
     if old_back and old_back != instance.back_cover_photo:
         if os.path.isfile(old_back.path):
             os.remove(old_back.path)
+    return None
