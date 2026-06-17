@@ -23,6 +23,18 @@
             <span class="post-author-handle">@{{ post.author.username.toLowerCase() }}</span>
             <span class="meta-separator">•</span>
             <span class="post-timestamp" :title="formatFullDate(post.created_at)">{{ formatRelativeTime(post.created_at) }}</span>
+            <template v-if="isAuthor">
+              <span class="meta-separator">•</span>
+              <button @click="showEditModal = true" class="text-slate-400 hover:text-indigo-600 transition-colors duration-200 cursor-pointer inline-flex items-center gap-0.5" title="Modifier">
+                <Icon name="lucide:edit-2" class="w-3.5 h-3.5" />
+                <span class="text-[10px] font-bold uppercase tracking-wider">Éditer</span>
+              </button>
+              <span class="meta-separator">•</span>
+              <button @click="handleDelete" class="text-slate-400 hover:text-red-500 transition-colors duration-200 cursor-pointer inline-flex items-center gap-0.5" title="Supprimer">
+                <Icon name="lucide:trash-2" class="w-3.5 h-3.5" />
+                <span class="text-[10px] font-bold uppercase tracking-wider">Suppr.</span>
+              </button>
+            </template>
           </div>
 
           <!-- Badges & Weather DateTime Column -->
@@ -50,51 +62,25 @@
         <!-- Post Body -->
         <div class="post-body-content">
           <h2 v-if="post.title" class="post-title-text">{{ post.title }}</h2>
-          <p v-if="post.caption" class="post-caption-text">{{ post.caption }}</p>
+          <div v-if="post.caption" class="post-caption-text markdown-content" v-html="renderMarkdown(post.caption)"></div>
 
           <!-- Attachments Grid (Twitter / Instagram style) -->
           <div v-if="post.attachments && post.attachments.length > 0" class="post-attachments-container">
             <!-- Images & Videos Grid -->
-            <div 
-              v-if="visualAttachments.length > 0" 
-              :class="['media-grid-wrapper', `grid-count-${Math.min(visualAttachments.length, 4)}`]"
-            >
-              <div 
-                v-for="(att, idx) in visualAttachments.slice(0, 4)" 
-                :key="att.id" 
-                class="media-grid-item"
-                @click="openLightbox(idx)"
-              >
-                <!-- Image -->
-                <img 
-                  v-if="att.file_type === 'IMAGE'" 
-                  :src="att.file_url" 
-                  :alt="att.caption || 'Photo'" 
-                  class="grid-media-element" 
-                />
-                
-                <!-- Video -->
-                <video 
-                  v-else-if="att.file_type === 'VIDEO'" 
-                  :src="att.file_url" 
-                  controls 
-                  class="grid-media-element"
-                  @click.stop
-                ></video>
-
-                <!-- Overlay caption if exists -->
+            <div v-if="visualAttachments.length > 0" :class="['media-grid-wrapper', `grid-count-${Math.min(visualAttachments.length, 4)}`]">
+              <div v-for="(att, idx) in visualAttachments.slice(0, 4)" :key="att.id" class="media-grid-item" @click="openLightbox(idx)">
+                <img v-if="att.file_type === 'IMAGE'" :src="att.file_url" :alt="att.caption || 'Photo'" class="grid-media-element" />
+                <video v-else-if="att.file_type === 'VIDEO'" :src="att.file_url" controls class="grid-media-element" @click.stop></video>
                 <div v-if="att.caption" class="grid-media-caption-overlay">
                   <p class="media-overlay-text">{{ att.caption }}</p>
                 </div>
-
-                <!-- More photos indicator overlay -->
                 <div v-if="idx === 3 && visualAttachments.length > 4" class="media-more-overlay">
                   <span class="more-count">+{{ visualAttachments.length - 4 }}</span>
                 </div>
               </div>
             </div>
 
-            <!-- Documents & PDFs Row (Rendered beautifully as elegant horizontal files) -->
+            <!-- Documents & PDFs Row -->
             <div v-if="docAttachments.length > 0" class="docs-attachments-row">
               <div v-for="att in docAttachments" :key="att.id" class="doc-attachment-bar">
                 <div class="doc-bar-icon-box">
@@ -136,44 +122,43 @@
         <button class="lightbox-close-btn" @click="closeLightbox">
           <Icon name="lucide:x" class="w-8 h-8" />
         </button>
-
         <div class="lightbox-content-wrapper" @click.stop>
           <button class="lightbox-nav-btn prev" @click="prevSlide" v-if="visualAttachments.length > 1">
             <Icon name="lucide:chevron-left" class="w-8 h-8" />
           </button>
-
           <div class="lightbox-main-media">
-            <img 
-              v-if="visualAttachments[activeSlideIdx].file_type === 'IMAGE'" 
-              :src="visualAttachments[activeSlideIdx].file_url" 
-              class="lightbox-img" 
-            />
-            <video 
-              v-else-if="visualAttachments[activeSlideIdx].file_type === 'VIDEO'" 
-              :src="visualAttachments[activeSlideIdx].file_url" 
-              controls 
-              autoplay
-              class="lightbox-video"
-            ></video>
-            
-            <p v-if="visualAttachments[activeSlideIdx].caption" class="lightbox-caption">
-              {{ visualAttachments[activeSlideIdx].caption }}
-            </p>
+            <img v-if="visualAttachments[activeSlideIdx].file_type === 'IMAGE'" :src="visualAttachments[activeSlideIdx].file_url" class="lightbox-img" />
+            <video v-else-if="visualAttachments[activeSlideIdx].file_type === 'VIDEO'" :src="visualAttachments[activeSlideIdx].file_url" controls autoplay class="lightbox-video"></video>
+            <p v-if="visualAttachments[activeSlideIdx].caption" class="lightbox-caption">{{ visualAttachments[activeSlideIdx].caption }}</p>
           </div>
-
           <button class="lightbox-nav-btn next" @click="nextSlide" v-if="visualAttachments.length > 1">
             <Icon name="lucide:chevron-right" class="w-8 h-8" />
           </button>
         </div>
       </div>
     </Transition>
+
+    <!-- Modal for Editing Post Properties/Content -->
+    <JournalEditorModal
+      :show="showEditModal"
+      :post="post"
+      @close="showEditModal = false"
+      @save="handleSaveEdit"
+    />
   </article>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { renderMarkdown } from '~/utils/formatters';
+import { useRichPosts } from '~/composables/useRichPosts';
+import { useAuth } from '~/composables/useAuth';
+import JournalEditorModal from './JournalEditorModal.vue';
 
 const props = defineProps<{ post: any }>();
+
+const { toggleLikeRichPost, toggleBookmarkRichPost, deleteRichPost, updateRichPost } = useRichPosts();
+const { user } = useAuth();
 
 const visualAttachments = computed(() => {
   return props.post.attachments?.filter((att: any) => ['IMAGE', 'VIDEO'].includes(att.file_type)) || [];
@@ -183,18 +168,36 @@ const docAttachments = computed(() => {
   return props.post.attachments?.filter((att: any) => !['IMAGE', 'VIDEO'].includes(att.file_type)) || [];
 });
 
-// Interactive local states for social feel
-const isLiked = ref(false);
-const likeCount = ref(Math.floor(Math.random() * 8) + 2); // Mock count for lively feel
-const isBookmarked = ref(false);
+const isAuthor = computed(() => user.value?.username === props.post.author.username);
 
-const toggleLike = () => {
-  isLiked.value = !isLiked.value;
-  likeCount.value += isLiked.value ? 1 : -1;
+// Interactive values linked to backend
+const isLiked = computed(() => props.post.is_liked_by_me);
+const likeCount = computed(() => props.post.likes_count || 0);
+const isBookmarked = computed(() => props.post.is_bookmarked_by_me);
+
+const toggleLike = async () => {
+  await toggleLikeRichPost(props.post.id);
 };
 
-const toggleBookmark = () => {
-  isBookmarked.value = !isBookmarked.value;
+const toggleBookmark = async () => {
+  await toggleBookmarkRichPost(props.post.id);
+};
+
+const handleDelete = async () => {
+  if (confirm('Voulez-vous vraiment supprimer cette page du journal de bord ?')) {
+    await deleteRichPost(props.post.id);
+  }
+};
+
+const showEditModal = ref(false);
+
+const handleSaveEdit = async (payload: any) => {
+  const success = await updateRichPost(props.post.id, payload);
+  if (success) {
+    showEditModal.value = false;
+  } else {
+    alert('Une erreur est survenue lors de la modification.');
+  }
 };
 
 const sharePost = () => {
@@ -267,6 +270,14 @@ const formatEventDate = (dateStr: string) => {
 
 const formatEventTime = (timeStr: string) => {
   if (!timeStr) return '';
-  return timeStr.substring(0, 5); // Take "HH:MM" from "HH:MM:SS" or "HH:MM"
+  return timeStr.substring(0, 5);
 };
 </script>
+
+<style scoped>
+:deep(.markdown-content) {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #334155;
+}
+</style>

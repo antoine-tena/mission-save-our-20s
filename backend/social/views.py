@@ -14,17 +14,14 @@ import os
 from typing import Any
 from rest_framework.request import Request
 from .utils import resolve_coordinates, fetch_open_meteo_weather
-
 class MyProfileView(APIView):
     """Vue pour voir et modifier son propre profil."""
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
-
     def get(self, request: Request) -> Response:
         profile, _ = Profile.objects.get_or_create(user=request.user)
         serializer = ProfileSerializer(profile, context={'request': request})
         return Response(serializer.data)
-    
     def patch(self, request: Request) -> Response:
         profile, _ = Profile.objects.get_or_create(user=request.user)
         serializer = ProfileSerializer(profile, data=request.data, partial=True, context={'request': request})
@@ -32,22 +29,18 @@ class MyProfileView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class PublicProfileView(APIView):
     """Vue pour voir le profil d'un autre utilisateur."""
     permission_classes = [IsAuthenticated]
-
     def get(self, request: Request, username: str) -> Response:
         user = get_object_or_404(User, username=username)
         profile, _ = Profile.objects.get_or_create(user=user)
         serializer = ProfileSerializer(profile, context={'request': request})
         return Response(serializer.data)
-
 class SocialPostListCreateView(APIView):
     """Vue pour lister et créer des publications sociales."""
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
-
     def get(self, request: Request) -> Response:
         username = request.query_params.get('username')
         if username:
@@ -56,18 +49,15 @@ class SocialPostListCreateView(APIView):
             posts = SocialPost.objects.all()
         serializer = SocialPostSerializer(posts, many=True, context={'request': request})
         return Response(serializer.data)
-    
     def post(self, request: Request) -> Response:
         serializer = SocialPostSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(author=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class LikePostView(APIView):
     """Vue pour liker/unliker une publication."""
     permission_classes = [IsAuthenticated]
-
     def post(self, request: Request, pk: int) -> Response:
         post = get_object_or_404(SocialPost, pk=pk)
         if post.likes.filter(id=request.user.id).exists():
@@ -75,44 +65,34 @@ class LikePostView(APIView):
             return Response({'liked': False})
         post.likes.add(request.user)
         return Response({'liked': True})
-
 class UserListView(APIView):
     """Liste tous les utilisateurs sauf soi-même."""
     permission_classes = [IsAuthenticated]
-
     def get(self, request: Request) -> Response:
         users = User.objects.exclude(id=request.user.id)
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
-
 class FriendRequestView(APIView):
     """Gère les demandes d'amis (envoi et liste)."""
     permission_classes = [IsAuthenticated]
-
     def get(self, request: Request) -> Response:
         requests = FriendRequest.objects.filter(to_user=request.user, accepted=False)
         serializer = FriendRequestSerializer(requests, many=True)
         return Response(serializer.data)
-
     def post(self, request: Request, user_id: int) -> Response:
         to_user = get_object_or_404(User, id=user_id)
         if to_user == request.user:
             return Response({'error': 'Impossible de s\'ajouter soi-même.'}, status=status.HTTP_400_BAD_REQUEST)
-        
         if request.user.profile.friends.filter(user=to_user).exists():
             return Response({'error': 'Déjà amis.'}, status=status.HTTP_400_BAD_REQUEST)
-        
         if FriendRequest.objects.filter(from_user=request.user, to_user=to_user).exists() or \
            FriendRequest.objects.filter(from_user=to_user, to_user=request.user).exists():
             return Response({'error': 'Demande déjà en cours.'}, status=status.HTTP_400_BAD_REQUEST)
-        
         FriendRequest.objects.create(from_user=request.user, to_user=to_user)
         return Response({'message': 'Demande envoyée.'}, status=status.HTTP_201_CREATED)
-
 class HandleFriendRequestView(APIView):
     """Vue pour accepter ou décliner une demande d'ami."""
     permission_classes = [IsAuthenticated]
-
     def post(self, request: Request, request_id: int) -> Response:
         friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=request.user)
         action = request.data.get('action')
@@ -238,5 +218,74 @@ class RichPostListCreateView(APIView):
         profile.save(update_fields=['points'])
         serializer = RichPostSerializer(rich_post, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class RichPostLikeToggleView(APIView):
+    """Vue pour liker/unliker une publication riche."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, pk: int) -> Response:
+        post = get_object_or_404(RichPost, pk=pk)
+        if post.likes.filter(id=request.user.id).exists():
+            post.likes.remove(request.user)
+            return Response({
+                'status': 'unliked',
+                'likes_count': post.likes.count()
+            })
+        post.likes.add(request.user)
+        return Response({
+            'status': 'liked',
+            'likes_count': post.likes.count()
+        })
+
+
+class RichPostBookmarkToggleView(APIView):
+    """Vue pour ajouter/retirer une publication riche des favoris."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, pk: int) -> Response:
+        post = get_object_or_404(RichPost, pk=pk)
+        if post.bookmarks.filter(id=request.user.id).exists():
+            post.bookmarks.remove(request.user)
+            return Response({
+                'status': 'unbookmarked',
+                'is_bookmarked': False
+            })
+        post.bookmarks.add(request.user)
+        return Response({
+            'status': 'bookmarked',
+            'is_bookmarked': True
+        })
+
+
+class RichPostDetailView(APIView):
+    """Vue pour récupérer, modifier ou supprimer une publication riche."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, pk: int) -> Response:
+        post = get_object_or_404(RichPost, pk=pk)
+        serializer = RichPostSerializer(post, context={'request': request})
+        return Response(serializer.data)
+
+    def patch(self, request: Request, pk: int) -> Response:
+        post = get_object_or_404(RichPost, pk=pk)
+        if post.author != request.user:
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        
+        allowed_fields = ['title', 'caption', 'location', 'event_date', 'event_time']
+        update_data = {k: v for k, v in request.data.items() if k in allowed_fields}
+        serializer = RichPostSerializer(post, data=update_data, partial=True, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request: Request, pk: int) -> Response:
+        post = get_object_or_404(RichPost, pk=pk)
+        if post.author != request.user:
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 

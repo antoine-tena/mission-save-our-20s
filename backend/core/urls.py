@@ -21,7 +21,8 @@ from games.views import GameTypeListView, GameSessionListCreateView, ScoreboardS
 from social.views import (
     MyProfileView, PublicProfileView, SocialPostListCreateView,
     LikePostView, UserListView, FriendRequestView, HandleFriendRequestView,
-    RichPostListCreateView
+    RichPostListCreateView, RichPostDetailView, RichPostLikeToggleView,
+    RichPostBookmarkToggleView
 )
 from rest_framework.routers import DefaultRouter
 from wishlist.views import WishlistItemViewSet
@@ -61,6 +62,9 @@ urlpatterns = [
     path('api/social/profile/<str:username>/', PublicProfileView.as_view()),
     path('api/social/posts/', SocialPostListCreateView.as_view()),
     path('api/social/rich-posts/', RichPostListCreateView.as_view()),
+    path('api/social/journal/<int:pk>/', RichPostDetailView.as_view()),
+    path('api/social/journal/<int:pk>/like/', RichPostLikeToggleView.as_view()),
+    path('api/social/journal/<int:pk>/bookmark/', RichPostBookmarkToggleView.as_view()),
     path('api/social/posts/<int:pk>/like/', LikePostView.as_view()),
     path('api/social/users/', UserListView.as_view()),
     path('api/social/friends/requests/', FriendRequestView.as_view()),

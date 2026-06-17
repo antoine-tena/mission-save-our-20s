@@ -108,6 +108,8 @@ class RichPost(models.Model):
     event_date = models.DateField(blank=True, null=True)
     event_time = models.TimeField(blank=True, null=True)
     weather_info = models.CharField(max_length=255, blank=True, null=True)
+    likes = models.ManyToManyField(User, related_name='liked_rich_posts', blank=True)
+    bookmarks = models.ManyToManyField(User, related_name='bookmarked_rich_posts', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
