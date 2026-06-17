@@ -10,17 +10,7 @@ const nextPageUrl = ref<string | null>(null);
 const isLoadingMore = ref<boolean>(false);
 
 export const usePhotos = () => {
-  const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://localhost:8000/api';
-  const { token } = useAuth();
-
-  const authHeaders = computed(() => {
-    const headers: Record<string, string> = {};
-    if (token.value) {
-      headers['Authorization'] = `Token ${token.value}`;
-    }
-    return headers;
-  });
+  const api = useApi();
   
   const isLoading = computed(() => fetchStatus.value === 'loading');
   const isSubmitting = computed(() => submitStatus.value === 'loading');
@@ -32,7 +22,7 @@ export const usePhotos = () => {
     fetchStatus.value = 'loading'; 
     fetchError.value = null;
     try {
-      const res: any = await $fetch(`${apiBase}/photos/`, { headers: authHeaders.value });
+      const res: any = await api.get('/photos/');
       photos.value = res.results || res;
       nextPageUrl.value = res.next || null;
       fetchStatus.value = 'success';
@@ -48,7 +38,7 @@ export const usePhotos = () => {
     
     isLoadingMore.value = true;
     try {
-      const res: any = await $fetch(nextPageUrl.value, { headers: authHeaders.value });
+      const res: any = await api.get(nextPageUrl.value);
       photos.value = [...photos.value, ...(res.results || [])];
       nextPageUrl.value = res.next || null;
     } catch (err: any) {
@@ -61,7 +51,7 @@ export const usePhotos = () => {
   const createPhoto = async (formData: FormData) => {
     submitStatus.value = 'loading';
     try {
-      await $fetch(`${apiBase}/photos/`, { method: 'POST', headers: authHeaders.value, body: formData });
+      await api.post('/photos/', formData);
       submitStatus.value = 'success';
       await fetchPhotos();
       return true;
@@ -73,7 +63,7 @@ export const usePhotos = () => {
 
   const deletePhoto = async (id: number) => {
     try {
-      await $fetch(`${apiBase}/photos/${id}/`, { method: 'DELETE', headers: authHeaders.value });
+      await api.delete(`/photos/${id}/`);
       photos.value = photos.value.filter(p => p.id !== id);
       return true;
     } catch (err: any) { 
@@ -83,7 +73,7 @@ export const usePhotos = () => {
 
   const clearAllPhotos = async () => {
     try {
-      await $fetch(`${apiBase}/photos/`, { method: 'DELETE', headers: authHeaders.value });
+      await api.delete('/photos/');
       photos.value = [];
       nextPageUrl.value = null;
       return true;
