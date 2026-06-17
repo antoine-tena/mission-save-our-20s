@@ -142,3 +142,17 @@ class RichPostAttachment(models.Model):
     def __str__(self) -> str:
         return f"Fichier {self.file_name} du post {self.post.id}"
 
+
+class SavedLocation(models.Model):
+    name = models.CharField(max_length=200, unique=True, verbose_name="Nom du lieu")
+    latitude = models.FloatField(verbose_name="Latitude")
+    longitude = models.FloatField(verbose_name="Longitude")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Lieu Sauvegardé"
+        verbose_name_plural = "Lieux Sauvegardés"
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.latitude}, {self.longitude})"
+

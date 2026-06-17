@@ -40,6 +40,23 @@ def resolve_coordinates(location_name: str | None) -> tuple[float | None, float 
     if not location_name:
         return None, None
     name = location_name.strip().lower()
+
+    # Essayer de chercher en base de données SavedLocation d'abord
+    try:
+        from .models import SavedLocation
+        # 1. Correspondance directe ou partielle insensible à la casse
+        loc = SavedLocation.objects.filter(name__icontains=name).first()
+        if loc:
+            return loc.latitude, loc.longitude
+        # 2. Chercher si l'un de nos lieux DB est inclus dans le texte cherché
+        # ex: recherche "Pathé Décines" matche "Pathé"
+        for db_loc in SavedLocation.objects.all():
+            if db_loc.name.lower() in name:
+                return db_loc.latitude, db_loc.longitude
+    except Exception as e:
+        print(f"Erreur de résolution GPS base de données : {e}")
+
+    # Repli (fallback) sur le dictionnaire en dur d'origine
     gps_map = {
         "semnoz": (45.7981, 6.1042),
         "crêt de châtillon": (45.7981, 6.1042),
