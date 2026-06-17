@@ -19,11 +19,15 @@ export const useSocial = () => {
     } catch (err) { console.error(err); }
   };
 
+  const { updateUserAvatar } = useAuth();
+
   const updateProfile = async (formData: FormData) => {
     try {
-      profile.value = await $fetch<Profile>(`${apiBase}/social/profile/`, {
+      const updated = await $fetch<Profile>(`${apiBase}/social/profile/`, {
         method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: formData
       });
+      profile.value = updated;
+      updateUserAvatar(updated.avatar_url);
       return true;
     } catch (err) { console.error(err); return false; }
   };
