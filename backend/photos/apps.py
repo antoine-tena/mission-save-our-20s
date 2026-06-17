@@ -4,5 +4,5 @@ class PhotosConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'photos'
 
-    def ready(self):
+    def ready(self) -> None:
         import photos.signals
