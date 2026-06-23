@@ -1,28 +1,33 @@
-export function formatDate(dateString: string): string {
+export type DateFormatType = 'long' | 'short' | 'datetime' | 'year';
+
+export function formatDate(dateString: string, type: DateFormatType = 'long'): string {
+  if (!dateString) return '';
   const date = new Date(dateString);
-  return new Intl.DateTimeFormat('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date);
+  if (isNaN(date.getTime())) return '';
+
+  switch (type) {
+    case 'short':
+      return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    case 'datetime':
+      return date.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    case 'year':
+      return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    case 'long':
+    default:
+      return new Intl.DateTimeFormat('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+  }
 }
 
-export function formatDateShort(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-}
-
-export function formatDateDateTime(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-}
-
-export function formatDateYear(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-}
+// Deprecated wrappers for backwards compatibility
+export const formatDateShort = (dateString: string) => formatDate(dateString, 'short');
+export const formatDateDateTime = (dateString: string) => formatDate(dateString, 'datetime');
+export const formatDateYear = (dateString: string) => formatDate(dateString, 'year');
 
 export function renderMarkdown(text: string): string {
   if (!text) return '';

@@ -1,14 +1,10 @@
-import { useRuntimeConfig, useCookie } from '#app';
-import type { AlbumData } from '~/types/album';
 import { activeAlbum, isLoading, uploadQueue, draggedPhotoId, draggedSourcePageId, isSidebarCollapsed, activeSidebarTab, focusedPhotoId, activePageIdx, croppingPhotoId, tempCropScale, canvasZoom } from './useAlbumEditorState';
 import { useAlbumEditorActions } from './useAlbumEditorActions';
 import { useAlbumHistory } from './useAlbumHistory';
+import type { AlbumData } from '~/types/album';
 
 export const useAlbumEditorStore = () => {
-  const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://localhost:8000/api';
-  const token = useCookie<string | null>('auth_token');
-
+  const api = useApi();
   const actions = useAlbumEditorActions();
 
   const updateAlbumTitle = async (albumId: number, title: string) => {
@@ -16,7 +12,7 @@ export const useAlbumEditorStore = () => {
     recordHistory();
     if (activeAlbum.value && activeAlbum.value.id === albumId) activeAlbum.value.title = title;
     try {
-      await $fetch(`${apiBase}/photos/albums/${albumId}/`, { method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { title } });
+      await api.patch(`/photos/albums/${albumId}/`, { title });
     } catch (err) { console.error('Failed to rename album:', err); }
   };
 
@@ -26,7 +22,7 @@ export const useAlbumEditorStore = () => {
     try {
       const fd = new FormData();
       fd.append(isBackCover ? 'back_cover_photo' : 'cover_photo', file);
-      const data = await $fetch<AlbumData>(`${apiBase}/photos/albums/${albumId}/`, { method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: fd });
+      const data = await api.patch<AlbumData>(`/photos/albums/${albumId}/`, fd);
       if (activeAlbum.value && activeAlbum.value.id === albumId) {
         if (isBackCover) activeAlbum.value.back_cover_photo_url = data.back_cover_photo_url;
         else activeAlbum.value.cover_photo_url = data.cover_photo_url;
@@ -39,7 +35,7 @@ export const useAlbumEditorStore = () => {
     recordHistory();
     if (activeAlbum.value && activeAlbum.value.id === albumId) (activeAlbum.value as any)[field] = value;
     try {
-      await $fetch(`${apiBase}/photos/albums/${albumId}/`, { method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { [field]: value } });
+      await api.patch(`/photos/albums/${albumId}/`, { [field]: value });
     } catch (err) { console.error(`Failed to update album field ${field}:`, err); }
   };
 
@@ -60,10 +56,7 @@ export const useAlbumEditorStore = () => {
       const bodyPayload: any = { crop_x: cropX, crop_y: cropY, crop_scale: cropScale };
       if (customWidth !== null) bodyPayload.custom_width = customWidth;
       if (customHeight !== null) bodyPayload.custom_height = customHeight;
-      await $fetch(`${apiBase}/photos/${photoId}/`, {
-        method: 'PATCH', headers: { Authorization: `Token ${token.value}` },
-        body: bodyPayload
-      });
+      await api.patch(`/photos/${photoId}/`, bodyPayload);
       if (activeAlbum.value) await fetchAlbumDetail(activeAlbum.value.id, true);
     } catch (err) { console.error('Failed to update photo crop:', err); }
   };
@@ -95,10 +88,7 @@ export const useAlbumEditorStore = () => {
       if (customWidth !== null) bodyPayload.custom_width = customWidth;
       if (customHeight !== null) bodyPayload.custom_height = customHeight;
       if (pageId !== null) bodyPayload.page = pageId;
-      await $fetch(`${apiBase}/photos/${photoId}/`, {
-        method: 'PATCH', headers: { Authorization: `Token ${token.value}` },
-        body: bodyPayload
-      });
+      await api.patch(`/photos/${photoId}/`, bodyPayload);
     } catch (err) { console.error('Failed to update photo position:', err); }
   };
 
@@ -109,8 +99,7 @@ export const useAlbumEditorStore = () => {
       clearHistory();
     }
     try {
-      const data = await $fetch<AlbumData>(`${apiBase}/photos/albums/${id}/?t=${Date.now()}`, { headers: { Authorization: `Token ${token.value}` } });
-      activeAlbum.value = data;
+      activeAlbum.value = await api.get<AlbumData>(`/photos/albums/${id}/?t=${Date.now()}`);
     } catch (err) { console.error('Error loading album details:', err); } finally {
       if (!silent) isLoading.value = false;
     }

@@ -47,13 +47,8 @@ const saveCaption = async () => {
     try {
       const { recordHistory } = useAlbumHistory();
       recordHistory();
-      const config = useRuntimeConfig();
-      const token = useCookie<string | null>('auth_token');
-      await $fetch(`${config.public.apiBase}/photos/${props.photo.id}/`, {
-        method: 'PATCH',
-        headers: { Authorization: `Token ${token.value}` },
-        body: { caption: tempCaption.value }
-      });
+      const api = useApi();
+      await api.patch(`/photos/${props.photo.id}/`, { caption: tempCaption.value });
       emit('saved');
       closeModal();
     } catch (err) {

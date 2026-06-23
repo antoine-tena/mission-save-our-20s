@@ -44,7 +44,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRuntimeConfig, useCookie } from '#app';
 import { useAlbumEditorStore } from '~/composables/useAlbumEditorStore';
 import { useAlbumHistory } from '~/composables/useAlbumHistory';
 import { parseTextBoxes } from '~/utils/textBoxes';
@@ -86,14 +85,15 @@ const onDrop = async (e: DragEvent) => {
   try {
     const { recordHistory } = useAlbumHistory();
     recordHistory();
-    const config = useRuntimeConfig(); const token = useCookie<string | null>('auth_token');
+    const api = useApi();
 
-    await $fetch(`${config.public.apiBase}/photos/${draggedPhotoId.value}/`, {
-      method: 'PATCH', headers: { Authorization: `Token ${token.value}` },
-      body: {
-        page: props.page.id, order: props.page.photos?.length || 0,
-        custom_x: colStart, custom_y: rowStart, custom_width: defaultSpanW, custom_height: defaultSpanH
-      }
+    await api.patch(`/photos/${draggedPhotoId.value}/`, {
+      page: props.page.id,
+      order: props.page.photos?.length || 0,
+      custom_x: colStart,
+      custom_y: rowStart,
+      custom_width: defaultSpanW,
+      custom_height: defaultSpanH
     });
     await fetchAlbumDetail(props.page.album, true);
   } catch (err) { console.error('Failed to drop photo in page grid canvas:', err); }

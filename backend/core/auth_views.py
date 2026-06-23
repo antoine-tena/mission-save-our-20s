@@ -9,10 +9,11 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.request import Request
 from typing import Optional
 
+from social.utils import get_absolute_media_url
+
 def _get_user_avatar_url(request: Request, user: User) -> Optional[str]:
-    if hasattr(user, 'profile') and user.profile.avatar:
-        return request.build_absolute_uri(user.profile.avatar.url)
-    return None
+    avatar = user.profile.avatar if hasattr(user, 'profile') else None
+    return get_absolute_media_url(request, avatar)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

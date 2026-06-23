@@ -13,6 +13,9 @@
     >
       <slot />
     </main>
+
+    <!-- Overlay global de Notifications Toasts -->
+    <ToastOverlay />
   </div>
 </template>
 

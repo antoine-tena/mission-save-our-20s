@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import type { Photo } from '~/types';
 
 export interface AlbumPageDetail {
   id: number;
@@ -27,19 +26,14 @@ export interface AlbumDetail {
 }
 
 export const useAlbums = () => {
-  const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://localhost:8000/api';
-  const token = useCookie<string | null>('auth_token');
-
+  const api = useApi();
   const customAlbums = ref<AlbumDetail[]>([]);
   const isAlbumsLoading = ref(false);
 
   const fetchAlbums = async () => {
     isAlbumsLoading.value = true;
     try {
-      const res: any = await $fetch(`${apiBase}/photos/albums/?t=${Date.now()}`, {
-        headers: { Authorization: `Token ${token.value}` }
-      });
+      const res: any = await api.get(`/photos/albums/?t=${Date.now()}`);
       customAlbums.value = res.results || res;
     } catch (err) {
       console.error('Error fetching custom albums:', err);
@@ -50,11 +44,7 @@ export const useAlbums = () => {
 
   const createAlbum = async (albumData: { title: string; description: string; theme: string; photos: number[]; cover_photo: number | null; layout_data?: any }) => {
     try {
-      const response = await $fetch<AlbumDetail>(`${apiBase}/photos/albums/`, {
-        method: 'POST',
-        headers: { Authorization: `Token ${token.value}` },
-        body: albumData
-      });
+      const response = await api.post<AlbumDetail>('/photos/albums/', albumData);
       await fetchAlbums();
       return response;
     } catch (err) {
@@ -65,11 +55,7 @@ export const useAlbums = () => {
 
   const updateAlbum = async (id: number, albumData: { title?: string; description?: string; theme?: string; photos?: number[]; cover_photo?: number | null; layout_data?: any }) => {
     try {
-      const response = await $fetch<AlbumDetail>(`${apiBase}/photos/albums/${id}/`, {
-        method: 'PATCH',
-        headers: { Authorization: `Token ${token.value}` },
-        body: albumData
-      });
+      const response = await api.patch<AlbumDetail>(`/photos/albums/${id}/`, albumData);
       await fetchAlbums();
       return response;
     } catch (err) {
@@ -80,10 +66,7 @@ export const useAlbums = () => {
 
   const deleteAlbum = async (id: number) => {
     try {
-      await $fetch(`${apiBase}/photos/albums/${id}/`, {
-        method: 'DELETE',
-        headers: { Authorization: `Token ${token.value}` }
-      });
+      await api.delete(`/photos/albums/${id}/`);
       customAlbums.value = customAlbums.value.filter(a => a.id !== id);
       return true;
     } catch (err) {

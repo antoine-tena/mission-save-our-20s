@@ -93,3 +93,13 @@ sois explicite : en lisant la branche on doit directement comprendre de quoi il 
 - Vues basées sur DRF `APIView` ou `ViewSet`.
 - Sérialiseurs explicites, pas de `ModelSerializer` sans champs déclarés.
 - Permissions déclarées par vue, jamais de `AllowAny` en production.
+
+---
+
+## 3. Frontend & Component Reuse Conventions
+
+### Réutilisation Systématique & Prioritaire
+- Avant de créer un nouveau composant, utilitaire, composable, style CSS ou logique réseau, vous **devez impérativement faire une recherche approfondie dans le codebase** pour vérifier s'il n'existe pas déjà un composant ou un outil similaire (ex: `BaseModal`, `ToastOverlay`, `useApi`, `useGridDragResize`, `StarRating`, `ProfileAvatar`, `LocationAutocomplete`, etc.).
+- Prioriser systématiquement la réutilisation, la composition, la paramétrisation et l'extension de composants ou composables existants plutôt que de réimplémenter ou créer des variantes dupliquées.
+- Maintenir une cohérence UX/UI stricte en exploitant les briques d'infrastructure de base déjà implantées.
+

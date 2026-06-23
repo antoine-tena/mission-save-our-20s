@@ -16,7 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import { useCookie, useRuntimeConfig } from '#app';
 import { useAlbumHistory } from '~/composables/useAlbumHistory';
 import { useAlbumEditorStore } from '~/composables/useAlbumEditorStore';
 import { parseTextBoxes, serializeTextBoxes } from '~/utils/textBoxes';
@@ -86,13 +85,8 @@ const deleteItem = async () => {
     try {
       const { recordHistory } = useAlbumHistory();
       recordHistory();
-      const config = useRuntimeConfig();
-      const token = useCookie<string | null>('auth_token');
-      await $fetch(`${config.public.apiBase}/photos/${focusedPhotoId.value}/`, {
-        method: 'PATCH',
-        headers: { Authorization: `Token ${token.value}` },
-        body: { page: null, order: 0 }
-      });
+      const api = useApi();
+      await api.patch(`/photos/${focusedPhotoId.value}/`, { page: null, order: 0 });
       await fetchAlbumDetail(activeAlbum.value.id, true);
       focusedPhotoId.value = null;
       emit('toast', 'Photo retirée de la page.');
@@ -116,13 +110,9 @@ const magicFill = async () => {
   }
   
   try {
-    const config = useRuntimeConfig();
-    const token = useCookie<string | null>('auth_token');
+    const api = useApi();
     
-    const res: any = await $fetch(`${config.public.apiBase}/photos/pages/${targetPageId}/magic-fill/`, {
-      method: 'POST',
-      headers: { Authorization: `Token ${token.value}` }
-    });
+    const res: any = await api.post(`/photos/pages/${targetPageId}/magic-fill/`);
     
     emit('toast', `✨ ${res.message || 'Les photos ont été disposées avec succès !'}`);
     await fetchAlbumDetail(activeAlbum.value.id, true);

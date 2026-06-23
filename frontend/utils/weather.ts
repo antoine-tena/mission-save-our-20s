@@ -1,32 +1,3 @@
-export const localResolveCoordinates = (locationName: string): { lat: number; lon: number } | null => {
-  if (!locationName) return null;
-  const name = locationName.trim().toLowerCase();
-  const gpsMap: Record<string, [number, number]> = {
-    "semnoz": [45.7981, 6.1042],
-    "crêt de châtillon": [45.7981, 6.1042],
-    "lac d'annecy": [45.8992, 6.1294],
-    "annecy": [45.8992, 6.1294],
-    "cinéma pathé": [45.9032, 6.1214],
-    "cinéma pathé annecy": [45.9032, 6.1214],
-    "pathé": [45.9032, 6.1214],
-    "cinema": [45.9032, 6.1214],
-    "cinéma": [45.9032, 6.1214],
-    "col de la forclaz": [45.8111, 6.2435],
-    "forclaz": [45.8111, 6.2435],
-    "aravis": [45.87, 6.35],
-    "bivouac aravis": [45.87, 6.35],
-    "chamonix": [45.92, 6.87],
-    "aiguille du midi": [45.92, 6.87]
-  };
-  
-  for (const [key, coords] of Object.entries(gpsMap)) {
-    if (name.includes(key)) {
-      return { lat: coords[0], lon: coords[1] };
-    }
-  }
-  return null;
-};
-
 export const fetchLiveWeather = async (
   latitude: number | null,
   longitude: number | null,
@@ -38,10 +9,27 @@ export const fetchLiveWeather = async (
   let lon = longitude;
   
   if (!lat || !lon) {
-    const coords = localResolveCoordinates(location);
-    if (coords) {
-      lat = coords.lat;
-      lon = coords.lon;
+    if (location) {
+      try {
+        const config = useRuntimeConfig();
+        const token = useCookie<string | null>('auth_token');
+        const apiBase = config.public.apiBase || 'http://localhost:8000/api';
+        
+        const headers: Record<string, string> = {};
+        if (token.value) {
+          headers['Authorization'] = `Token ${token.value}`;
+        }
+        
+        const res: any = await $fetch(`${apiBase}/social/locations/resolve/?query=${encodeURIComponent(location)}`, {
+          headers
+        });
+        if (res && res.latitude && res.longitude) {
+          lat = res.latitude;
+          lon = res.longitude;
+        }
+      } catch (err) {
+        console.warn('GPS backend resolution failed for:', location, err);
+      }
     }
   }
 
@@ -58,7 +46,7 @@ export const fetchLiveWeather = async (
     if (0 <= deltaDays && deltaDays <= 90) {
       url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&past_days=${deltaDays}&hourly=temperature_2m,weather_code`;
     } else {
-      url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date={dateStr}&end_date=${dateStr}&hourly=temperature_2m,weather_code`;
+      url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date={dateStr}&end_date={dateStr}&hourly=temperature_2m,weather_code`;
     }
     
     // Safety check for template string replacement in case start_date / end_date were template literals

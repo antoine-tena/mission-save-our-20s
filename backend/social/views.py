@@ -291,4 +291,19 @@ class RichPostDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class LocationResolveView(APIView):
+    """Vue pour résoudre les coordonnées GPS d'un lieu à la demande."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        query = request.query_params.get('query')
+        if not query:
+            return Response({'error': 'Query required'}, status=400)
+        lat, lon = resolve_coordinates(query)
+        if lat is not None and lon is not None:
+            return Response({'latitude': lat, 'longitude': lon})
+        return Response({'error': 'Location not found'}, status=404)
+
+
+
 

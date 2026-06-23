@@ -61,7 +61,6 @@ import { usePhotoCrop } from '~/composables/usePhotoCrop';
 import { usePolaroidDragResize } from '~/composables/usePolaroidDragResize';
 import { useAlbumHistory } from '~/composables/useAlbumHistory';
 import { getDefaultPhotoSlot } from '~/utils/photoSlots';
-import { useCookie } from '#app';
 
 const props = withDefaults(
   defineProps<{ photo: any; pageId: number; readonly?: boolean; }>(),
@@ -134,10 +133,8 @@ const resetPosition = async () => {
 const deletePhoto = async () => {
   try {
     const { recordHistory } = useAlbumHistory(); recordHistory();
-    const config = useRuntimeConfig(); const token = useCookie<string | null>('auth_token');
-    await $fetch(`${config.public.apiBase}/photos/${props.photo.id}/`, {
-      method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { page: null, order: 0 }
-    });
+    const api = useApi();
+    await api.patch(`/photos/${props.photo.id}/`, { page: null, order: 0 });
     await fetchAlbumDetail(props.pageId, true);
   } catch (err) { console.error(err); }
 };

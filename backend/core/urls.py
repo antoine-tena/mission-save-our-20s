@@ -22,7 +22,7 @@ from social.views import (
     MyProfileView, PublicProfileView, SocialPostListCreateView,
     LikePostView, UserListView, FriendRequestView, HandleFriendRequestView,
     RichPostListCreateView, RichPostDetailView, RichPostLikeToggleView,
-    RichPostBookmarkToggleView
+    RichPostBookmarkToggleView, LocationResolveView
 )
 from rest_framework.routers import DefaultRouter
 from wishlist.views import WishlistItemViewSet
@@ -58,6 +58,7 @@ urlpatterns = [
     path('api/health/', HealthCheckView.as_view()),
 
     # Social
+    path('api/social/locations/resolve/', LocationResolveView.as_view()),
     path('api/social/profile/', MyProfileView.as_view()),
     path('api/social/profile/<str:username>/', PublicProfileView.as_view()),
     path('api/social/posts/', SocialPostListCreateView.as_view()),

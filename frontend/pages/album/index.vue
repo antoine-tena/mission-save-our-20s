@@ -174,15 +174,12 @@ const getAlbumThemeClass = (index: number) => {
 const handleAutoGenerate = async () => {
   isGeneratingAuto.value = true;
   try {
-    const config = useRuntimeConfig();
-    const token = useCookie<string | null>('auth_token');
-    await $fetch(`${config.public.apiBase}/photos/albums/auto-generate/`, { 
-      method: 'POST', 
-      headers: { Authorization: `Token ${token.value}` } 
-    });
+    const api = useApi();
+    await api.post('/photos/albums/auto-generate/');
     await fetchAlbums();
+    useToast().success("✨ Carnet de souvenirs auto-généré avec succès !");
   } catch (err) {
-    alert('Aucune photo libre disponible dans l\'archive.');
+    useToast().error("Aucune photo libre disponible dans l'archive.");
   } finally { 
     isGeneratingAuto.value = false; 
   }
