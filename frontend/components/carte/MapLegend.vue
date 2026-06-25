@@ -1,7 +1,7 @@
 <template>
   <div class="map-overlay-legend glass-card">
-    <div class="legend-item"><span class="dot dot--photo"></span><span>Souvenir Photo</span></div>
-    <div class="legend-item"><span class="dot dot--movie"></span><span>Séance Cinéma</span></div>
+    <div class="legend-item"><span class="dot dot--photo"/><span>Souvenir Photo</span></div>
+    <div class="legend-item"><span class="dot dot--movie"/><span>Séance Cinéma</span></div>
   </div>
 </template>
 

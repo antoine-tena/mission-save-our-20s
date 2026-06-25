@@ -4,13 +4,13 @@
       <div class="review-author">Amani</div>
       <p v-if="amaniReview">{{ amaniReview }}</p>
       <p v-else class="placeholder-text">En attente de l'avis de la parisienne...</p>
-      <StarRating :modelValue="amaniRating" class="review-rating" />
+      <StarRating :model-value="amaniRating" class="review-rating" />
     </div>
     <div class="review-bubble review-bubble--antoine" :class="{ 'empty': !antoineReview }">
       <div class="review-author">Antoine</div>
       <p v-if="antoineReview">{{ antoineReview }}</p>
       <p v-else class="placeholder-text">En attente de l'avis du lyonnais...</p>
-      <StarRating :modelValue="antoineRating" class="review-rating" />
+      <StarRating :model-value="antoineRating" class="review-rating" />
     </div>
   </div>
 </template>

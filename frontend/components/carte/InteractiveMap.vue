@@ -1,6 +1,6 @@
 <template>
   <main class="carte-main">
-    <div id="mso-map" class="mso-map-canvas"></div>
+    <div id="mso-map" class="mso-map-canvas"/>
     <CarteMapLegend />
   </main>
 </template>
@@ -71,7 +71,7 @@ const renderMarkers = () => {
 };
 
 const initMap = async () => {
-  if (process.server) return;
+  if (import.meta.server) return;
   L = await import('leaflet'); 
   import('leaflet/dist/leaflet.css');
   

@@ -2,14 +2,14 @@
   <article class="movie-card glass-card" :class="{ 'is-expanded': showDetails }" @click="showDetails = !showDetails">
     <div class="card-options" @click.stop>
       <button class="options-trigger" @click="showMenu = !showMenu">
-        <span></span><span></span><span></span>
+        <span/><span/><span/>
       </button>
       <Transition name="fade">
-        <div v-if="showMenu" class="options-menu" v-click-outside="() => showMenu = false">
-          <button @click="onEdit" class="menu-item">
+        <div v-if="showMenu" v-click-outside="() => showMenu = false" class="options-menu">
+          <button class="menu-item" @click="onEdit">
             <span class="icon"><Icon name="lucide:pencil" /></span> Modifier
           </button>
-          <button @click="onDelete" class="menu-item delete">
+          <button class="menu-item delete" @click="onDelete">
             <span class="icon"><Icon name="lucide:trash-2" /></span> Supprimer
           </button>
         </div>
