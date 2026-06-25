@@ -4,8 +4,8 @@
       {{ initial }}
     </div>
     <div class="card-content">
-      <p class="intro" v-html="introText"></p>
-      <p v-html="bodyText"></p>
+      <p class="intro" v-html="introText"/>
+      <p v-html="bodyText"/>
     </div>
   </ScrapbookCard>
 </template>

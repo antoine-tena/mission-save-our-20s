@@ -6,19 +6,19 @@
     max-width="max-w-md"
     @close="$emit('update:modelValue', false)"
   >
-    <form @submit.prevent="handleCreate" class="create-form">
+    <form class="create-form" @submit.prevent="handleCreate">
       <div class="form-group">
         <label>Nom de l'album</label>
-        <input v-model="formTitle" type="text" placeholder="Ex: Notre escapade dans le Queyras..." required />
+        <input v-model="formTitle" type="text" placeholder="Ex: Notre escapade dans le Queyras..." required >
       </div>
       <div class="form-group">
         <label>Description (optionnelle)</label>
-        <textarea v-model="formDesc" placeholder="Quelques mots pour retracer l'histoire..." rows="3"></textarea>
+        <textarea v-model="formDesc" placeholder="Quelques mots pour retracer l'histoire..." rows="3"/>
       </div>
       <div class="form-group">
         <label>Photo de Couverture</label>
         <div class="custom-file-upload">
-          <input type="file" accept="image/*" @change="e => formCover = (e.target as HTMLInputElement).files?.[0] || null" id="cover-file-input" />
+          <input id="cover-file-input" type="file" accept="image/*" @change="e => formCover = (e.target as HTMLInputElement).files?.[0] || null" >
           <label for="cover-file-input" class="file-label">
             <Icon name="lucide:image" />
             <span>{{ formCover ? formCover.name : 'Sélectionner une photo' }}</span>

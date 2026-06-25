@@ -8,7 +8,7 @@
         class="gallery-square-item"
         @click="selectedPhoto = photo"
       >
-        <img :src="photo.image_url" :alt="photo.titre" class="square-img" loading="lazy" />
+        <img :src="photo.image_url" :alt="photo.titre" class="square-img" loading="lazy" >
       </div>
     </section>
 
@@ -16,21 +16,21 @@
     <Transition name="lightbox-fade">
       <div v-if="selectedPhoto" class="lightbox-overlay" @click.self="selectedPhoto = null">
         <!-- Close button -->
-        <button class="lightbox-close" @click="selectedPhoto = null" title="Fermer">×</button>
+        <button class="lightbox-close" title="Fermer" @click="selectedPhoto = null">×</button>
 
         <!-- Gallery Browse Navigation -->
-        <button class="gallery-nav-btn prev-arrow" @click="prevPhoto" :disabled="isFirst"><Icon name="lucide:chevron-left" /></button>
-        <button class="gallery-nav-btn next-arrow" @click="nextPhoto" :disabled="isLast"><Icon name="lucide:chevron-right" /></button>
+        <button class="gallery-nav-btn prev-arrow" :disabled="isFirst" @click="prevPhoto"><Icon name="lucide:chevron-left" /></button>
+        <button class="gallery-nav-btn next-arrow" :disabled="isLast" @click="nextPhoto"><Icon name="lucide:chevron-right" /></button>
 
         <!-- Media frame -->
         <div class="lightbox-content-box">
-          <img :src="selectedPhoto.image_url" :alt="selectedPhoto.titre" class="fullscreen-image" />
+          <img :src="selectedPhoto.image_url" :alt="selectedPhoto.titre" class="fullscreen-image" >
           
           <!-- Small metadata box underneath -->
           <div class="fullscreen-metadata font-sans">
             <div class="meta-header">
               <h3 class="meta-title font-serif">{{ selectedPhoto.titre }}</h3>
-              <button class="meta-delete-btn" @click="triggerDelete" title="Supprimer de la galerie">
+              <button class="meta-delete-btn" title="Supprimer de la galerie" @click="triggerDelete">
                 <Icon name="lucide:trash-2" />
               </button>
             </div>

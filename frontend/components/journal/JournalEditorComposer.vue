@@ -6,41 +6,41 @@
       <div class="editor-title-container">
         <input 
           :value="title"
-          @input="$emit('update:title', ($event.target as HTMLInputElement).value)"
-          type="text" 
+          type="text"
           class="editor-title-input" 
           placeholder="Le titre de votre aventure..." 
-          maxlength="80"
-        />
+          maxlength="80" 
+          @input="$emit('update:title', ($event.target as HTMLInputElement).value)"
+        >
       </div>
 
       <!-- Interactive Formatting Markdown Helper Toolbar -->
       <div class="markdown-toolbar">
-        <button type="button" class="toolbar-tool-btn" @click="wrapText('**', '**')" title="Gras (Ctrl+B)">
+        <button type="button" class="toolbar-tool-btn" title="Gras (Ctrl+B)" @click="wrapText('**', '**')">
           <Icon name="lucide:bold" class="w-4.5 h-4.5" />
         </button>
-        <button type="button" class="toolbar-tool-btn" @click="wrapText('*', '*')" title="Italique (Ctrl+I)">
+        <button type="button" class="toolbar-tool-btn" title="Italique (Ctrl+I)" @click="wrapText('*', '*')">
           <Icon name="lucide:italic" class="w-4.5 h-4.5" />
         </button>
-        <button type="button" class="toolbar-tool-btn" @click="wrapText('> ', '')" title="Citation">
+        <button type="button" class="toolbar-tool-btn" title="Citation" @click="wrapText('> ', '')">
           <Icon name="lucide:quote" class="w-4.5 h-4.5" />
         </button>
-        <button type="button" class="toolbar-tool-btn" @click="wrapText('`', '`')" title="Code">
+        <button type="button" class="toolbar-tool-btn" title="Code" @click="wrapText('`', '`')">
           <Icon name="lucide:code" class="w-4.5 h-4.5" />
         </button>
-        <button type="button" class="toolbar-tool-btn" @click="insertText('- ')" title="Liste à puces">
+        <button type="button" class="toolbar-tool-btn" title="Liste à puces" @click="insertText('- ')">
           <Icon name="lucide:list" class="w-4.5 h-4.5" />
         </button>
         
-        <div class="toolbar-divider"></div>
+        <div class="toolbar-divider"/>
 
         <!-- Clear Draft Action inside toolbar -->
         <button 
+          v-if="title || caption || attachments.length > 0" 
           type="button" 
-          class="toolbar-tool-btn text-slate-400 hover:text-red-500 ml-auto" 
-          v-if="title || caption || attachments.length > 0"
-          @click="$emit('clear-draft')"
+          class="toolbar-tool-btn text-slate-400 hover:text-red-500 ml-auto"
           title="Effacer le brouillon"
+          @click="$emit('clear-draft')"
         >
           <Icon name="lucide:trash-2" class="w-4.5 h-4.5" />
         </button>
@@ -51,11 +51,11 @@
         <textarea 
           ref="textareaRef"
           :value="caption"
-          @input="onTextareaInput(($event.target as HTMLTextAreaElement).value)"
-          class="editor-textarea" 
+          class="editor-textarea"
           placeholder="Racontez votre moment ici... Laissez parler votre créativité !" 
-          rows="8"
-        ></textarea>
+          rows="8" 
+          @input="onTextareaInput(($event.target as HTMLTextAreaElement).value)"
+        />
         
         <!-- Character / Word Counter Gauge -->
         <div class="editor-stats-overlay">
@@ -73,11 +73,11 @@
     <!-- Properties Editor Grid -->
     <JournalEditorProperties
       :location="location"
-      @update:location="$emit('update:location', $event)"
       :event-date="eventDate"
-      @update:eventDate="$emit('update:eventDate', $event)"
       :event-time="eventTime"
-      @update:eventTime="$emit('update:eventTime', $event)"
+      @update:location="$emit('update:location', $event)"
+      @update:event-date="$emit('update:eventDate', $event)"
+      @update:event-time="$emit('update:eventTime', $event)"
       @select-location="$emit('select-location', $event)"
     />
 

@@ -11,7 +11,7 @@
     <div class="day-circle">
       <span class="day-number">{{ date.getDate() }}</span>
     </div>
-    <div v-if="events.length > 0" class="event-indicator"></div>
+    <div v-if="events.length > 0" class="event-indicator"/>
   </div>
 </template>
 

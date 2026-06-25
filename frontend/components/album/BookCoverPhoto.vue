@@ -13,13 +13,13 @@
         :alt="type === 'front' ? 'Couverture' : 'Couverture de fin'" 
         :style="getImageStyle()"
         class="cover-img-elem"
-      />
+      >
       <div v-else class="empty-cover-placeholder-studio-full">
         <Icon name="lucide:cloud-upload" class="empty-icon-studio-full" />
         <p>{{ placeholderText }}</p>
         <span>{{ descriptionText }}</span>
       </div>
-      <div v-if="!isCropping" class="cover-wash" :style="washStyle"></div>
+      <div v-if="!isCropping" class="cover-wash" :style="washStyle"/>
     </div>
   </div>
 </template>

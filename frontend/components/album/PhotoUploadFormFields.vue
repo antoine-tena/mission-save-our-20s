@@ -3,21 +3,21 @@
     <div class="input-group">
       <input
         :value="titre"
-        @input="$emit('update:titre', ($event.target as HTMLInputElement).value)"
         type="text"
         placeholder="Un titre pour l'éternité..."
         maxlength="100"
         required
-      />
+        @input="$emit('update:titre', ($event.target as HTMLInputElement).value)"
+      >
       <span class="char-count">{{ titre.length }}/100</span>
     </div>
 
     <textarea
       :value="description"
-      @input="$emit('update:description', ($event.target as HTMLInputElement).value)"
       placeholder="Raconte-moi l'histoire derrière cette image (optionnel)..."
       rows="3"
-    ></textarea>
+      @input="$emit('update:description', ($event.target as HTMLInputElement).value)"
+    />
   </div>
 </template>
 

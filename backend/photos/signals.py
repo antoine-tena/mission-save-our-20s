@@ -47,7 +47,7 @@ def auto_delete_file_on_change(sender: Type[Photo], instance: Photo, **kwargs: A
         if os.path.isfile(old_file.path):
             try:
                 os.remove(old_file.path)
-            except Exception as e:
+            except Exception:
                 pass
     return None
 

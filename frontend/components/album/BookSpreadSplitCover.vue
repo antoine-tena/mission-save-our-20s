@@ -7,7 +7,7 @@
       @dragleave="$emit('dragleave')"
       @drop="$emit('drop', $event)"
     >
-      <div class="book-spine-edge" style="border-radius: 0 4px 4px 0; left: auto; right: 0; transform: scaleX(-1);"></div>
+      <div class="book-spine-edge" style="border-radius: 0 4px 4px 0; left: auto; right: 0; transform: scaleX(-1);"/>
       
       <AlbumBookCoverPhoto
         type="back"
@@ -39,7 +39,7 @@
       @dragleave="$emit('dragleave')"
       @drop="$emit('drop', $event)"
     >
-      <div class="book-spine-edge"></div>
+      <div class="book-spine-edge"/>
       
       <AlbumBookCoverPhoto
         type="front"

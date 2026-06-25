@@ -41,9 +41,9 @@
           <Icon name="lucide:chevron-right" />
         </button>
       </div>
-      <input ref="albumColorInput" type="color" :value="activeAlbum?.cover_color || '#3d352e'" class="hidden" @input="onAlbumColorInput" />
-      <input ref="leftColorInput" type="color" :value="leftPage?.background_color || '#ffffff'" class="hidden" @input="onLeftColorInput" />
-      <input ref="rightColorInput" type="color" :value="rightPage?.background_color || '#ffffff'" class="hidden" @input="onRightColorInput" />
+      <input ref="albumColorInput" type="color" :value="activeAlbum?.cover_color || '#3d352e'" class="hidden" @input="onAlbumColorInput" >
+      <input ref="leftColorInput" type="color" :value="leftPage?.background_color || '#ffffff'" class="hidden" @input="onLeftColorInput" >
+      <input ref="rightColorInput" type="color" :value="rightPage?.background_color || '#ffffff'" class="hidden" @input="onRightColorInput" >
     </div>
   </div>
 </template>

@@ -5,7 +5,7 @@
       <div class="composer-header">
         <div class="user-avatar-wrapper">
           <ProfileAvatar size="lg" class="composer-avatar" />
-          <div class="composer-avatar-glowing-ring"></div>
+          <div class="composer-avatar-glowing-ring"/>
         </div>
         
         <div class="composer-main-inputs">
@@ -18,7 +18,7 @@
                 class="composer-title-input" 
                 placeholder="Donnez un titre à cette page (Optionnel)..." 
                 maxlength="80"
-              />
+              >
             </div>
           </Transition>
 
@@ -30,7 +30,7 @@
             placeholder="Quoi de neuf ? Partagez un souvenir, une rando, des photos..." 
             rows="3"
             @input="adjustTextareaHeight"
-          ></textarea>
+          />
 
           <!-- Inline Location Badges or Inputs -->
           <Transition name="slide-up">
@@ -56,7 +56,7 @@
           <div class="composer-attachments-grid">
             <div v-for="(att, idx) in attachments" :key="idx" class="composer-att-card">
               <div class="att-media-preview">
-                <img v-if="att.fileType === 'IMAGE'" :src="att.previewUrl" class="att-preview-img" />
+                <img v-if="att.fileType === 'IMAGE'" :src="att.previewUrl" class="att-preview-img" >
                 <div v-else-if="att.fileType === 'VIDEO'" class="att-preview-placeholder video">
                   <Icon name="lucide:video" class="w-8 h-8 text-indigo-500" />
                 </div>
@@ -66,7 +66,7 @@
                 <div class="file-name-overlay">{{ att.file.name }}</div>
                 
                 <!-- Quick delete button -->
-                <button type="button" class="quick-delete-btn" @click="removeAttachment(idx)" title="Supprimer">
+                <button type="button" class="quick-delete-btn" title="Supprimer" @click="removeAttachment(idx)">
                   <Icon name="lucide:x" class="w-4 h-4" />
                 </button>
               </div>
@@ -77,7 +77,7 @@
                   type="text" 
                   class="att-caption-input" 
                   placeholder="Légende pour ce fichier..." 
-                />
+                >
                 <div class="att-loc-wrapper">
                   <Icon name="lucide:map-pin" class="w-3.5 h-3.5 text-slate-400" />
                   <LocationAutocomplete 
@@ -100,9 +100,9 @@
           <button 
             type="button" 
             class="toolbar-btn" 
-            @click="triggerFileInput" 
-            title="Ajouter des médias (Images, Vidéos, PDFs...)"
+            title="Ajouter des médias (Images, Vidéos, PDFs...)" 
             :class="{ 'active': attachments.length > 0 }"
+            @click="triggerFileInput"
           >
             <Icon name="lucide:image" class="w-5.5 h-5.5" />
           </button>
@@ -113,15 +113,15 @@
             multiple 
             accept="image/*,video/*,application/pdf" 
             @change="handleFileChange" 
-          />
+          >
 
           <!-- Toggle Location Field button -->
           <button 
             type="button" 
             class="toolbar-btn" 
-            @click="showLocationField = !showLocationField" 
-            title="Ajouter un lieu principal"
+            title="Ajouter un lieu principal" 
             :class="{ 'active': showLocationField || location }"
+            @click="showLocationField = !showLocationField"
           >
             <Icon name="lucide:map-pin" class="w-5.5 h-5.5" />
           </button>
@@ -130,9 +130,9 @@
           <button 
             type="button" 
             class="toolbar-btn" 
-            @click="showTitleField = !showTitleField" 
-            title="Ajouter un titre"
+            title="Ajouter un titre" 
             :class="{ 'active': showTitleField || title }"
+            @click="showTitleField = !showTitleField"
           >
             <Icon name="lucide:heading" class="w-5.5 h-5.5" />
           </button>
@@ -141,9 +141,9 @@
         <!-- Submit Button -->
         <button 
           type="button"
-          @click="handleSubmit" 
           class="composer-submit-btn" 
-          :disabled="isSubmitting || (!caption.trim() && !title.trim() && attachments.length === 0)"
+          :disabled="isSubmitting || (!caption.trim() && !title.trim() && attachments.length === 0)" 
+          @click="handleSubmit"
         >
           <Icon :name="isSubmitting ? 'lucide:loader-2' : 'lucide:send-horizontal'" :class="{ 'spin': isSubmitting }" class="w-4 h-4" />
           <span>{{ isSubmitting ? 'Publication...' : 'Publier' }}</span>

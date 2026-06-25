@@ -11,8 +11,8 @@
         
         <!-- Animated Background Blur -->
         <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <div class="absolute top-[20%] right-[20%] w-[30rem] h-[30rem] bg-orange-300/10 rounded-full blur-[100px]"></div>
-          <div class="absolute bottom-[20%] left-[20%] w-[30rem] h-[30rem] bg-amber-300/10 rounded-full blur-[100px]"></div>
+          <div class="absolute top-[20%] right-[20%] w-[30rem] h-[30rem] bg-orange-300/10 rounded-full blur-[100px]"/>
+          <div class="absolute bottom-[20%] left-[20%] w-[30rem] h-[30rem] bg-amber-300/10 rounded-full blur-[100px]"/>
         </div>
 
         <!-- Centered top floating actions bar -->
@@ -22,13 +22,13 @@
 
         <!-- The Book spreadsheets slot -->
         <div class="mt-12 flex-1 w-full flex items-center justify-center min-h-0 min-w-0 z-10">
-          <slot name="canvas"></slot>
+          <slot name="canvas"/>
         </div>
 
       </div>
 
       <!-- Bottom chronological Spread carousel footer slot -->
-      <slot name="footer"></slot>
+      <slot name="footer"/>
 
     </div>
   </div>

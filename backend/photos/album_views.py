@@ -43,7 +43,7 @@ class AlbumDetailDeleteUpdateView(APIView):
     def get(self, request: Request, pk: int) -> Response:
         album = self.get_object(pk, request.user)
         serializer = AlbumSerializer(album, context={'request': request})
-        return Response(album_data := serializer.data)
+        return Response(serializer.data)
 
     def patch(self, request: Request, pk: int) -> Response:
         album = self.get_object(pk, request.user)
@@ -218,7 +218,7 @@ class AlbumAutoGenerateView(APIView):
             for idx in range(0, len(plist), 3):
                 chunk = plist[idx:idx+3]
                 layout = 'mosaic' if len(chunk) == 3 else ('scrapbook' if len(chunk) == 2 else 'full')
-                page = AlbumPage.objects.create(album=album, title=f"Souvenirs", layout_type=layout, order=idx//3)
+                page = AlbumPage.objects.create(album=album, title="Souvenirs", layout_type=layout, order=idx//3)
                 for s_idx, p in enumerate(chunk):
                     p.page = page
                     p.order = s_idx

@@ -5,7 +5,7 @@ import os
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from django.db.models import Manager
+    pass
 
 def movie_poster_path(movie_instance: 'Movie', filename: str) -> str:
     """Génère le chemin d'upload pour l'affiche du film."""

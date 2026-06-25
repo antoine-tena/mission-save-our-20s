@@ -29,7 +29,7 @@
           <p>Aucun cinéma épinglé.</p>
         </div>
         <div v-for="movie in movies" :key="'movie-'+movie.id" class="journal-movie-item" @click="$emit('focus', { type: 'movie', id: movie.id })">
-          <img :src="movie.poster_url" class="mini-poster" />
+          <img :src="movie.poster_url" class="mini-poster" >
           <div class="movie-info">
             <span class="title">{{ movie.title }}</span>
             <span class="location">{{ movie.location }}</span>

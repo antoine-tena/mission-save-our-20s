@@ -1,15 +1,15 @@
 <template>
-  <div class="location-autocomplete" ref="wrapperRef">
+  <div ref="wrapperRef" class="location-autocomplete">
     <div class="autocomplete-input-wrapper">
       <Icon v-if="showIcon" name="lucide:map-pin" class="input-icon" />
       <input 
         type="text" 
         :value="modelValue" 
-        @input="onInput"
-        :placeholder="placeholder" 
-        :class="inputClass"
+        :placeholder="placeholder"
+        :class="inputClass" 
         autocomplete="off"
-      />
+        @input="onInput"
+      >
     </div>
     
     <Transition name="dropdown-fade">

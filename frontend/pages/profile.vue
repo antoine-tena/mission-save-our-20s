@@ -5,12 +5,12 @@
       :is-own-profile="isOwnProfile"
       @edit-cover="triggerInput(coverInput)" @edit-avatar="triggerInput(avatarInput)" @edit-profile="activeTab = 'info'"
     />
-    <input v-if="isOwnProfile" ref="coverInput" type="file" class="hidden" accept="image/*" @change="onFileChange($event, 'cover_image')" />
-    <input v-if="isOwnProfile" ref="avatarInput" type="file" class="hidden" accept="image/*" @change="onFileChange($event, 'avatar')" />
+    <input v-if="isOwnProfile" ref="coverInput" type="file" class="hidden" accept="image/*" @change="onFileChange($event, 'cover_image')" >
+    <input v-if="isOwnProfile" ref="avatarInput" type="file" class="hidden" accept="image/*" @change="onFileChange($event, 'avatar')" >
 
     <div class="container profile-grid-layout">
       <main class="profile-main-content">
-        <SocialProfileTabs v-model:activeTab="activeTab" />
+        <SocialProfileTabs v-model:active-tab="activeTab" />
 
         <div class="tab-content-area">
           <Transition name="fade-slide" mode="out-in">

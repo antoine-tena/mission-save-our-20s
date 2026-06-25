@@ -4,7 +4,7 @@
       v-if="tape !== 'none'"
       :class="['tape-effect', `tape-effect--${tape}`]"
       :style="{ backgroundColor: tapeColor }"
-    ></div>
+    />
     <slot />
   </div>
 </template>

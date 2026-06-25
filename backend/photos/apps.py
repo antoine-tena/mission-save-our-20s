@@ -5,4 +5,4 @@ class PhotosConfig(AppConfig):
     name = 'photos'
 
     def ready(self) -> None:
-        import photos.signals
+        pass

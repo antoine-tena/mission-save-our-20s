@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import Photo, Album, AlbumPage
-from django.contrib.auth.models import User
-from typing import Optional, Any
+from typing import Optional
 from social.utils import get_absolute_media_url
 
 class PhotoSerializer(serializers.ModelSerializer):

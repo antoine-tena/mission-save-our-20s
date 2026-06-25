@@ -1,6 +1,6 @@
 <template>
   <div class="stars-page">
-    <div class="mso-scrapbook-bg"></div>
+    <div class="mso-scrapbook-bg"/>
 
     <div class="full-map-container">
       <StarsStarMap />

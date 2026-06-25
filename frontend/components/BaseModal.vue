@@ -18,7 +18,7 @@
               <span>{{ title }}</span>
             </h3>
           </slot>
-          <button @click="handleClose" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer p-1 rounded-full hover:bg-slate-50 flex items-center justify-center">
+          <button class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer p-1 rounded-full hover:bg-slate-50 flex items-center justify-center" @click="handleClose">
             <Icon name="lucide:x" class="w-5 h-5" />
           </button>
         </header>

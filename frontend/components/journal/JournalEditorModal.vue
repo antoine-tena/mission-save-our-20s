@@ -16,7 +16,7 @@
           type="text" 
           class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:bg-white font-semibold text-slate-800 transition-all" 
           placeholder="Modifier le titre..." 
-        />
+        >
       </div>
 
       <!-- Caption -->
@@ -27,7 +27,7 @@
           rows="5"
           class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:bg-white font-medium text-slate-700 transition-all resize-none" 
           placeholder="Racontez votre souvenir..."
-        ></textarea>
+        />
       </div>
 
       <!-- Properties Grid -->
@@ -40,7 +40,7 @@
             type="text" 
             class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:bg-white font-semibold text-slate-800 transition-all" 
             placeholder="Lieu..." 
-          />
+          >
         </div>
 
         <!-- Date -->
@@ -50,7 +50,7 @@
             v-model="editEventDate" 
             type="date" 
             class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:bg-white font-semibold text-slate-800 transition-all" 
-          />
+          >
         </div>
       </div>
 
@@ -61,16 +61,16 @@
           v-model="editEventTime" 
           type="time" 
           class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:bg-white font-semibold text-slate-800 transition-all" 
-        />
+        >
       </div>
     </div>
 
     <!-- Modal Footer -->
     <template #footer>
-      <button @click="$emit('close')" class="px-5 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer text-sm">
+      <button class="px-5 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer text-sm" @click="$emit('close')">
         Annuler
       </button>
-      <button @click="handleSave" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all cursor-pointer text-sm">
+      <button class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all cursor-pointer text-sm" @click="handleSave">
         Enregistrer
       </button>
     </template>

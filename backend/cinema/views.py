@@ -11,7 +11,6 @@ from .models import Movie
 from .serializers import MovieSerializer
 from agenda.models import Event
 from rest_framework.request import Request
-from typing import Any
 from datetime import datetime
 
 TMDB_API_KEY = config('TMDB_API_KEY', default='06e557b0259a1521943c6587ad6c898c')

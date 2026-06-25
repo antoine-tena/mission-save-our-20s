@@ -1,27 +1,27 @@
 <template>
   <ScrapbookCard class="add-movie-section">
     <h2 class="card-title">{{ isEditing ? 'Modifier la Séance' : 'Nouvelle Séance' }}</h2>
-    <form @submit.prevent="$emit('submit')" class="movie-form">
+    <form class="movie-form" @submit.prevent="$emit('submit')">
       <CinemaMovieFormBase
         :date-seen="modelValue.date_seen"
-        @update:date-seen="val => updateField('date_seen', val)"
         :location="modelValue.location"
-        @update:location="val => updateField('location', val)"
         :latitude="modelValue.latitude"
-        @update:latitude="val => updateField('latitude', val)"
         :longitude="modelValue.longitude"
-        @update:longitude="val => updateField('longitude', val)"
         :title="modelValue.title"
+        @update:date-seen="val => updateField('date_seen', val)"
+        @update:location="val => updateField('location', val)"
+        @update:latitude="val => updateField('latitude', val)"
+        @update:longitude="val => updateField('longitude', val)"
         @select="onMovieSelect"
       />
       <CinemaMovieFormReviews
         :amani-review="modelValue.amani_review"
-        @update:amani-review="val => updateField('amani_review', val)"
         :amani-rating="modelValue.amani_rating"
-        @update:amani-rating="val => updateField('amani_rating', val)"
         :antoine-review="modelValue.antoine_review"
-        @update:antoine-review="val => updateField('antoine_review', val)"
         :antoine-rating="modelValue.antoine_rating"
+        @update:amani-review="val => updateField('amani_review', val)"
+        @update:amani-rating="val => updateField('amani_rating', val)"
+        @update:antoine-review="val => updateField('antoine_review', val)"
         @update:antoine-rating="val => updateField('antoine_rating', val)"
       />
       <div class="form-actions">

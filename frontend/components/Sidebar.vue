@@ -42,9 +42,9 @@
       <!-- Logout Button -->
       <button 
         type="button" 
-        @click="handleLogout" 
-        class="sidebar-icon-item logout-btn group relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200"
+        class="sidebar-icon-item logout-btn group relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200" 
         title="Déconnexion"
+        @click="handleLogout"
       >
         <Icon name="lucide:log-out" class="nav-icon text-slate-400 group-hover:text-red-500" />
         <span class="tooltip-bubble">Déconnexion</span>

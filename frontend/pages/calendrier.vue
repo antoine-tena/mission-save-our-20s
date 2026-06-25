@@ -2,8 +2,8 @@
   <div class="min-h-screen pb-24 bg-slate-50 overflow-hidden relative selection:bg-fuchsia-200" style="padding-top: calc(var(--header-height) + 3rem)">
     <!-- Animated modern background -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-[20%] right-[-10%] w-[40rem] h-[40rem] bg-indigo-300/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 8s;"></div>
-      <div class="absolute bottom-[0%] left-[-10%] w-[30rem] h-[30rem] bg-fuchsia-300/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 10s;"></div>
+      <div class="absolute top-[20%] right-[-10%] w-[40rem] h-[40rem] bg-indigo-300/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 8s;"/>
+      <div class="absolute bottom-[0%] left-[-10%] w-[30rem] h-[30rem] bg-fuchsia-300/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 10s;"/>
     </div>
 
     <!-- Page Hero -->
@@ -15,7 +15,7 @@
       subtitle-class="text-indigo-600"
     >
       <template #actions>
-        <button @click="openAddEvent" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-indigo-600 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:shadow-indigo-500/30 flex items-center gap-2">
+        <button class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-indigo-600 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:shadow-indigo-500/30 flex items-center gap-2" @click="openAddEvent">
           <Icon name="lucide:plus" class="w-5 h-5" /> Ajouter une mission
         </button>
       </template>
@@ -38,9 +38,9 @@
           <AgendaCalendarGrid 
             :events="events"
             :selected-date="selectedDate"
+            class="w-full"
             @day-click="handleDayClick"
             @update-view="handleViewUpdate"
-            class="w-full"
           />
         </div>
 

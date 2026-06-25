@@ -16,23 +16,23 @@
       @mousedown="croppingPhotoId === photo.id ? onCropMouseDown($event) : null"
       @wheel.prevent.stop="croppingPhotoId === photo.id ? onCropWheel($event) : null"
     >
-      <img :src="photo.image_url" class="slot-image font-sans" :style="getImageStyle()" />
+      <img :src="photo.image_url" class="slot-image font-sans" :style="getImageStyle()" >
       
       <!-- Rule-of-Thirds 3x3 Grid Overlay -->
       <div v-if="croppingPhotoId === photo.id" class="crop-grid-overlay absolute inset-0 pointer-events-none grid grid-cols-3 grid-rows-3 z-30">
-        <div v-for="i in 9" :key="i" class="border border-white/20 border-dashed"></div>
+        <div v-for="i in 9" :key="i" class="border border-white/20 border-dashed"/>
       </div>
     </div>
 
     <!-- Central Washi Tape for 'polaroid-tape' style -->
-    <div v-if="pageFrameStyle === 'polaroid-tape' && croppingPhotoId !== photo.id" class="washi-tape" :style="getTapeRotationStyle()"></div>
+    <div v-if="pageFrameStyle === 'polaroid-tape' && croppingPhotoId !== photo.id" class="washi-tape" :style="getTapeRotationStyle()"/>
 
     <!-- 4 Corner Washi Tapes for 'washi-corners' style -->
     <template v-if="pageFrameStyle === 'washi-corners' && croppingPhotoId !== photo.id">
-      <div class="corner-tape tl"></div>
-      <div class="corner-tape tr"></div>
-      <div class="corner-tape bl"></div>
-      <div class="corner-tape br"></div>
+      <div class="corner-tape tl"/>
+      <div class="corner-tape tr"/>
+      <div class="corner-tape bl"/>
+      <div class="corner-tape br"/>
     </template>
 
     <!-- Clear position / snap back button -->

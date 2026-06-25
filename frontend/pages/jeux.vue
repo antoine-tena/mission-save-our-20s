@@ -2,8 +2,8 @@
   <div class="min-h-screen pb-24 bg-slate-900 overflow-hidden relative selection:bg-fuchsia-500/30" style="padding-top: calc(var(--header-height) + 2rem)">
     <!-- Animated background -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-[10%] left-[20%] w-96 h-96 bg-fuchsia-600/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 4s;"></div>
-      <div class="absolute bottom-[20%] right-[10%] w-[30rem] h-[30rem] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 6s;"></div>
+      <div class="absolute top-[10%] left-[20%] w-96 h-96 bg-fuchsia-600/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 4s;"/>
+      <div class="absolute bottom-[20%] right-[10%] w-[30rem] h-[30rem] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 6s;"/>
     </div>
 
     <div class="container mx-auto px-4 relative z-10">
@@ -17,7 +17,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <!-- GAME SECTION -->
         <div class="backdrop-blur-xl bg-white/5 border border-white/10 p-8 rounded-3xl shadow-2xl flex flex-col items-center relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-br from-fuchsia-500/5 to-indigo-500/5 pointer-events-none"></div>
+          <div class="absolute inset-0 bg-gradient-to-br from-fuchsia-500/5 to-indigo-500/5 pointer-events-none"/>
           
           <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-3 relative z-10">
             <Icon name="lucide:swords" class="text-fuchsia-400" /> Le Morpion
@@ -36,10 +36,10 @@
             <button 
               v-for="(cell, index) in board" 
               :key="index"
-              @click="makeMove(index)"
               :disabled="cell !== null || winner !== null"
               class="w-20 h-20 sm:w-24 sm:h-24 bg-slate-800/80 hover:bg-slate-700 transition-colors rounded-xl flex items-center justify-center text-4xl sm:text-5xl font-bold shadow-inner disabled:cursor-not-allowed group"
               :class="{'text-fuchsia-400': cell === 'X', 'text-indigo-400': cell === 'O'}"
+              @click="makeMove(index)"
             >
               <span v-if="cell" class="animate-bounceIn drop-shadow-lg">{{ cell }}</span>
               <span v-else class="opacity-0 group-hover:opacity-10 transition-opacity duration-300 text-white">{{ currentPlayer }}</span>
@@ -52,12 +52,12 @@
               <span v-else class="text-green-400 flex items-center gap-2"><Icon name="lucide:party-popper" /> Victoire de {{ winner === 'X' ? 'Amani' : 'Antoine' }} !</span>
             </p>
             <div class="flex gap-4 justify-center">
-              <button @click="resetGame" class="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium transition-all flex items-center gap-2">
+              <button class="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium transition-all flex items-center gap-2" @click="resetGame">
                 <Icon name="lucide:rotate-ccw" /> Rejouer
               </button>
-              <button v-if="winner !== 'Draw'" @click="saveGameScore" :disabled="isSubmitting" class="px-6 py-3 rounded-xl bg-gradient-to-r from-fuchsia-500 to-indigo-500 hover:from-fuchsia-400 hover:to-indigo-400 text-white font-medium shadow-lg shadow-fuchsia-500/25 transition-all disabled:opacity-50 flex items-center gap-2">
-                <Icon name="lucide:save" v-if="!isSubmitting" />
-                <Icon name="lucide:loader-2" class="animate-spin" v-else />
+              <button v-if="winner !== 'Draw'" :disabled="isSubmitting" class="px-6 py-3 rounded-xl bg-gradient-to-r from-fuchsia-500 to-indigo-500 hover:from-fuchsia-400 hover:to-indigo-400 text-white font-medium shadow-lg shadow-fuchsia-500/25 transition-all disabled:opacity-50 flex items-center gap-2" @click="saveGameScore">
+                <Icon v-if="!isSubmitting" name="lucide:save" />
+                <Icon v-else name="lucide:loader-2" class="animate-spin" />
                 <span>{{ isSubmitting ? 'Sauvegarde...' : 'Enregistrer Score' }}</span>
               </button>
             </div>

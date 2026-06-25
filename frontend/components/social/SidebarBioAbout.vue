@@ -6,7 +6,7 @@
       <button v-if="isOwnProfile" class="btn-text-only" @click="$emit('startEdit')">Modifier la bio</button>
     </div>
     <div v-else class="bio-editor">
-      <textarea v-model="localBio" class="bio-edit-input" maxlength="500"></textarea>
+      <textarea v-model="localBio" class="bio-edit-input" maxlength="500"/>
       <button class="btn-save-mini" @click="$emit('save', localBio)">Enregistrer</button>
     </div>
   </div>

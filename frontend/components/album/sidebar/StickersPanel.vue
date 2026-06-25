@@ -14,18 +14,18 @@
         <button 
           type="button" class="flex-1 py-1.5 text-xs font-extrabold rounded-lg border-none transition-all flex flex-col items-center gap-0.5 cursor-pointer"
           :class="modelValue === 'left' ? 'bg-white text-indigo-600 shadow-sm' : 'bg-transparent text-gray-400'"
-          @click="$emit('update:modelValue', 'left')" :disabled="!leftPage"
+          :disabled="!leftPage" @click="$emit('update:modelValue', 'left')"
         >
           <span>Page Gauche</span>
-          <span class="text-[8px] font-medium opacity-80" v-if="leftPage && leftPage.sticker">(Actif)</span>
+          <span v-if="leftPage && leftPage.sticker" class="text-[8px] font-medium opacity-80">(Actif)</span>
         </button>
         <button 
           type="button" class="flex-1 py-1.5 text-xs font-extrabold rounded-lg border-none transition-all flex flex-col items-center gap-0.5 cursor-pointer"
           :class="modelValue === 'right' ? 'bg-white text-indigo-600 shadow-sm' : 'bg-transparent text-gray-400'"
-          @click="$emit('update:modelValue', 'right')" :disabled="!rightPage"
+          :disabled="!rightPage" @click="$emit('update:modelValue', 'right')"
         >
           <span>Page Droite</span>
-          <span class="text-[8px] font-medium opacity-80" v-if="rightPage && rightPage.sticker">(Actif)</span>
+          <span v-if="rightPage && rightPage.sticker" class="text-[8px] font-medium opacity-80">(Actif)</span>
         </button>
       </div>
 

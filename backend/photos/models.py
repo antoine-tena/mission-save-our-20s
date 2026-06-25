@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
-from typing import Optional, Tuple, Any
+from typing import Optional, Any
 
 def photo_upload_path(instance: 'Photo', filename: str) -> str:
     """Génère le chemin d'upload basé sur la date du jour."""

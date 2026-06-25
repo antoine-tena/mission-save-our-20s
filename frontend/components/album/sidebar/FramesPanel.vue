@@ -36,7 +36,7 @@
             <div 
               v-if="frame.id.includes('polaroid') || frame.id === 'handwritten' || frame.id === 'dotted-grid'" 
               class="h-0.5 w-full bg-slate-100 mt-0.5 rounded-full"
-            ></div>
+            />
           </div>
         </div>
 

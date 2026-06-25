@@ -6,7 +6,7 @@
       placeholder="Quoi de neuf dans votre mission ?" 
       class="creator-input"
       @input="$emit('update:caption', ($event.target as HTMLTextAreaElement).value)"
-    ></textarea>
+    />
   </div>
 </template>
 

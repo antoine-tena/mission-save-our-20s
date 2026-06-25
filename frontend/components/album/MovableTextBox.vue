@@ -8,11 +8,11 @@
   >
     <!-- Floating Minimal Formatting toolbar when focused -->
     <div v-if="isEditing && !readonly" class="floating-formatting-bar absolute -top-11 left-1/2 -translate-x-1/2 bg-white border border-gray-100 shadow-md rounded-lg px-2 py-1 flex items-center gap-1 z-50">
-      <button type="button" class="bar-btn" @mousedown.prevent="format('bold')" title="Gras"><b>G</b></button>
-      <button type="button" class="bar-btn font-serif italic" @mousedown.prevent="format('italic')" title="Italique">I</button>
-      <button type="button" class="bar-btn underline" @mousedown.prevent="format('underline')" title="Souligné">S</button>
-      <div class="h-3 w-[1px] bg-gray-200"></div>
-      <button type="button" class="bar-btn text-red-500" @click.stop="deleteBox" title="Supprimer"><Icon name="lucide:trash-2" class="text-xs" /></button>
+      <button type="button" class="bar-btn" title="Gras" @mousedown.prevent="format('bold')"><b>G</b></button>
+      <button type="button" class="bar-btn font-serif italic" title="Italique" @mousedown.prevent="format('italic')">I</button>
+      <button type="button" class="bar-btn underline" title="Souligné" @mousedown.prevent="format('underline')">S</button>
+      <div class="h-3 w-[1px] bg-gray-200"/>
+      <button type="button" class="bar-btn text-red-500" title="Supprimer" @click.stop="deleteBox"><Icon name="lucide:trash-2" class="text-xs" /></button>
     </div>
 
     <!-- Ruled Papery Note Editable Content Area -->
@@ -20,13 +20,13 @@
       ref="editorRef"
       :contenteditable="!readonly"
       class="note-editor flex-1 p-1 outline-none font-serif text-[11px] text-gray-800 leading-normal overflow-y-auto w-full select-text cursor-text"
+      placeholder="Saisissez vos notes ou poèmes..."
       @focus="isEditing = isFocused = true"
       @blur="onBlur"
-      placeholder="Saisissez vos notes ou poèmes..."
-    ></div>
+    />
 
     <!-- Small deletion button on top-right -->
-    <button v-if="!readonly && !isEditing" type="button" class="delete-btn" @click.stop="deleteBox" title="Supprimer la note">
+    <button v-if="!readonly && !isEditing" type="button" class="delete-btn" title="Supprimer la note" @click.stop="deleteBox">
       <Icon name="lucide:x" />
     </button>
 

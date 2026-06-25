@@ -1,10 +1,10 @@
 <template>
   <div class="mso-journal writing-zen-mode">
-    <div class="journal-bg"></div>
+    <div class="journal-bg"/>
     <!-- Animated modern background -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-[10%] right-[-10%] w-[50rem] h-[40rem] bg-indigo-300/10 rounded-full blur-[140px] animate-pulse" style="animation-duration: 9s;"></div>
-      <div class="absolute bottom-[10%] left-[-10%] w-[40rem] h-[30rem] bg-fuchsia-300/10 rounded-full blur-[120px] animate-pulse" style="animation-duration: 11s;"></div>
+      <div class="absolute top-[10%] right-[-10%] w-[50rem] h-[40rem] bg-indigo-300/10 rounded-full blur-[140px] animate-pulse" style="animation-duration: 9s;"/>
+      <div class="absolute bottom-[10%] left-[-10%] w-[40rem] h-[30rem] bg-fuchsia-300/10 rounded-full blur-[120px] animate-pulse" style="animation-duration: 11s;"/>
     </div>
     <!-- Modular Navigation Header -->
     <JournalEditorHeader
@@ -15,7 +15,7 @@
       @submit="handleSubmit"
     />
     <!-- Bulletproof layout spacer to force space under header -->
-    <div class="h-10 w-full relative z-10 flex-shrink-0"></div>
+    <div class="h-10 w-full relative z-10 flex-shrink-0"/>
     <!-- Main Workspace -->
     <main class="container mx-auto px-6 pb-6 flex-1 relative z-10 max-w-7xl grid grid-cols-1 md:grid-cols-12 gap-8 items-start h-[calc(100vh-140px)] overflow-hidden">
       <!-- LEFT SECTION: CREATIVE WRITING CANVAS -->
@@ -30,8 +30,8 @@
           @update:title="queueDraftSave"
           @update:caption="queueDraftSave"
           @update:location="queueDraftSave"
-          @update:eventDate="queueDraftSave"
-          @update:eventTime="queueDraftSave"
+          @update:event-date="queueDraftSave"
+          @update:event-time="queueDraftSave"
           @select-location="onLocationSelect"
           @clear-draft="clearDraftConfirm"
           @add-files="processFiles"

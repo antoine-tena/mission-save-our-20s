@@ -1,16 +1,16 @@
 <template>
   <section class="add-session-section card glass-card">
-    <div class="mso-journal-card__tape"></div>
+    <div class="mso-journal-card__tape"/>
     <h2 class="card-title">Enregistrer un exploit</h2>
-    <form @submit.prevent="$emit('submit')" class="games-form">
+    <form class="games-form" @submit.prevent="$emit('submit')">
       <GamesSessionFormFields :model-value="modelValue" :game-types="gameTypes" @update:field="$emit('update:modelValue', { ...modelValue, ...$event })" />
       <div class="form-group full-width">
         <label>Lieu</label>
-        <LocationAutocomplete :model-value="modelValue.location" @update:model-value="val => $emit('update:modelValue', { ...modelValue, location: val })" placeholder="Ex: Billard Club" />
+        <LocationAutocomplete :model-value="modelValue.location" placeholder="Ex: Billard Club" @update:model-value="val => $emit('update:modelValue', { ...modelValue, location: val })" />
       </div>
       <div class="form-group full-width">
         <label>Notes</label>
-        <textarea :value="modelValue.notes" @input="$emit('update:modelValue', { ...modelValue, notes: ($event.target as HTMLTextAreaElement).value })" placeholder="Une anecdote ?"></textarea>
+        <textarea :value="modelValue.notes" placeholder="Une anecdote ?" @input="$emit('update:modelValue', { ...modelValue, notes: ($event.target as HTMLTextAreaElement).value })"/>
       </div>
       <div class="form-actions"><button type="submit" class="mso-btn-primary" :disabled="isSubmitting">{{ isSubmitting ? 'Enregistrement...' : 'Valider' }}</button></div>
     </form>

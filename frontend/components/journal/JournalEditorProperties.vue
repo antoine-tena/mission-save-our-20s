@@ -13,7 +13,7 @@
           class="property-input-autocomplete"
           :show-icon="false"
           @select="$emit('select-location', $event)"
-          @update:modelValue="$emit('update:location', $event)"
+          @update:model-value="$emit('update:location', $event)"
         />
       </div>
     </div>
@@ -28,9 +28,9 @@
         <input 
           type="date" 
           :model-value="eventDate" 
-          @input="$emit('update:eventDate', ($event.target as HTMLInputElement).value)"
           class="property-input-field"
-        />
+          @input="$emit('update:eventDate', ($event.target as HTMLInputElement).value)"
+        >
       </div>
     </div>
 
@@ -44,9 +44,9 @@
         <input 
           type="time" 
           :model-value="eventTime" 
-          @input="$emit('update:eventTime', ($event.target as HTMLInputElement).value)"
           class="property-input-field"
-        />
+          @input="$emit('update:eventTime', ($event.target as HTMLInputElement).value)"
+        >
       </div>
     </div>
 

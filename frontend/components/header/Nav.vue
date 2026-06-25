@@ -8,7 +8,7 @@
         >
           <Icon v-if="isMobile" :name="link.icon" class="nav-icon" />
           <span>{{ link.label }}</span>
-          <div class="active-indicator"></div>
+          <div class="active-indicator"/>
         </NuxtLink>
       </li>
     </ul>

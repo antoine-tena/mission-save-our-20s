@@ -3,10 +3,10 @@
     <!-- Movie Search -->
     <div class="search-container">
       <label>Rechercher un film</label>
-      <input v-model="movieQuery" @input="onMovieInput" type="text" placeholder="Tapez le titre..." class="search-input" />
+      <input v-model="movieQuery" type="text" placeholder="Tapez le titre..." class="search-input" @input="onMovieInput" >
       <div v-if="movieSuggestions.length > 0" class="suggestions-list">
         <div v-for="s in movieSuggestions.slice(0, 5)" :key="s.id" class="suggestion-item" @click="selectMovie(s)">
-          <img v-if="s.poster_path" :src="'https://image.tmdb.org/t/p/w92' + s.poster_path" class="mini-poster" />
+          <img v-if="s.poster_path" :src="'https://image.tmdb.org/t/p/w92' + s.poster_path" class="mini-poster" >
           <div class="suggestion-info">
             <span class="title">{{ s.title }}</span>
             <span class="year">{{ s.release_year }}</span>
@@ -18,7 +18,7 @@
     <!-- Location Search -->
     <div class="search-container">
       <label>Lieu du cinéma</label>
-      <input v-model="locationQuery" @input="onLocationInput" type="text" placeholder="Nom du cinéma ou ville..." class="search-input" />
+      <input v-model="locationQuery" type="text" placeholder="Nom du cinéma ou ville..." class="search-input" @input="onLocationInput" >
       <div v-if="locationSuggestions.length > 0" class="suggestions-list">
         <div v-for="(loc, idx) in locationSuggestions" :key="idx" class="suggestion-item" @click="selectLocation(loc)">
           <div class="suggestion-info">
@@ -31,7 +31,7 @@
     <div class="details-row">
       <div class="form-group">
         <label>Date & Heure</label>
-        <input :value="dateSeen" @input="$emit('update:dateSeen', ($event.target as HTMLInputElement).value)" type="datetime-local" required />
+        <input :value="dateSeen" type="datetime-local" required @input="$emit('update:dateSeen', ($event.target as HTMLInputElement).value)" >
       </div>
       <div class="form-group">
         <label>Coordonnées (Auto)</label>

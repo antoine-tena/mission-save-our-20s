@@ -9,7 +9,7 @@
     <form @submit.prevent="$emit('submit', localItem)">
       <div class="form-group">
         <label>Titre</label>
-        <input v-model="localItem.title" type="text" required placeholder="Ex: Voyage au Japon" />
+        <input v-model="localItem.title" type="text" required placeholder="Ex: Voyage au Japon" >
       </div>
 
       <div class="form-row">
@@ -34,11 +34,11 @@
       <div class="form-row">
         <div class="form-group">
           <label>Prix estimé</label>
-          <input v-model.number="localItem.price" type="number" step="0.01" placeholder="0.00" />
+          <input v-model.number="localItem.price" type="number" step="0.01" placeholder="0.00" >
         </div>
         <div class="form-group checkbox-group">
           <label class="checkbox-label">
-            <input v-model="localItem.is_favorite" type="checkbox" />
+            <input v-model="localItem.is_favorite" type="checkbox" >
             Coup de cœur ❤️
           </label>
         </div>
@@ -46,7 +46,7 @@
 
       <div class="form-group">
         <label>Lien (URL)</label>
-        <input v-model="localItem.link" type="url" placeholder="https://..." />
+        <input v-model="localItem.link" type="url" placeholder="https://..." >
       </div>
 
       <div class="form-actions-row">

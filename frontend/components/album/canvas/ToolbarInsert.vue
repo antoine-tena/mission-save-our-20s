@@ -1,15 +1,15 @@
 <template>
   <div class="flex items-center gap-1.5 border-r border-gray-100 pr-3">
-    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" @click="addText" title="Ajouter une zone de texte">
+    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" title="Ajouter une zone de texte" @click="addText">
       <Icon name="lucide:type" />
     </button>
-    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" @click="addPhotoZone" title="Ajouter une photo manuellement">
+    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" title="Ajouter une photo manuellement" @click="addPhotoZone">
       <Icon name="lucide:image-plus" />
     </button>
-    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-amber-500 hover:bg-amber-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" @click="magicFill" title="Remplissage Magique (Auto-Layout)">
+    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-amber-500 hover:bg-amber-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" title="Remplissage Magique (Auto-Layout)" @click="magicFill">
       <Icon name="lucide:wand-2" />
     </button>
-    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" @click="deleteItem" :disabled="focusedPhotoId === null" title="Supprimer l'élément sélectionné">
+    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed" :disabled="focusedPhotoId === null" title="Supprimer l'élément sélectionné" @click="deleteItem">
       <Icon name="lucide:trash-2" />
     </button>
   </div>
