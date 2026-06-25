@@ -92,7 +92,7 @@ class Photo(models.Model):
     description = models.TextField(blank=True, null=True)
     caption = models.TextField(blank=True, null=True)
     image = models.ImageField(
-        upload_to=photo_upload_path,
+        upload_to='temp/',
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])]
     )
     thumbnail = models.ImageField(
@@ -100,6 +100,9 @@ class Photo(models.Model):
         null=True, 
         blank=True
     )
+    cloudinary_url = models.URLField(max_length=1024, blank=True, null=True)
+    google_drive_url = models.URLField(max_length=1024, blank=True, null=True)
+    is_archived = models.BooleanField(default=False)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
     order = models.IntegerField(default=0)
@@ -123,6 +126,11 @@ class Photo(models.Model):
         constraints = [
             models.CheckConstraint(check=models.Q(crop_scale__gt=0.0), name='check_photo_crop_scale_positive')
         ]
+
+    @property
+    def active_url(self) -> Optional[str]:
+        """Retourne google_drive_url si la photo est archivée, sinon cloudinary_url."""
+        return self.google_drive_url if self.is_archived else self.cloudinary_url
 
     def __str__(self) -> str:
         return self.titre or self.caption or f"Photo {self.id}"
