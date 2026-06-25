@@ -1,6 +1,18 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Photo
+from .models import Photo, Album, AlbumPage
+
+@admin.register(Album)
+class AlbumAdmin(admin.ModelAdmin):
+    list_display = ('title', 'user', 'created_at')
+    list_filter = ('user', 'created_at')
+    search_fields = ('title', 'description')
+
+@admin.register(AlbumPage)
+class AlbumPageAdmin(admin.ModelAdmin):
+    list_display = ('album', 'title', 'layout_type', 'order')
+    list_filter = ('album', 'layout_type')
+    search_fields = ('title', 'description')
 
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
