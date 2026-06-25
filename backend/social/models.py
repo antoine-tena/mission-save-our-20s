@@ -105,6 +105,11 @@ class RichPost(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
     caption = models.TextField(blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
+    event_date = models.DateField(blank=True, null=True)
+    event_time = models.TimeField(blank=True, null=True)
+    weather_info = models.CharField(max_length=255, blank=True, null=True)
+    likes = models.ManyToManyField(User, related_name='liked_rich_posts', blank=True)
+    bookmarks = models.ManyToManyField(User, related_name='bookmarked_rich_posts', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -136,4 +141,18 @@ class RichPostAttachment(models.Model):
 
     def __str__(self) -> str:
         return f"Fichier {self.file_name} du post {self.post.id}"
+
+
+class SavedLocation(models.Model):
+    name = models.CharField(max_length=200, unique=True, verbose_name="Nom du lieu")
+    latitude = models.FloatField(verbose_name="Latitude")
+    longitude = models.FloatField(verbose_name="Longitude")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Lieu Sauvegardé"
+        verbose_name_plural = "Lieux Sauvegardés"
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.latitude}, {self.longitude})"
 

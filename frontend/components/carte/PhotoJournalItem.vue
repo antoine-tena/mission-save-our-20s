@@ -1,6 +1,6 @@
 <template>
   <div class="journal-item glass-card" @click="$emit('click')">
-    <div class="journal-item__img"><img :src="photo.image_url" :alt="photo.titre" /></div>
+    <div class="journal-item__img"><img :src="photo.image_url" :alt="photo.titre" ></div>
     <div class="journal-item__info">
       <h4>{{ photo.titre }}</h4>
       <time>{{ formatDate(photo.date_creation) }}</time>

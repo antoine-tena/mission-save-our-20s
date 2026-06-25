@@ -9,22 +9,22 @@
         ref="inputRef"
         type="text" 
         :value="modelValue" 
+        :class="inputClass"
+        :placeholder="placeholder"
         @input="onInput"
         @blur="finishEditing"
         @keyup.enter="finishEditing"
-        :class="inputClass"
-        :placeholder="placeholder"
-      />
+      >
       <textarea 
         v-else 
         ref="inputRef"
         :value="modelValue" 
-        @input="onInput"
-        @blur="finishEditing"
         :class="inputClass"
         :placeholder="placeholder"
         :rows="rows"
-      ></textarea>
+        @input="onInput"
+        @blur="finishEditing"
+      />
     </div>
   </div>
 </template>

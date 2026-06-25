@@ -2,21 +2,21 @@
   <article class="movie-card glass-card" :class="{ 'is-expanded': showDetails }" @click="showDetails = !showDetails">
     <div class="card-options" @click.stop>
       <button class="options-trigger" @click="showMenu = !showMenu">
-        <span></span><span></span><span></span>
+        <span/><span/><span/>
       </button>
       <Transition name="fade">
-        <div v-if="showMenu" class="options-menu" v-click-outside="() => showMenu = false">
-          <button @click="onEdit" class="menu-item">
+        <div v-if="showMenu" v-click-outside="() => showMenu = false" class="options-menu">
+          <button class="menu-item" @click="onEdit">
             <span class="icon"><Icon name="lucide:pencil" /></span> Modifier
           </button>
-          <button @click="onDelete" class="menu-item delete">
+          <button class="menu-item delete" @click="onDelete">
             <span class="icon"><Icon name="lucide:trash-2" /></span> Supprimer
           </button>
         </div>
       </Transition>
     </div>
 
-    <CinemaMovieCardPoster :poster-url="movie.poster_url" :title="movie.title" :date="formatDate(movie.date_seen)" />
+    <CinemaMovieCardPoster :poster-url="movie.poster_url" :title="movie.title" :date="formatDateDateTime(movie.date_seen)" />
     <div class="movie-details">
       <header class="movie-header">
         <h2 class="movie-title">{{ movie.title }}</h2>
@@ -48,14 +48,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import type { Movie } from '~/types';
+import { formatDateDateTime } from '~/utils/formatters';
 
 const props = defineProps<{ movie: Movie }>();
 const emit = defineEmits(['edit', 'delete']);
 
 const showDetails = ref(false);
 const showMenu = ref(false);
-
-const formatDate = (d: string) => new Date(d).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 const onEdit = () => {
   showMenu.value = false;

@@ -2,9 +2,7 @@ import { ref, computed } from 'vue';
 import type { WishlistItem, WishlistStatus, WishlistInitiator } from '~/types';
 
 export const useWishlist = () => {
-  const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://127.0.0.1:8000/api';
-  const { token } = useAuth();
+  const api = useApi();
 
   const items = ref<WishlistItem[]>([]);
   const isLoading = ref(false);
@@ -12,10 +10,7 @@ export const useWishlist = () => {
   const fetchItems = async () => {
     isLoading.value = true;
     try {
-      const data = await $fetch<WishlistItem[]>(`${apiBase}/wishlist/`, {
-        headers: { Authorization: `Token ${token.value}` }
-      });
-      items.value = data;
+      items.value = await api.get<WishlistItem[]>('/wishlist/');
     } catch (err) {
       console.error('Wishlist load error:', err);
     } finally {
@@ -25,11 +20,7 @@ export const useWishlist = () => {
 
   const createItem = async (itemData: Partial<WishlistItem>) => {
     try {
-      await $fetch(`${apiBase}/wishlist/`, {
-        method: 'POST',
-        headers: { Authorization: `Token ${token.value}` },
-        body: itemData
-      });
+      await api.post('/wishlist/', itemData);
       await fetchItems();
       return true;
     } catch (err) {
@@ -40,11 +31,7 @@ export const useWishlist = () => {
 
   const updateItem = async (id: number, itemData: Partial<WishlistItem>) => {
     try {
-      await $fetch(`${apiBase}/wishlist/${id}/`, {
-        method: 'PATCH',
-        headers: { Authorization: `Token ${token.value}` },
-        body: itemData
-      });
+      await api.patch(`/wishlist/${id}/`, itemData);
       await fetchItems();
       return true;
     } catch (err) {
@@ -55,10 +42,7 @@ export const useWishlist = () => {
 
   const deleteItem = async (id: number) => {
     try {
-      await $fetch(`${apiBase}/wishlist/${id}/`, {
-        method: 'DELETE',
-        headers: { Authorization: `Token ${token.value}` }
-      });
+      await api.delete(`/wishlist/${id}/`);
       items.value = items.value.filter(i => i.id !== id);
       return true;
     } catch (err) {

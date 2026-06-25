@@ -5,7 +5,7 @@
     </h3>
     <div class="mso-flashback__grid">
       <div v-for="memory in memories" :key="memory.id" class="mso-flashback__item">
-        <img :src="memory.image_url" :alt="memory.titre" class="mso-flashback__img" />
+        <img :src="memory.image_url" :alt="memory.titre" class="mso-flashback__img" >
         <div class="mso-flashback__overlay">
           <span class="mso-flashback__date">{{ formatDateYear(memory.date_creation) }}</span>
         </div>
@@ -16,15 +16,11 @@
 
 <script setup lang="ts">
 import type { Photo } from '~/types';
+import { formatDateYear } from '~/utils/formatters';
 
 defineProps<{
   memories: Photo[]
 }>();
-
-const formatDateYear = (dateStr: string) => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-};
 </script>
 
 <style scoped>

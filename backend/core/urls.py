@@ -7,11 +7,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from photos.views import (
     PhotoListCreateView, PhotoDetailDeleteView, 
-    PhotoMemoriesView, HealthCheckView,
+    PhotoMemoriesView, HealthCheckView
+)
+from photos.album_views import (
     AlbumListCreateView, AlbumDetailDeleteUpdateView,
     AlbumPageListCreateView, AlbumPageDetailDeleteUpdateView,
     AlbumPageReorderView, AlbumPhotoUploadView,
-    AlbumAutoGenerateView
+    AlbumAutoGenerateView, AlbumPageMagicFillView
 )
 from . import auth_views
 from cinema.views import MovieListCreateView, MovieDetailView, MovieTMDBSearchView
@@ -19,7 +21,8 @@ from games.views import GameTypeListView, GameSessionListCreateView, ScoreboardS
 from social.views import (
     MyProfileView, PublicProfileView, SocialPostListCreateView,
     LikePostView, UserListView, FriendRequestView, HandleFriendRequestView,
-    RichPostListCreateView
+    RichPostListCreateView, RichPostDetailView, RichPostLikeToggleView,
+    RichPostBookmarkToggleView, LocationResolveView
 )
 from rest_framework.routers import DefaultRouter
 from wishlist.views import WishlistItemViewSet
@@ -51,13 +54,18 @@ urlpatterns = [
     path('api/photos/albums/<int:album_id>/pages/', AlbumPageListCreateView.as_view()),
     path('api/photos/pages/<int:pk>/', AlbumPageDetailDeleteUpdateView.as_view()),
     path('api/photos/pages/<int:page_id>/upload/', AlbumPhotoUploadView.as_view()),
+    path('api/photos/pages/<int:page_id>/magic-fill/', AlbumPageMagicFillView.as_view()),
     path('api/health/', HealthCheckView.as_view()),
 
     # Social
+    path('api/social/locations/resolve/', LocationResolveView.as_view()),
     path('api/social/profile/', MyProfileView.as_view()),
     path('api/social/profile/<str:username>/', PublicProfileView.as_view()),
     path('api/social/posts/', SocialPostListCreateView.as_view()),
     path('api/social/rich-posts/', RichPostListCreateView.as_view()),
+    path('api/social/journal/<int:pk>/', RichPostDetailView.as_view()),
+    path('api/social/journal/<int:pk>/like/', RichPostLikeToggleView.as_view()),
+    path('api/social/journal/<int:pk>/bookmark/', RichPostBookmarkToggleView.as_view()),
     path('api/social/posts/<int:pk>/like/', LikePostView.as_view()),
     path('api/social/users/', UserListView.as_view()),
     path('api/social/friends/requests/', FriendRequestView.as_view()),

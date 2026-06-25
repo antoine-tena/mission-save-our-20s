@@ -5,12 +5,12 @@
       :is-own-profile="isOwnProfile"
       @edit-cover="triggerInput(coverInput)" @edit-avatar="triggerInput(avatarInput)" @edit-profile="activeTab = 'info'"
     />
-    <input v-if="isOwnProfile" ref="coverInput" type="file" class="hidden" accept="image/*" @change="onFileChange($event, 'cover_image')" />
-    <input v-if="isOwnProfile" ref="avatarInput" type="file" class="hidden" accept="image/*" @change="onFileChange($event, 'avatar')" />
+    <input v-if="isOwnProfile" ref="coverInput" type="file" class="hidden" accept="image/*" @change="onFileChange($event, 'cover_image')" >
+    <input v-if="isOwnProfile" ref="avatarInput" type="file" class="hidden" accept="image/*" @change="onFileChange($event, 'avatar')" >
 
     <div class="container profile-grid-layout">
       <main class="profile-main-content">
-        <SocialProfileTabs v-model:activeTab="activeTab" />
+        <SocialProfileTabs v-model:active-tab="activeTab" />
 
         <div class="tab-content-area">
           <Transition name="fade-slide" mode="out-in">
@@ -24,13 +24,16 @@
                 />
               </div>
               <div class="scrapbook-content-grid">
-                <template v-if="profileUsername === 'antoine'">
-                  <AntoineProfileStats :points="profile?.points || 0" />
-                  <AntoineProfileMain />
-                </template>
-                <template v-else-if="profileUsername === 'amani'">
-                  <AmaniProfileMain />
-                  <AmaniProfileStats :points="profile?.points || 0" />
+                <template v-if="profileUsername === 'antoine' || profileUsername === 'amani'">
+                  <ProfileStatsCard 
+                    :points="profile?.points || 0" 
+                    :username="profileUsername" 
+                    :style="{ order: profileUsername === 'antoine' ? 1 : 2 }"
+                  />
+                  <ProfileHighlightCard 
+                    :username="profileUsername" 
+                    :style="{ order: profileUsername === 'antoine' ? 2 : 1 }"
+                  />
                 </template>
                 <template v-else>
                   <div class="glass-card p-8 text-center">

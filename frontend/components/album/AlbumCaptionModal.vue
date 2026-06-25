@@ -3,13 +3,13 @@
     <div v-if="isOpen && photo" class="caption-modal-overlay" @click.self="closeModal">
       <div class="caption-modal glass-card">
         <h4>Légende pour la Photo du Slot {{ slotIdx + 1 }}</h4>
-        <img :src="photo.image_url" class="caption-preview-img" />
+        <img :src="photo.image_url" class="caption-preview-img" >
         <textarea 
           v-model="tempCaption" 
           placeholder="Écrivez une petite légende ou anecdote pour cette photo..." 
           rows="3" 
           class="caption-textarea"
-        ></textarea>
+        />
         <div class="caption-actions">
           <button type="button" class="btn-cancel" @click="closeModal">Annuler</button>
           <button type="button" class="btn-save" @click="saveCaption">Sauvegarder</button>
@@ -45,13 +45,10 @@ const closeModal = () => {
 const saveCaption = async () => {
   if (props.photo) {
     try {
-      const config = useRuntimeConfig();
-      const token = useCookie<string | null>('auth_token');
-      await $fetch(`${config.public.apiBase}/photos/${props.photo.id}/`, {
-        method: 'PATCH',
-        headers: { Authorization: `Token ${token.value}` },
-        body: { caption: tempCaption.value }
-      });
+      const { recordHistory } = useAlbumHistory();
+      recordHistory();
+      const api = useApi();
+      await api.patch(`/photos/${props.photo.id}/`, { caption: tempCaption.value });
       emit('saved');
       closeModal();
     } catch (err) {

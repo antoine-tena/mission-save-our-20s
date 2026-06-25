@@ -23,13 +23,13 @@ class PhotoAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('date_creation', 'apercu_detail')
 
-    def apercu(self, obj):
+    def apercu(self, obj: Photo) -> str:
         if obj.image:
             return format_html('<img src="{}" style="width: 50px; height: auto; border-radius: 4px;" />', obj.image.url)
         return "Aucun aperçu"
     apercu.short_description = 'Aperçu'
 
-    def apercu_detail(self, obj):
+    def apercu_detail(self, obj: Photo) -> str:
         if obj.image:
             return format_html('<img src="{}" style="max-width: 300px; height: auto; border-radius: 8px;" />', obj.image.url)
         return "Aucun aperçu"

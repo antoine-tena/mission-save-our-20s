@@ -22,7 +22,7 @@
 
     <div class="filter-group checkbox">
       <label>
-        <input type="checkbox" :checked="favoritesOnly" @change="$emit('update:favoritesOnly', ($event.target as HTMLInputElement).checked)" />
+        <input type="checkbox" :checked="favoritesOnly" @change="$emit('update:favoritesOnly', ($event.target as HTMLInputElement).checked)" >
         Coups de cœur ❤️
       </label>
     </div>

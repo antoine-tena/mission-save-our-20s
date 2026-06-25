@@ -1,6 +1,6 @@
 <template>
   <div class="mso-carte">
-    <div class="mso-scrapbook-bg"></div>
+    <div class="mso-scrapbook-bg"/>
     <div class="carte-layout">
       <CartePhotoJournal 
         :photos="localizedPhotos" 

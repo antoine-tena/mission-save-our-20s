@@ -4,7 +4,7 @@
       <h1 class="page-title">Scoreboard</h1>
       <p class="page-subtitle">Qui est le champion d'Annecy ? <Icon name="lucide:swords" /></p>
     </div>
-    <button @click="$emit('toggle-form')" class="btn-toggle-form" :class="{ 'btn-toggle-form--active': showForm }">
+    <button class="btn-toggle-form" :class="{ 'btn-toggle-form--active': showForm }" @click="$emit('toggle-form')">
       {{ showForm ? 'Fermer' : 'Nouvelle Partie' }}
     </button>
   </header>

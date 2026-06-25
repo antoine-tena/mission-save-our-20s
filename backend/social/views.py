@@ -12,41 +12,56 @@ from .serializers import (
 )
 import os
 from typing import Any
+from rest_framework.request import Request
+from .utils import resolve_coordinates, fetch_open_meteo_weather
 
+class BaseToggleM2MView(APIView):
+    """Classe de base générique pour basculer (toggle) des relations Many-to-Many."""
+    permission_classes = [IsAuthenticated]
+    model = None
+    relation_name = None
+
+    def post(self, request: Request, pk: int) -> Response:
+        obj = get_object_or_404(self.model, pk=pk)
+        relation = getattr(obj, self.relation_name)
+        
+        if relation.filter(id=request.user.id).exists():
+            relation.remove(request.user)
+            return self.get_response(obj, added=False)
+        else:
+            relation.add(request.user)
+            return self.get_response(obj, added=True)
+
+    def get_response(self, obj: Any, added: bool) -> Response:
+        return Response({"active": added})
 class MyProfileView(APIView):
     """Vue pour voir et modifier son propre profil."""
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
-
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         profile, _ = Profile.objects.get_or_create(user=request.user)
         serializer = ProfileSerializer(profile, context={'request': request})
         return Response(serializer.data)
-    
-    def patch(self, request: Any) -> Response:
+    def patch(self, request: Request) -> Response:
         profile, _ = Profile.objects.get_or_create(user=request.user)
         serializer = ProfileSerializer(profile, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class PublicProfileView(APIView):
     """Vue pour voir le profil d'un autre utilisateur."""
     permission_classes = [IsAuthenticated]
-
-    def get(self, request: Any, username: str) -> Response:
+    def get(self, request: Request, username: str) -> Response:
         user = get_object_or_404(User, username=username)
         profile, _ = Profile.objects.get_or_create(user=user)
         serializer = ProfileSerializer(profile, context={'request': request})
         return Response(serializer.data)
-
 class SocialPostListCreateView(APIView):
     """Vue pour lister et créer des publications sociales."""
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
-
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         username = request.query_params.get('username')
         if username:
             posts = SocialPost.objects.filter(author__username=username)
@@ -54,64 +69,48 @@ class SocialPostListCreateView(APIView):
             posts = SocialPost.objects.all()
         serializer = SocialPostSerializer(posts, many=True, context={'request': request})
         return Response(serializer.data)
-    
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         serializer = SocialPostSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(author=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class LikePostView(APIView):
+class LikePostView(BaseToggleM2MView):
     """Vue pour liker/unliker une publication."""
-    permission_classes = [IsAuthenticated]
+    model = SocialPost
+    relation_name = 'likes'
 
-    def post(self, request: Any, pk: int) -> Response:
-        post = get_object_or_404(SocialPost, pk=pk)
-        if post.likes.filter(id=request.user.id).exists():
-            post.likes.remove(request.user)
-            return Response({'liked': False})
-        post.likes.add(request.user)
-        return Response({'liked': True})
-
+    def get_response(self, obj: SocialPost, added: bool) -> Response:
+        return Response({'liked': added})
 class UserListView(APIView):
     """Liste tous les utilisateurs sauf soi-même."""
     permission_classes = [IsAuthenticated]
-
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         users = User.objects.exclude(id=request.user.id)
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
-
 class FriendRequestView(APIView):
     """Gère les demandes d'amis (envoi et liste)."""
     permission_classes = [IsAuthenticated]
-
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         requests = FriendRequest.objects.filter(to_user=request.user, accepted=False)
         serializer = FriendRequestSerializer(requests, many=True)
         return Response(serializer.data)
-
-    def post(self, request: Any, user_id: int) -> Response:
+    def post(self, request: Request, user_id: int) -> Response:
         to_user = get_object_or_404(User, id=user_id)
         if to_user == request.user:
             return Response({'error': 'Impossible de s\'ajouter soi-même.'}, status=status.HTTP_400_BAD_REQUEST)
-        
         if request.user.profile.friends.filter(user=to_user).exists():
             return Response({'error': 'Déjà amis.'}, status=status.HTTP_400_BAD_REQUEST)
-        
         if FriendRequest.objects.filter(from_user=request.user, to_user=to_user).exists() or \
            FriendRequest.objects.filter(from_user=to_user, to_user=request.user).exists():
             return Response({'error': 'Demande déjà en cours.'}, status=status.HTTP_400_BAD_REQUEST)
-        
         FriendRequest.objects.create(from_user=request.user, to_user=to_user)
         return Response({'message': 'Demande envoyée.'}, status=status.HTTP_201_CREATED)
-
 class HandleFriendRequestView(APIView):
     """Vue pour accepter ou décliner une demande d'ami."""
     permission_classes = [IsAuthenticated]
-
-    def post(self, request: Any, request_id: int) -> Response:
+    def post(self, request: Request, request_id: int) -> Response:
         friend_request = get_object_or_404(FriendRequest, id=request_id, to_user=request.user)
         action = request.data.get('action')
         
@@ -130,40 +129,12 @@ class HandleFriendRequestView(APIView):
         return Response({'error': 'Action invalide.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-def resolve_coordinates(location_name: str | None) -> tuple[float | None, float | None]:
-    """Résout des noms de lieux courants vers leurs coordonnées GPS."""
-    if not location_name:
-        return None, None
-    name = location_name.strip().lower()
-    gps_map = {
-        "semnoz": (45.7981, 6.1042),
-        "crêt de châtillon": (45.7981, 6.1042),
-        "lac d'annecy": (45.8992, 6.1294),
-        "annecy": (45.8992, 6.1294),
-        "cinéma pathé": (45.9032, 6.1214),
-        "cinéma pathé annecy": (45.9032, 6.1214),
-        "pathé": (45.9032, 6.1214),
-        "cinema": (45.9032, 6.1214),
-        "cinéma": (45.9032, 6.1214),
-        "col de la forclaz": (45.8111, 6.2435),
-        "forclaz": (45.8111, 6.2435),
-        "aravis": (45.87, 6.35),
-        "bivouac aravis": (45.87, 6.35),
-        "chamonix": (45.92, 6.87),
-        "aiguille du midi": (45.92, 6.87),
-    }
-    for key, coords in gps_map.items():
-        if key in name:
-            return coords
-    return None, None
-
-
 class RichPostListCreateView(APIView):
     """Vue pour lister et créer des publications riches avec multi-médias."""
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get(self, request: Any) -> Response:
+    def get(self, request: Request) -> Response:
         """Liste toutes les publications riches avec leurs pièces jointes."""
         posts = RichPost.objects.all().prefetch_related('attachments')
         serializer = RichPostSerializer(posts, many=True, context={'request': request})
@@ -178,8 +149,8 @@ class RichPostListCreateView(APIView):
             if file_key not in request_files:
                 break
             uploaded_file = request_files[file_key]
-            att_caption = request_data.get(f'caption_{index}', '')
-            att_location = request_data.get(f'location_{index}', '')
+            att_caption = request_data.get(f'caption_{index}') or ''
+            att_location = request_data.get(f'location_{index}') or ''
             filename = uploaded_file.name
             ext = os.path.splitext(filename)[1].lower()
             if ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
@@ -205,12 +176,45 @@ class RichPostListCreateView(APIView):
                 photo_obj.image.save(filename, uploaded_file, save=True)
             index += 1
 
-    def post(self, request: Any) -> Response:
+    def post(self, request: Request) -> Response:
         """Crée une publication riche avec pièces jointes et synchro auto."""
         from cinema.models import Movie
         from django.utils import timezone
-        title, caption, loc = request.data.get('title', ''), request.data.get('caption', ''), request.data.get('location', '')
-        rich_post = RichPost.objects.create(author=request.user, title=title, caption=caption, location=loc)
+        title = request.data.get('title') or ''
+        caption = request.data.get('caption') or ''
+        loc = request.data.get('location') or ''
+        
+        event_date_str = request.data.get('event_date')
+        event_time_str = request.data.get('event_time')
+        event_date = None
+        event_time = None
+        weather_info = None
+        
+        if event_date_str:
+            try:
+                event_date = timezone.datetime.strptime(event_date_str, "%Y-%m-%d").date()
+            except ValueError:
+                pass
+                
+        if event_time_str:
+            try:
+                event_time = timezone.datetime.strptime(event_time_str, "%H:%M").time()
+            except ValueError:
+                try:
+                    event_time = timezone.datetime.strptime(event_time_str, "%H:%M:%S").time()
+                except ValueError:
+                    pass
+                    
+        # Récupération de la météo historique réelle sur Open-Meteo
+        if loc and event_date:
+            lat, lon = resolve_coordinates(loc)
+            if lat is not None and lon is not None:
+                weather_info = fetch_open_meteo_weather(lat, lon, event_date, event_time)
+                
+        rich_post = RichPost.objects.create(
+            author=request.user, title=title, caption=caption, location=loc,
+            event_date=event_date, event_time=event_time, weather_info=weather_info
+        )
         self._create_attachments(rich_post, request.data, request.FILES)
 
         # Détection de journée Cinéma
@@ -231,5 +235,75 @@ class RichPostListCreateView(APIView):
         profile.save(update_fields=['points'])
         serializer = RichPostSerializer(rich_post, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class RichPostLikeToggleView(BaseToggleM2MView):
+    """Vue pour liker/unliker une publication riche."""
+    model = RichPost
+    relation_name = 'likes'
+
+    def get_response(self, obj: RichPost, added: bool) -> Response:
+        return Response({
+            'status': 'liked' if added else 'unliked',
+            'likes_count': obj.likes.count()
+        })
+
+
+class RichPostBookmarkToggleView(BaseToggleM2MView):
+    """Vue pour ajouter/retirer une publication riche des favoris."""
+    model = RichPost
+    relation_name = 'bookmarks'
+
+    def get_response(self, obj: RichPost, added: bool) -> Response:
+        return Response({
+            'status': 'bookmarked' if added else 'unbookmarked',
+            'is_bookmarked': added
+        })
+
+
+class RichPostDetailView(APIView):
+    """Vue pour récupérer, modifier ou supprimer une publication riche."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, pk: int) -> Response:
+        post = get_object_or_404(RichPost, pk=pk)
+        serializer = RichPostSerializer(post, context={'request': request})
+        return Response(serializer.data)
+
+    def patch(self, request: Request, pk: int) -> Response:
+        post = get_object_or_404(RichPost, pk=pk)
+        if post.author != request.user:
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        
+        allowed_fields = ['title', 'caption', 'location', 'event_date', 'event_time']
+        update_data = {k: v for k, v in request.data.items() if k in allowed_fields}
+        serializer = RichPostSerializer(post, data=update_data, partial=True, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request: Request, pk: int) -> Response:
+        post = get_object_or_404(RichPost, pk=pk)
+        if post.author != request.user:
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class LocationResolveView(APIView):
+    """Vue pour résoudre les coordonnées GPS d'un lieu à la demande."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        query = request.query_params.get('query')
+        if not query:
+            return Response({'error': 'Query required'}, status=400)
+        lat, lon = resolve_coordinates(query)
+        if lat is not None and lon is not None:
+            return Response({'latitude': lat, 'longitude': lon})
+        return Response({'error': 'Location not found'}, status=404)
+
+
 
 

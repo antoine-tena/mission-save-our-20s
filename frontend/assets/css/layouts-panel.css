@@ -1,0 +1,11 @@
+@import '~/assets/css/album-library.css';
+.layout-preset-btn {
+  border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(0,0,0,0.02); outline: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.layout-preset-btn:hover { border-color: #cbd5e1; transform: translateY(-1px); }
+.selected-layout-card {
+  border-color: #6366f1 !important; background-color: rgba(99, 102, 241, 0.04) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.06);
+}
+.truncate-two-lines { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }

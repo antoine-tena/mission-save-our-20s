@@ -26,7 +26,7 @@
       <div class="cover-panel" :class="{ active: !isBackCover }">
         <h3 class="cover-title font-serif">Couverture de Début</h3>
         <div class="cover-preview" @click="triggerUpload(false)">
-          <img v-if="activeAlbum?.cover_photo_url" :src="activeAlbum.cover_photo_url" class="cover-img" />
+          <img v-if="activeAlbum?.cover_photo_url" :src="activeAlbum.cover_photo_url" class="cover-img" >
           <div v-else class="empty-cover-placeholder">
             <Icon name="lucide:image-plus" class="empty-icon" />
             <span>Ajouter une image</span>
@@ -38,7 +38,7 @@
       <div class="cover-panel" :class="{ active: isBackCover }">
         <h3 class="cover-title font-serif">Couverture de Fin</h3>
         <div class="cover-preview" @click="triggerUpload(true)">
-          <img v-if="activeAlbum?.back_cover_photo_url" :src="activeAlbum.back_cover_photo_url" class="cover-img" />
+          <img v-if="activeAlbum?.back_cover_photo_url" :src="activeAlbum.back_cover_photo_url" class="cover-img" >
           <div v-else class="empty-cover-placeholder">
             <Icon name="lucide:image-plus" class="empty-icon" />
             <span>Ajouter une image</span>
@@ -56,7 +56,7 @@
       </p>
     </div>
 
-    <input ref="fileInput" type="file" class="hidden" accept="image/*" @change="onFileSelected" />
+    <input ref="fileInput" type="file" class="hidden" accept="image/*" @change="onFileSelected" >
   </div>
 </template>
 

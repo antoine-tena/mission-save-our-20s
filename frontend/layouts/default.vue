@@ -1,39 +1,40 @@
 <template>
-  <div class="app-layout">
-    <Header />
-    <main class="main-content">
+  <div class="app-layout" :class="{ 'flex h-screen w-full overflow-hidden bg-[#fafafa]': isAuthenticated }">
+    <!-- 1. LA SIDEBAR (Gauche) - Rendu conditionnel si authentifié -->
+    <Sidebar v-if="isAuthenticated" />
+
+    <!-- 2. LE CONTENU PRINCIPAL (Droite) -->
+    <main 
+      :class="[
+        isAuthenticated 
+          ? 'flex-1 h-screen overflow-y-auto px-4 md:px-12 py-8 relative' 
+          : 'auth-container w-full min-h-screen bg-slate-50'
+      ]"
+    >
       <slot />
     </main>
-    <footer v-if="!hideFooter" class="main-footer">
-      <div class="container">
-        <p>&copy; {{ new Date().getFullYear() }} Mission Save Our 20s. Tous droits réservés.</p>
-      </div>
-    </footer>
+
+    <!-- Overlay global de Notifications Toasts -->
+    <ToastOverlay />
   </div>
 </template>
 
 <script setup lang="ts">
-const route = useRoute();
-const hideFooter = computed(() => ['/etoiles', '/carte', '/calendrier'].includes(route.path));
+import { computed } from 'vue';
+
+const { isAuthenticated } = useAuth();
 </script>
 
-<style scoped>
-.app-layout {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+<style>
+/* Réinitialisation de base pour notre layout fullscreen */
+html, body, #__nuxt {
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
-.main-content {
-  flex: 1;
-}
-
-.main-footer {
-  padding-block: var(--space-8);
-  border-top: 1px solid var(--clr-neutral-200);
-  background: var(--clr-neutral-0);
-  text-align: center;
-  color: var(--clr-neutral-500);
-  font-size: var(--text-sm);
+/* Redéfinir la hauteur de l'ancien header horizontal à 0px pour adapter automatiquement toutes les pages existantes ! */
+:root {
+  --header-height: 0px !important;
 }
 </style>

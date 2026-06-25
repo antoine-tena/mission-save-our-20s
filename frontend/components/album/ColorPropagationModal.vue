@@ -9,22 +9,22 @@
       <div class="pages-list-container">
         <div v-for="(p, index) in pagesToSelect" :key="p.id" class="page-checkbox-item">
           <input 
-            type="checkbox" 
             :id="'chk-' + p.id" 
-            :value="p.id" 
             v-model="selectedPageIds" 
+            type="checkbox" 
+            :value="p.id" 
             class="mso-checkbox"
-          />
+          >
           <label :for="'chk-' + p.id" class="font-sans checkbox-label">
             <span class="p-num">Page {{ index + 1 }}</span>
-            <span class="p-title" v-if="p.title"> - {{ p.title }}</span>
+            <span v-if="p.title" class="p-title"> - {{ p.title }}</span>
           </label>
         </div>
       </div>
 
       <footer class="sheet-footer">
         <button type="button" class="btn-cancel" @click="$emit('close')">Annuler</button>
-        <button type="button" class="btn-apply" @click="applyColor" :disabled="selectedPageIds.length === 0">
+        <button type="button" class="btn-apply" :disabled="selectedPageIds.length === 0" @click="applyColor">
           Appliquer ({{ selectedPageIds.length }})
         </button>
       </footer>

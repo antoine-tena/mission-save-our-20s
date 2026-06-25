@@ -1,6 +1,6 @@
 <template>
-  <div class="star-map-container" ref="mapContainer">
-    <div id="celestial-map"></div>
+  <div ref="mapContainer" class="star-map-container">
+    <div id="celestial-map"/>
     <div v-if="isLoading" class="map-loading-placeholder">
       <Icon name="lucide:loader-2" class="animate-spin" />
       <p>{{ loadingStatus }}</p>
@@ -20,7 +20,7 @@ const isLoading = ref(true);
 const loadingStatus = ref("Initialisation...");
 
 onMounted(async () => {
-  if (process.server) return;
+  if (import.meta.server) return;
 
   const loadScript = (src: string, id: string) => {
     return new Promise((resolve, reject) => {

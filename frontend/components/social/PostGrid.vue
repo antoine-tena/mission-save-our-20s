@@ -5,7 +5,7 @@
     </div>
     <div v-else class="grid-container">
       <div v-for="post in posts" :key="post.id" class="grid-item" @click="$emit('select', post)">
-        <img :src="post.image_url" class="grid-img" />
+        <img :src="post.image_url" class="grid-img" >
         <div class="grid-overlay">
           <span class="overlay-stat">❤️ {{ post.likes_count }}</span>
         </div>

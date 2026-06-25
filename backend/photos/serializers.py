@@ -1,17 +1,18 @@
 from rest_framework import serializers
 from .models import Photo, Album, AlbumPage
-from django.contrib.auth.models import User
-from typing import Optional, Any
+from typing import Optional
+from social.utils import get_absolute_media_url
 
 class PhotoSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
     author_name = serializers.ReadOnlyField(source='author.username')
 
     class Meta:
         model = Photo
         fields = [
             'id', 'author', 'author_name', 'page', 'titre', 'description', 
-            'caption', 'image', 'image_url', 'latitude', 'longitude', 'order',
+            'caption', 'image', 'image_url', 'thumbnail', 'thumbnail_url', 'latitude', 'longitude', 'order',
             'crop_x', 'crop_y', 'crop_scale', 'custom_width', 'custom_height',
             'custom_x', 'custom_y', 'date_creation'
         ]
@@ -20,10 +21,10 @@ class PhotoSerializer(serializers.ModelSerializer):
         }
     
     def get_image_url(self, obj: Photo) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.image and request:
-            return request.build_absolute_uri(obj.image.url)
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.image)
+
+    def get_thumbnail_url(self, obj: Photo) -> Optional[str]:
+        return get_absolute_media_url(self.context.get('request'), obj.thumbnail)
 
 class AlbumPageSerializer(serializers.ModelSerializer):
     photos = PhotoSerializer(many=True, read_only=True)
@@ -34,6 +35,7 @@ class AlbumPageSerializer(serializers.ModelSerializer):
             'id', 'album', 'title', 'description', 'date', 
             'location', 'layout_type', 'background_color', 'sticker', 'order', 'is_auto_color', 'photos'
         ]
+        read_only_fields = ['album']
 
 class AlbumSerializer(serializers.ModelSerializer):
     pages = AlbumPageSerializer(many=True, read_only=True)
@@ -58,13 +60,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         }
 
     def get_cover_photo_url(self, obj: Album) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.cover_photo and request:
-            return request.build_absolute_uri(obj.cover_photo.url)
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.cover_photo)
 
     def get_back_cover_photo_url(self, obj: Album) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.back_cover_photo and request:
-            return request.build_absolute_uri(obj.back_cover_photo.url)
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.back_cover_photo)

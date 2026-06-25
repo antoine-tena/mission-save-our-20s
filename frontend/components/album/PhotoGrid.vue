@@ -8,7 +8,7 @@
         class="gallery-square-item"
         @click="selectedPhoto = photo"
       >
-        <img :src="photo.image_url" :alt="photo.titre" class="square-img" loading="lazy" />
+        <img :src="photo.image_url" :alt="photo.titre" class="square-img" loading="lazy" >
       </div>
     </section>
 
@@ -16,27 +16,27 @@
     <Transition name="lightbox-fade">
       <div v-if="selectedPhoto" class="lightbox-overlay" @click.self="selectedPhoto = null">
         <!-- Close button -->
-        <button class="lightbox-close" @click="selectedPhoto = null" title="Fermer">×</button>
+        <button class="lightbox-close" title="Fermer" @click="selectedPhoto = null">×</button>
 
         <!-- Gallery Browse Navigation -->
-        <button class="gallery-nav-btn prev-arrow" @click="prevPhoto" :disabled="isFirst"><Icon name="lucide:chevron-left" /></button>
-        <button class="gallery-nav-btn next-arrow" @click="nextPhoto" :disabled="isLast"><Icon name="lucide:chevron-right" /></button>
+        <button class="gallery-nav-btn prev-arrow" :disabled="isFirst" @click="prevPhoto"><Icon name="lucide:chevron-left" /></button>
+        <button class="gallery-nav-btn next-arrow" :disabled="isLast" @click="nextPhoto"><Icon name="lucide:chevron-right" /></button>
 
         <!-- Media frame -->
         <div class="lightbox-content-box">
-          <img :src="selectedPhoto.image_url" :alt="selectedPhoto.titre" class="fullscreen-image" />
+          <img :src="selectedPhoto.image_url" :alt="selectedPhoto.titre" class="fullscreen-image" >
           
           <!-- Small metadata box underneath -->
           <div class="fullscreen-metadata font-sans">
             <div class="meta-header">
               <h3 class="meta-title font-serif">{{ selectedPhoto.titre }}</h3>
-              <button class="meta-delete-btn" @click="triggerDelete" title="Supprimer de la galerie">
+              <button class="meta-delete-btn" title="Supprimer de la galerie" @click="triggerDelete">
                 <Icon name="lucide:trash-2" />
               </button>
             </div>
             <p v-if="selectedPhoto.description" class="meta-desc">{{ selectedPhoto.description }}</p>
             <div class="meta-small-details">
-              <span>Ajouté le {{ formatDate(selectedPhoto.date_creation) }}</span>
+              <span>Ajouté le {{ formatDateShort(selectedPhoto.date_creation) }}</span>
               <span v-if="selectedPhoto.author_name"> • Par {{ selectedPhoto.author_name }}</span>
             </div>
           </div>
@@ -49,6 +49,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import type { Photo } from '~/types';
+import { formatDateShort } from '~/utils/formatters';
 
 const props = defineProps<{ photos: Photo[]; }>();
 const emit = defineEmits(['delete']);
@@ -68,35 +69,28 @@ const triggerDelete = () => {
     selectedPhoto.value = null;
   }
 };
-
-const formatDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-};
 </script>
 
 <style scoped>
 .phone-gallery-wrapper { width: 100%; position: relative; }
 
-/* Swipeable horizontal grid */
+/* Clean, minimalist responsive square photo grid */
 .phone-gallery-grid { 
   display: grid; 
-  grid-template-rows: repeat(2, 1fr); 
-  grid-auto-flow: column; 
-  grid-auto-columns: calc(100% / 4); 
-  gap: 2px; 
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 16px; 
   background: transparent; 
   width: 100%; 
-  overflow-x: auto; 
-  scroll-snap-type: x mandatory; 
-  scrollbar-width: none; 
 }
-.phone-gallery-grid::-webkit-scrollbar { display: none; }
 
-@media (max-width: 1024px) { 
-  .phone-gallery-grid { grid-auto-columns: calc(100% / 3); } 
+@media (min-width: 640px) { 
+  .phone-gallery-grid { grid-template-columns: repeat(3, 1fr); } 
 }
-@media (max-width: 640px) { 
-  .phone-gallery-grid { grid-auto-columns: calc(100% / 2); } 
+@media (min-width: 1024px) { 
+  .phone-gallery-grid { grid-template-columns: repeat(4, 1fr); } 
+}
+@media (min-width: 1280px) { 
+  .phone-gallery-grid { grid-template-columns: repeat(5, 1fr); } 
 }
 
 .gallery-square-item { 
@@ -106,7 +100,13 @@ const formatDate = (dateStr: string) => {
   cursor: pointer; 
   background: #e2e8f0; 
   position: relative; 
-  scroll-snap-align: start; 
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gallery-square-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.06);
 }
 .square-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 .gallery-square-item:hover .square-img { transform: scale(1.04); filter: brightness(0.95); }

@@ -1,6 +1,6 @@
 <template>
   <div v-if="isAlbumLoading" class="loader-container">
-    <div class="book-loader"><div class="book-page-loader"></div></div>
+    <div class="book-loader"><div class="book-page-loader"/></div>
     <p>Lecture de votre carnet de souvenirs...</p>
   </div>
 
@@ -18,11 +18,11 @@
     :page-id="currentUploadPageId"
   >
     <template #canvas>
-      <AlbumBookSpread v-model:activePageIdx="activePageIdx" />
+      <AlbumBookSpread v-model:active-page-idx="activePageIdx" />
     </template>
 
     <template #footer>
-      <AlbumStudioFooter v-model:activePageIdx="activePageIdx" />
+      <AlbumStudioFooter v-model:active-page-idx="activePageIdx" />
     </template>
   </AlbumStudioLayout>
 </template>
@@ -41,9 +41,13 @@ const route = useRoute();
 const albumId = computed(() => parseInt(route.params.id as string));
 
 const { photos, fetchPhotos } = usePhotos();
-const { activeAlbum, isLoading: isAlbumLoading, fetchAlbumDetail, createPage } = useAlbumEditorStore();
+const store = useAlbumEditorStore();
+const { activeAlbum, isLoading: isAlbumLoading, fetchAlbumDetail, createPage } = store;
 
-const activePageIdx = ref(0);
+const activePageIdx = computed({
+  get: () => store.activePageIdx.value,
+  set: (val) => { store.activePageIdx.value = val; }
+});
 
 const maxPageIdx = computed(() => {
   if (!activeAlbum.value) return 0;

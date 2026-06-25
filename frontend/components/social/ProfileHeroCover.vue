@@ -1,5 +1,5 @@
 <template>
-  <div class="cover-container" :style="coverStyle" @click="isOwnProfile ? $emit('edit') : null" :class="{ 'is-own': isOwnProfile }">
+  <div class="cover-container" :style="coverStyle" :class="{ 'is-own': isOwnProfile }" @click="isOwnProfile ? $emit('edit') : null">
     <div v-if="isOwnProfile" class="cover-overlay">
       <span class="cover-hint">Changer la couverture</span>
     </div>

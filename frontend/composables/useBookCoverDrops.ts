@@ -1,6 +1,7 @@
-import { useRuntimeConfig, useCookie } from '#app';
+import { useRuntimeConfig } from '#app';
 
 export function useBookCoverDrops(state: any) {
+  const api = useApi();
   const { activeAlbum, isCoverDragOver, isBackCoverDragOver, draggedPhotoId, draggedSourcePageId, fetchAlbumDetail } = state;
 
   const onCoverDragOver = (e: DragEvent) => { e.preventDefault(); isCoverDragOver.value = true; };
@@ -12,15 +13,13 @@ export function useBookCoverDrops(state: any) {
   const onDeleteCover = async () => {
     if (confirm('Retirer le style/photo de couverture ?')) {
       try {
-        const config = useRuntimeConfig();
-        const token = useCookie<string | null>('auth_token');
+        const { recordHistory } = useAlbumHistory();
+        recordHistory();
         const body: any = { cover_photo_id: null, cover_color: '#3d352e' };
         if (activeAlbum.value?.is_full_wrap) {
           body.back_cover_photo_id = null;
         }
-        await $fetch(`${config.public.apiBase}/photos/albums/${activeAlbum.value?.id}/`, {
-          method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body
-        });
+        await api.patch(`/photos/albums/${activeAlbum.value?.id}/`, body);
         await fetchAlbumDetail(activeAlbum.value!.id, true);
       } catch (err) { console.error(err); }
     }
@@ -29,11 +28,9 @@ export function useBookCoverDrops(state: any) {
   const onDeleteBackCover = async () => {
     if (confirm('Retirer le style/photo de couverture de fin ?')) {
       try {
-        const config = useRuntimeConfig();
-        const token = useCookie<string | null>('auth_token');
-        await $fetch(`${config.public.apiBase}/photos/albums/${activeAlbum.value?.id}/`, {
-          method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { back_cover_photo_id: null, cover_color: '#3d352e' }
-        });
+        const { recordHistory } = useAlbumHistory();
+        recordHistory();
+        await api.patch(`/photos/albums/${activeAlbum.value?.id}/`, { back_cover_photo_id: null, cover_color: '#3d352e' });
         await fetchAlbumDetail(activeAlbum.value!.id, true);
       } catch (err) { console.error(err); }
     }
@@ -46,16 +43,12 @@ export function useBookCoverDrops(state: any) {
     const photoId = parseInt(droppedIdRaw, 10);
     if (!activeAlbum.value) return;
     try {
-      const config = useRuntimeConfig();
-      const token = useCookie<string | null>('auth_token');
+      const { recordHistory } = useAlbumHistory();
+      recordHistory();
       if (draggedSourcePageId.value !== null && draggedPhotoId.value !== null) {
-        await $fetch(`${config.public.apiBase}/photos/${draggedPhotoId.value}/`, {
-          method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { page: null, order: 0 }
-        });
+        await api.patch(`/photos/${draggedPhotoId.value}/`, { page: null, order: 0 });
       }
-      await $fetch(`${config.public.apiBase}/photos/albums/${activeAlbum.value?.id}/`, {
-        method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { cover_photo_id: photoId }
-      });
+      await api.patch(`/photos/albums/${activeAlbum.value?.id}/`, { cover_photo_id: photoId });
       await fetchAlbumDetail(activeAlbum.value!.id, true);
     } catch (err) { console.error(err); } finally { draggedPhotoId.value = null; draggedSourcePageId.value = null; }
   };
@@ -67,16 +60,12 @@ export function useBookCoverDrops(state: any) {
     const photoId = parseInt(droppedIdRaw, 10);
     if (!activeAlbum.value) return;
     try {
-      const config = useRuntimeConfig();
-      const token = useCookie<string | null>('auth_token');
+      const { recordHistory } = useAlbumHistory();
+      recordHistory();
       if (draggedSourcePageId.value !== null && draggedPhotoId.value !== null) {
-        await $fetch(`${config.public.apiBase}/photos/${draggedPhotoId.value}/`, {
-          method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { page: null, order: 0 }
-        });
+        await api.patch(`/photos/${draggedPhotoId.value}/`, { page: null, order: 0 });
       }
-      await $fetch(`${config.public.apiBase}/photos/albums/${activeAlbum.value?.id}/`, {
-        method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { back_cover_photo_id: photoId }
-      });
+      await api.patch(`/photos/albums/${activeAlbum.value?.id}/`, { back_cover_photo_id: photoId });
       await fetchAlbumDetail(activeAlbum.value!.id, true);
     } catch (err) { console.error(err); } finally { draggedPhotoId.value = null; draggedSourcePageId.value = null; }
   };
@@ -88,16 +77,12 @@ export function useBookCoverDrops(state: any) {
     const photoId = parseInt(droppedIdRaw, 10);
     if (!activeAlbum.value) return;
     try {
-      const config = useRuntimeConfig();
-      const token = useCookie<string | null>('auth_token');
+      const { recordHistory } = useAlbumHistory();
+      recordHistory();
       if (draggedSourcePageId.value !== null && draggedPhotoId.value !== null) {
-        await $fetch(`${config.public.apiBase}/photos/${draggedPhotoId.value}/`, {
-          method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { page: null, order: 0 }
-        });
+        await api.patch(`/photos/${draggedPhotoId.value}/`, { page: null, order: 0 });
       }
-      await $fetch(`${config.public.apiBase}/photos/albums/${activeAlbum.value?.id}/`, {
-        method: 'PATCH', headers: { Authorization: `Token ${token.value}` }, body: { cover_photo_id: photoId, back_cover_photo_id: photoId }
-      });
+      await api.patch(`/photos/albums/${activeAlbum.value?.id}/`, { cover_photo_id: photoId, back_cover_photo_id: photoId });
       await fetchAlbumDetail(activeAlbum.value!.id, true);
     } catch (err) { console.error(err); } finally { draggedPhotoId.value = null; draggedSourcePageId.value = null; }
   };

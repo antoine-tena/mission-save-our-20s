@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
-from typing import Optional, Tuple, Any
+from typing import Optional, Any
 
 def photo_upload_path(instance: 'Photo', filename: str) -> str:
     """Génère le chemin d'upload basé sur la date du jour."""
@@ -39,6 +39,9 @@ class Album(models.Model):
         ordering = ['-created_at']
         verbose_name = "Album"
         verbose_name_plural = "Albums"
+        indexes = [
+            models.Index(fields=['user', '-created_at']),
+        ]
 
     def __str__(self) -> str:
         return self.title
@@ -75,6 +78,9 @@ class AlbumPage(models.Model):
         ordering = ['order']
         verbose_name = "Page d'Album"
         verbose_name_plural = "Pages d'Album"
+        indexes = [
+            models.Index(fields=['album', 'order']),
+        ]
 
     def __str__(self) -> str:
         return f"Page {self.order} de {self.album.title}"
@@ -86,9 +92,17 @@ class Photo(models.Model):
     description = models.TextField(blank=True, null=True)
     caption = models.TextField(blank=True, null=True)
     image = models.ImageField(
-        upload_to=photo_upload_path,
+        upload_to='temp/',
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])]
     )
+    thumbnail = models.ImageField(
+        upload_to=photo_upload_path, 
+        null=True, 
+        blank=True
+    )
+    cloudinary_url = models.URLField(max_length=1024, blank=True, null=True)
+    google_drive_url = models.URLField(max_length=1024, blank=True, null=True)
+    is_archived = models.BooleanField(default=False)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
     order = models.IntegerField(default=0)
@@ -105,9 +119,54 @@ class Photo(models.Model):
         ordering = ['order', '-date_creation']
         verbose_name = "Photo"
         verbose_name_plural = "Photos"
+        indexes = [
+            models.Index(fields=['page', 'order']),
+            models.Index(fields=['author', '-date_creation']),
+        ]
+        constraints = [
+            models.CheckConstraint(check=models.Q(crop_scale__gt=0.0), name='check_photo_crop_scale_positive')
+        ]
+
+    @property
+    def active_url(self) -> Optional[str]:
+        """Retourne google_drive_url si la photo est archivée, sinon cloudinary_url."""
+        return self.google_drive_url if self.is_archived else self.cloudinary_url
 
     def __str__(self) -> str:
         return self.titre or self.caption or f"Photo {self.id}"
+
+    def make_thumbnail(self) -> None:
+        """Créer une miniature 400x400 via Pillow."""
+        if not self.image:
+            return
+
+        from io import BytesIO
+        from django.core.files.base import ContentFile
+        
+        img = Image.open(self.image)
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+            
+        img.thumbnail((400, 400), Image.Resampling.LANCZOS)
+        
+        thumb_io = BytesIO()
+        img.save(thumb_io, format='JPEG', quality=85)
+        
+        filename = os.path.basename(self.image.name)
+        thumb_filename = f"thumb_{filename}"
+        if not thumb_filename.lower().endswith('.jpg'):
+            thumb_filename = f"{os.path.splitext(thumb_filename)[0]}.jpg"
+            
+        self.thumbnail.save(thumb_filename, ContentFile(thumb_io.getvalue()), save=False)
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        # Générer la miniature si elle n'existe pas et qu'une image est présente
+        if self.image and not self.thumbnail:
+            try:
+                self.make_thumbnail()
+            except Exception as e:
+                print(f"Erreur génération miniature: {e}")
+        super().save(*args, **kwargs)
 
     def _get_gps_info(self, exif_data: dict) -> dict:
         """Filtre et décode les tags GPS de l'EXIF."""
@@ -120,7 +179,7 @@ class Photo(models.Model):
                     gps_info[sub_decoded] = value[t]
         return gps_info
 
-    def _convert_to_degrees(self, value) -> float:
+    def _convert_to_degrees(self, value: Any) -> float:
         """Convertit les tuples EXIF en degrés décimaux."""
         d = float(value[0])
         m = float(value[1])

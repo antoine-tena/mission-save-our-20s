@@ -1,7 +1,7 @@
 <template>
   <div class="hero-main-group">
     <div class="avatar-container">
-      <img :src="avatarUrl || '/default-avatar.png'" alt="Avatar" class="main-avatar" />
+      <ProfileAvatar size="xl" class="main-avatar" :avatar-url="avatarUrl" :username="username" />
       <button v-if="isOwnProfile" class="avatar-edit-badge" @click="$emit('editAvatar')">
         <Icon name="lucide:camera" />
       </button>
@@ -32,6 +32,8 @@ defineEmits(['editAvatar', 'editProfile']);
 .hero-main-group { display: flex; align-items: center; gap: 4rem; padding: 2rem 0; }
 .avatar-container { position: relative; width: 150px; height: 160px; }
 .main-avatar { width: 150px; height: 150px; border-radius: 50%; border: 1px solid #dbdbdb; object-fit: cover; }
+.fallback-avatar { background: #fff0f9; color: #ca75d6; display: flex; align-items: center; justify-content: center; }
+.fallback-icon { font-size: 3.5rem; }
 .avatar-edit-badge { position: absolute; bottom: 15px; right: 5px; background: white; border: 1px solid #dbdbdb; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 .user-meta-info { flex: 1; }
 .name-badge-row { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }

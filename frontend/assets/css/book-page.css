@@ -1,0 +1,44 @@
+.page-content-wrapper { 
+  position: static !important; 
+  flex: 1; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: start; 
+  overflow: visible; 
+  height: 100%; /* Spans the full height of the page */
+  width: 100%; 
+  box-sizing: border-box;
+}
+.page-content-wrapper.readonly {
+  pointer-events: none !important;
+}
+
+.page-inner-container {
+  padding: 0;
+  box-sizing: border-box;
+  height: 100%; /* Spans the full height of the wrapper */
+  position: static !important;
+}
+
+/* 24x18 Snapping Grid Canvas: positioned relative to the .book-page ancestor to cover 100% edge-to-edge */
+.grid-canvas {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  grid-template-rows: repeat(18, 1fr);
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible;
+  padding: 0;
+  box-sizing: border-box;
+  z-index: 1; /* Positioned behind the text editorial block, but covers 100% of the page area */
+}
+/* No outline at all, completely border-free and pristine! */
+.page-content-wrapper:not(.readonly) .grid-canvas {
+  border: none !important;
+}
+
+.grid-canvas.readonly {
+  pointer-events: none;
+}

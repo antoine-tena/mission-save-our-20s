@@ -2,9 +2,7 @@ import { ref, computed } from 'vue';
 import type { User, AuthResponse } from '~/types';
 
 export const useAuth = () => {
-  const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://localhost:8000/api';
-
+  const api = useApi();
   const user = useState<User | null>('auth_user', () => null);
   const token = useCookie<string | null>('auth_token', {
     maxAge: 60 * 60 * 24 * 7, // 1 week
@@ -15,11 +13,7 @@ export const useAuth = () => {
 
   const register = async (username: string, password: string, email: string = '') => {
     try {
-      const response = await $fetch<AuthResponse>(`${apiBase}/auth/register/`, {
-        method: 'POST',
-        body: { username, password, email },
-        credentials: 'include'
-      });
+      const response = await api.post<AuthResponse>('/auth/register/', { username, password, email });
       token.value = response.token;
       user.value = response.user;
       return { success: true };
@@ -31,11 +25,7 @@ export const useAuth = () => {
 
   const login = async (username: string, password: string) => {
     try {
-      const response = await $fetch<AuthResponse>(`${apiBase}/auth/login/`, {
-        method: 'POST',
-        body: { username, password },
-        credentials: 'include'
-      });
+      const response = await api.post<AuthResponse>('/auth/login/', { username, password });
       token.value = response.token;
       user.value = response.user;
       return { success: true };
@@ -48,13 +38,7 @@ export const useAuth = () => {
   const logout = async () => {
     if (token.value) {
       try {
-        await $fetch(`${apiBase}/auth/logout/`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Token ${token.value}`
-          },
-          credentials: 'include'
-        });
+        await api.post('/auth/logout/');
       } catch (err) {
         console.error('Logout error:', err);
       }
@@ -67,16 +51,16 @@ export const useAuth = () => {
   const fetchUser = async () => {
     if (!token.value) return;
     try {
-      const data = await $fetch<User>(`${apiBase}/auth/me/`, {
-        headers: {
-          'Authorization': `Token ${token.value}`
-        },
-        credentials: 'include'
-      });
-      user.value = data;
+      user.value = await api.get<User>('/auth/me/');
     } catch (err) {
       token.value = null;
       user.value = null;
+    }
+  };
+
+  const updateUserAvatar = (avatarUrl: string | null) => {
+    if (user.value) {
+      user.value = { ...user.value, avatar_url: avatarUrl };
     }
   };
 
@@ -87,6 +71,7 @@ export const useAuth = () => {
     register,
     login,
     logout,
-    fetchUser
+    fetchUser,
+    updateUserAvatar
   };
 };

@@ -6,18 +6,26 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.request import Request
+from typing import Optional
+
+from social.utils import get_absolute_media_url
+
+def _get_user_avatar_url(request: Request, user: User) -> Optional[str]:
+    avatar = user.profile.avatar if hasattr(user, 'profile') else None
+    return get_absolute_media_url(request, avatar)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 @authentication_classes([])
-def root_view(request):
+def root_view(request: Request) -> Response:
     return Response({"message": "API Mission Save Our 20s"})
 
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @authentication_classes([])
-def register(request):
+def register(request: Request) -> Response:
     username = request.data.get('username')
     password = request.data.get('password')
     email = request.data.get('email', '')
@@ -36,7 +44,8 @@ def register(request):
         'user': {
             'id': user.id,
             'username': user.username,
-            'email': user.email
+            'email': user.email,
+            'avatar_url': _get_user_avatar_url(request, user)
         }
     }, status=status.HTTP_201_CREATED)
 
@@ -44,7 +53,7 @@ def register(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @authentication_classes([])
-def login(request):
+def login(request: Request) -> Response:
     username = request.data.get('username')
     password = request.data.get('password')
 
@@ -58,22 +67,24 @@ def login(request):
         'user': {
             'id': user.id,
             'username': user.username,
-            'email': user.email
+            'email': user.email,
+            'avatar_url': _get_user_avatar_url(request, user)
         }
     })
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def logout(request):
+def logout(request: Request) -> Response:
     request.user.auth_token.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_user(request):
+def get_user(request: Request) -> Response:
     user = request.user
     return Response({
         'id': user.id,
         'username': user.username,
-        'email': user.email
+        'email': user.email,
+        'avatar_url': _get_user_avatar_url(request, user)
     })

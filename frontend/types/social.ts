@@ -1,4 +1,4 @@
-import { User } from './auth';
+import type { User } from './auth';
 
 export interface Profile {
   id: number; user: User; bio: string; status: string;
@@ -32,5 +32,11 @@ export interface RichPost {
   location: string | null;
   created_at: string;
   attachments: RichPostAttachment[];
+  event_date: string | null;
+  event_time: string | null;
+  weather_info: string | null;
+  likes_count: number;
+  is_liked_by_me: boolean;
+  is_bookmarked_by_me: boolean;
 }
 

@@ -2,14 +2,14 @@
   <div class="auth-card">
     <h1 class="auth-title">Connexion</h1>
     <p class="auth-subtitle">Ravi de vous revoir !</p>
-    <form @submit.prevent="$emit('submit')" class="auth-form">
+    <form class="auth-form" @submit.prevent="$emit('submit')">
       <div class="form-group">
         <label for="username">Nom d'utilisateur</label>
-        <input v-model="modelValue.username" type="text" id="username" required placeholder="votre_pseudo" />
+        <input id="username" v-model="modelValue.username" type="text" required placeholder="votre_pseudo" >
       </div>
       <div class="form-group">
         <label for="password">Mot de passe</label>
-        <input v-model="modelValue.password" type="password" id="password" required placeholder="••••••••" />
+        <input id="password" v-model="modelValue.password" type="password" required placeholder="••••••••" >
       </div>
       <div v-if="error" class="auth-error">{{ error }}</div>
       <button type="submit" :disabled="loading" class="btn-auth">

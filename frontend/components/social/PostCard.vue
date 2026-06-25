@@ -1,7 +1,7 @@
 <template>
   <article class="post-item glass-card">
     <div class="post-item-header">
-      <img :src="avatar || '/default-avatar.png'" class="small-avatar" />
+      <ProfileAvatar size="md" class="small-avatar" :avatar-url="avatar || post.author.avatar_url" :username="post.author.username" />
       <div class="post-meta">
         <span class="post-author">{{ post.author.username }}</span>
         <time class="post-time">{{ formatDate(post.created_at) }}</time>
@@ -9,7 +9,7 @@
     </div>
     <p class="post-caption">{{ post.caption }}</p>
     <div class="post-media-box">
-      <img :src="post.image_url" class="post-full-image" loading="lazy" />
+      <img :src="post.image_url" class="post-full-image" loading="lazy" >
     </div>
     <div class="post-interactions">
       <button class="interaction-btn" :class="{ 'liked': post.is_liked }" @click="$emit('like', post.id)">
@@ -46,6 +46,8 @@ defineEmits<{
 .post-item { padding: 0; overflow: hidden; }
 .post-item-header { padding: 16px; display: flex; align-items: center; gap: 12px; }
 .small-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.fallback-avatar-small { background: #fff0f9; color: #ca75d6; display: flex; align-items: center; justify-content: center; }
+.fallback-icon-small { font-size: 1.1rem; }
 .post-author { font-weight: 700; color: #1a202c; }
 .post-time { font-size: 12px; color: #a0aec0; display: block; }
 .post-caption { padding: 0 16px 12px; font-size: 15px; line-height: 1.5; color: #333; }

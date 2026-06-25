@@ -5,10 +5,10 @@
         <Icon name="lucide:search" class="icon" />
         <input 
           :value="search" 
-          @input="$emit('update:search', ($event.target as HTMLInputElement).value)" 
           type="text" 
           placeholder="Rechercher..." 
-        />
+          @input="$emit('update:search', ($event.target as HTMLInputElement).value)" 
+        >
       </div>
 
       <div class="select-group">
@@ -54,7 +54,7 @@
         </div>
       </div>
 
-      <button class="btn-reset" @click="$emit('reset')" title="Réinitialiser">
+      <button class="btn-reset" title="Réinitialiser" @click="$emit('reset')">
         <Icon name="lucide:rotate-ccw" />
       </button>
     </div>

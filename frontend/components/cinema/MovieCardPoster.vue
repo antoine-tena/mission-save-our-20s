@@ -1,6 +1,6 @@
 <template>
   <div class="movie-poster-wrapper">
-    <img v-if="posterUrl" :src="posterUrl" :alt="title" class="movie-poster" />
+    <img v-if="posterUrl" :src="posterUrl" :alt="title" class="movie-poster" >
     <div v-else class="movie-poster movie-poster--fallback">
       <span><Icon name="lucide:clapperboard" /></span>
     </div>

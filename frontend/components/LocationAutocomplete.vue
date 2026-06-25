@@ -1,15 +1,15 @@
 <template>
-  <div class="location-autocomplete" ref="wrapperRef">
+  <div ref="wrapperRef" class="location-autocomplete">
     <div class="autocomplete-input-wrapper">
-      <Icon name="lucide:map-pin" class="input-icon" />
+      <Icon v-if="showIcon" name="lucide:map-pin" class="input-icon" />
       <input 
         type="text" 
         :value="modelValue" 
-        @input="onInput"
-        :placeholder="placeholder" 
-        :class="inputClass"
+        :placeholder="placeholder"
+        :class="inputClass" 
         autocomplete="off"
-      />
+        @input="onInput"
+      >
     </div>
     
     <Transition name="dropdown-fade">
@@ -35,9 +35,11 @@ const props = withDefaults(defineProps<{
   modelValue: string;
   placeholder?: string;
   inputClass?: string;
+  showIcon?: boolean;
 }>(), {
   placeholder: 'Rechercher un lieu ou une ville...',
-  inputClass: 'autocomplete-default-input'
+  inputClass: 'autocomplete-default-input',
+  showIcon: true
 });
 
 const emit = defineEmits(['update:modelValue', 'select']);

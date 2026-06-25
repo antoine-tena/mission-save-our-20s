@@ -13,7 +13,7 @@
   >
     <Transition name="fade" mode="out-in">
       <div v-if="apercu" class="drop-zone__preview">
-        <img :src="apercu" alt="Aperçu" class="preview-img" />
+        <img :src="apercu" alt="Aperçu" class="preview-img" >
         <button type="button" class="remove-btn" @click.stop="$emit('remove')">×</button>
       </div>
       <div v-else class="drop-zone__placeholder">
@@ -24,7 +24,7 @@
         <span class="hint">JPG, PNG ou WebP</span>
       </div>
     </Transition>
-    <input ref="fileInput" type="file" class="hidden" accept="image/*" @change="$emit('change', $event)" />
+    <input ref="fileInput" type="file" class="hidden" accept="image/*" @change="$emit('change', $event)" >
   </div>
 </template>
 

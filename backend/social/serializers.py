@@ -1,12 +1,19 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Profile, SocialPost, FriendRequest, RichPost, RichPostAttachment
-from typing import Optional, Any
+from typing import Optional
+from .utils import get_absolute_media_url
 
 class UserSerializer(serializers.ModelSerializer):
+    avatar_url = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = ['id', 'username', 'email', 'avatar_url']
+
+    def get_avatar_url(self, obj: User) -> Optional[str]:
+        avatar = obj.profile.avatar if hasattr(obj, 'profile') else None
+        return get_absolute_media_url(self.context.get('request'), avatar)
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -28,16 +35,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         }
     
     def get_avatar_url(self, obj: Profile) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.avatar and request:
-            return request.build_absolute_uri(obj.avatar.url)
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.avatar)
 
     def get_cover_url(self, obj: Profile) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.cover_image and request:
-            return request.build_absolute_uri(obj.cover_image.url)
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.cover_image)
     
     def get_friends_count(self, obj: Profile) -> int:
         return obj.friends.count()
@@ -71,10 +72,7 @@ class SocialPostSerializer(serializers.ModelSerializer):
         }
     
     def get_image_url(self, obj: SocialPost) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.image and request:
-            return request.build_absolute_uri(obj.image.url)
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.image)
     
     def get_likes_count(self, obj: SocialPost) -> int:
         return obj.likes.count()
@@ -105,17 +103,37 @@ class RichPostAttachmentSerializer(serializers.ModelSerializer):
         }
 
     def get_file_url(self, obj: RichPostAttachment) -> Optional[str]:
-        request = self.context.get('request')
-        if obj.file and request:
-            return request.build_absolute_uri(obj.file.url)
-        return None
+        return get_absolute_media_url(self.context.get('request'), obj.file)
 
 
 class RichPostSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     attachments = RichPostAttachmentSerializer(many=True, read_only=True)
+    likes_count = serializers.SerializerMethodField()
+    is_liked_by_me = serializers.SerializerMethodField()
+    is_bookmarked_by_me = serializers.SerializerMethodField()
 
     class Meta:
         model = RichPost
-        fields = ['id', 'author', 'title', 'caption', 'location', 'created_at', 'attachments']
+        fields = [
+            'id', 'author', 'title', 'caption', 'location', 'created_at', 
+            'attachments', 'event_date', 'event_time', 'weather_info',
+            'likes_count', 'is_liked_by_me', 'is_bookmarked_by_me'
+        ]
+
+    def get_likes_count(self, obj: RichPost) -> int:
+        return obj.likes.count()
+
+    def get_is_liked_by_me(self, obj: RichPost) -> bool:
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.likes.filter(id=request.user.id).exists()
+        return False
+
+    def get_is_bookmarked_by_me(self, obj: RichPost) -> bool:
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.bookmarks.filter(id=request.user.id).exists()
+        return False
+
 

@@ -5,21 +5,151 @@
 .nav-turn-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .book-and-controls-stack { display: flex; flex-direction: column; gap: 1rem; align-items: center; width: 100%; }
-.global-book-controls-row { display: grid; grid-template-columns: 320px 320px; gap: 0; width: 640px; margin: 0 auto; box-sizing: border-box; }
-.page-controls-column { width: 320px; min-width: 320px; max-width: 320px; min-height: 40px; display: flex; flex-direction: column; justify-content: center; }
+.global-book-controls-row { display: grid; grid-template-columns: 400px 400px; gap: 0; width: 800px; margin: 0 auto; box-sizing: border-box; }
+.page-controls-column { width: 400px; min-width: 400px; max-width: 400px; min-height: 40px; display: flex; flex-direction: column; justify-content: center; }
 
-.book-container { width: fit-content; margin: 0 auto; padding: 12px; background: #3d352e; border-radius: 16px; box-shadow: 0 30px 60px rgba(0,0,0,0.2), inset 0 1px 3px rgba(255,255,255,0.2); border: none; position: relative; transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1); }
-.book-pages-spread { display: grid; grid-template-columns: 320px 320px; width: 640px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); position: relative; }
+/* ── SKEUOMORPHIC SCENE LAYERS ── */
+.book-scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  perspective: 1500px;
+}
+.table-surface {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: none;
+  z-index: 1;
+}
+.book-zoom-wrapper {
+  position: relative;
+  z-index: 2;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
 
+.book-container { width: fit-content; margin: 0 auto; padding: 0; background: transparent; box-shadow: none; position: relative; transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1); }
+.book-pages-spread { 
+  display: grid; 
+  grid-template-columns: 400px 400px; 
+  width: 800px; 
+  background: white; 
+  border-radius: 12px; 
+  overflow: hidden; 
+  position: relative; 
+  z-index: 5;
+  box-shadow: 
+    0 0 0 1px rgba(0,0,0,0.05),
+    0 2px 2px rgba(0,0,0,0.02),
+    0 4px 4px rgba(0,0,0,0.03),
+    0 8px 8px rgba(0,0,0,0.03),
+    0 16px 16px rgba(0,0,0,0.03),
+    0 30px 60px rgba(0,0,0,0.12),
+    0 50px 100px rgba(0,0,0,0.08);
+}
+
+/* Spine Pliure Lines */
 .spine-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: linear-gradient(90deg, rgba(0,0,0,0.15), rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.15)); z-index: 20; box-shadow: inset 0 0 10px rgba(0,0,0,0.25); }
-.spine-glow { position: absolute; left: 50%; transform: translateX(-50%); top: 0; bottom: 0; width: 48px; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.04) 40%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.04) 60%, transparent); z-index: 10; pointer-events: none; }
+.spine-glow { 
+  position: absolute; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  top: 0; 
+  bottom: 0; 
+  width: 80px; 
+  background: linear-gradient(90deg, 
+    rgba(0,0,0,0) 0%, 
+    rgba(0,0,0,0.02) 20%, 
+    rgba(0,0,0,0.06) 40%, 
+    rgba(0,0,0,0.18) 48%, 
+    rgba(0,0,0,0.25) 50%, 
+    rgba(0,0,0,0.18) 52%, 
+    rgba(0,0,0,0.06) 60%, 
+    rgba(0,0,0,0.02) 80%, 
+    rgba(0,0,0,0) 100%
+  ); 
+  z-index: 10; 
+  pointer-events: none; 
+}
+.spine-specular {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.1) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  z-index: 15;
+  pointer-events: none;
+}
 
-.book-page { display: flex; flex-direction: column; justify-content: start; padding: 2.2rem; width: 320px; min-width: 320px; max-width: 320px; height: 440px; position: relative; transition: background-color 0.5s; box-shadow: inset 0 0 40px rgba(0,0,0,0.015); overflow: hidden; box-sizing: border-box; }
-.left-page { border-right: 1px solid rgba(0,0,0,0.04); }
-.right-page { border-left: 1px solid rgba(0,0,0,0.04); }
+.book-page { display: flex; flex-direction: column; justify-content: start; padding: 12px; width: 400px; min-width: 400px; max-width: 400px; height: 520px; position: relative; transition: background-color 0.5s; overflow: hidden; box-sizing: border-box; }
+.left-page { 
+  border-right: 1px solid rgba(0,0,0,0.04); 
+}
+.right-page { 
+  border-left: 1px solid rgba(0,0,0,0.04); 
+}
 
-.page-corner-fold-left { position: absolute; top: 0; left: 0; width: 15px; height: 15px; background: linear-gradient(135deg, #3d352e 45%, rgba(0,0,0,0.15) 55%, transparent 55%); pointer-events: none; opacity: 0.3; }
-.page-corner-fold-right { position: absolute; top: 0; right: 0; width: 15px; height: 15px; background: linear-gradient(225deg, #3d352e 45%, rgba(0,0,0,0.15) 55%, transparent 55%); pointer-events: none; opacity: 0.3; }
+/* Page Curvature Shading */
+.page-curve-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 12;
+}
+.left-curve {
+  background: linear-gradient(90deg,
+    rgba(0,0,0,0.015) 0%,
+    rgba(0,0,0,0) 15%,
+    rgba(0,0,0,0) 85%,
+    rgba(0,0,0,0.06) 98%,
+    rgba(0,0,0,0.12) 100%
+  );
+}
+.right-curve {
+  background: linear-gradient(90deg,
+    rgba(0,0,0,0.12) 0%,
+    rgba(0,0,0,0.06) 2%,
+    rgba(0,0,0,0) 15%,
+    rgba(0,0,0,0) 85%,
+    rgba(0,0,0,0.015) 100%
+  );
+}
+
+/* Page Texture Overlay */
+.page-texture-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.12;
+  background-image: radial-gradient(rgba(0,0,0,0.12) 0.5px, transparent 0.5px);
+  background-size: 3px 3px;
+}
+
+/* Ambient Light gradient */
+.book-ambient-light {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.02) 25%,
+    transparent 50%
+  );
+  pointer-events: none;
+  z-index: 25;
+  border-radius: 12px;
+}
 
 .book-container.flipping-next { animation: flipNextEffect 0.7s cubic-bezier(0.645, 0.045, 0.355, 1); }
 .book-container.flipping-prev { animation: flipPrevEffect 0.7s cubic-bezier(0.645, 0.045, 0.355, 1); }
@@ -27,10 +157,9 @@
 @keyframes flipNextEffect { 0% { transform: rotateY(0deg) scale(1); } 50% { transform: rotateY(-2.5deg) scale(0.985); filter: brightness(0.96); } 100% { transform: rotateY(0deg) scale(1); } }
 @keyframes flipPrevEffect { 0% { transform: rotateY(0deg) scale(1); } 50% { transform: rotateY(2.5deg) scale(0.985); filter: brightness(0.96); } 100% { transform: rotateY(0deg) scale(1); } }
 
-/* Outer book cover layout matching /album exactly inside studio */
+/* Outer book cover layout */
 .studio-book-cover-wrapper { position: absolute; inset: 0; background: transparent; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: all 0.3s; }
 .studio-book-cover-wrapper.drag-over { box-shadow: inset 0 0 0 4px #6366f1; transform: scale(0.98); }
-
 .book-spine-edge { position: absolute; left: 0; top: 0; bottom: 0; width: 16px; background: linear-gradient(90deg, rgba(0,0,0,0.4), rgba(255,255,255,0.1) 15%, rgba(0,0,0,0.2) 85%, rgba(0,0,0,0.5)); border-radius: 4px 0 0 4px; z-index: 10; pointer-events: none; }
 
 .delete-cover-btn-full-floating { position: absolute; top: 16px; right: 16px; background: rgba(239, 68, 68, 0.95); border: none; color: white; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; z-index: 15; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: all 0.2s; pointer-events: auto; }
@@ -38,96 +167,33 @@
 .delete-cover-btn-full-floating:hover { background: #dc2626; transform: translateY(-1px); }
 
 /* Full wrap cover styles */
-.full-wrap-cover-page { padding: 0 !important; border: none !important; width: 640px !important; min-width: 640px !important; max-width: 640px !important; }
-.studio-book-cover-wrapper.full-wrap { width: 640px; height: 440px; }
+.full-wrap-cover-page { padding: 0 !important; border: none !important; width: 800px !important; min-width: 800px !important; max-width: 800px !important; }
+.studio-book-cover-wrapper.full-wrap { width: 800px; height: 520px; }
 .spine-line-cover { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: linear-gradient(90deg, rgba(0,0,0,0.25), rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.25)); z-index: 20; }
 .spine-glow-cover { position: absolute; left: 50%; transform: translateX(-50%); top: 0; bottom: 0; width: 48px; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0.12) 50%, rgba(0,0,0,0.08) 60%, transparent); z-index: 10; pointer-events: none; }
 
 /* Right toolbar styling */
-.right-spread-sidebar-col {
-  width: 54px;
-  min-width: 54px;
-  max-width: 54px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: auto;
-}
-
-.vertical-pill-toolbar {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 9999px;
-  padding: 20px 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-  width: 48px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  box-sizing: border-box;
-}
-
-.color-dot-btn {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2px solid white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
-  display: block;
-}
-
-.color-dot-btn:hover {
-  transform: scale(1.15);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-}
-
-.pill-action-btn {
-  background: none;
-  border: none;
-  color: #718096;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1rem;
-  padding: 0;
-}
-
-.pill-action-btn:hover:not(:disabled) {
-  background: #f7fafc;
-  color: #4f46e5;
-}
-
-.pill-action-btn.active {
-  background: #6366f1;
-  color: white;
-}
-
-.pill-action-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
+.right-spread-sidebar-col { width: 54px; min-width: 54px; max-width: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: auto; }
+.vertical-pill-toolbar { background: white; border: 1px solid rgba(0, 0, 0, 0.05); border-radius: 9999px; padding: 20px 8px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06); width: 48px; display: flex; flex-direction: column; align-items: center; gap: 12px; box-sizing: border-box; }
+.color-dot-btn { width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.2s ease; padding: 0; display: block; }
+.color-dot-btn:hover { transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.25); }
+.pill-action-btn { background: none; border: none; color: #718096; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; padding: 0; }
+.pill-action-btn:hover:not(:disabled) { background: #f7fafc; color: #4f46e5; }
+.pill-action-btn.active { background: #6366f1; color: white; }
+.pill-action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
 /* Split Cover absolute fullscreen flat color or photo */
-.split-cover-page {
-  padding: 0 !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Pages de garde (restricted blank white pages) */
-.garde-page {
-  border: none !important;
-  box-shadow: none !important;
-}
+.split-cover-page { padding: 0 !important; border: none !important; box-shadow: none !important; }
+.garde-page { border: none !important; padding: 0 !important; }
 
 @media (max-width: 1000px) { .book-pages-spread { grid-template-columns: 1fr; } .left-page { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.05); } .nav-turn-btn { display: none; } }
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}

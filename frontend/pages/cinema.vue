@@ -1,7 +1,26 @@
 <template>
   <div class="cinema-page">
-    <div class="mso-scrapbook-bg"></div>
-    <CinemaHeader :show-form="showAddForm" @toggle="showAddForm = !showAddForm" />
+    <div class="mso-scrapbook-bg"/>
+    <PageHero
+      title="Ciné-Journal"
+      icon="lucide:clapperboard"
+      icon-class="text-rose-500"
+      subtitle-class="text-rose-600"
+    >
+      <template #subtitle>
+        Nos critiques étanches & indépendantes <Icon name="lucide:popcorn" />
+      </template>
+      <template #actions>
+        <button 
+          class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-rose-600 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:shadow-rose-500/30 flex items-center gap-2" 
+          :class="{ '!bg-rose-600 !shadow-rose-500/30': showAddForm }" 
+          @click="showAddForm = !showAddForm"
+        >
+          <Icon :name="showAddForm ? 'lucide:x' : 'lucide:plus'" class="w-5 h-5" />
+          <span>{{ showAddForm ? 'Fermer' : 'Ajouter un film' }}</span>
+        </button>
+      </template>
+    </PageHero>
 
     <div class="container main-content">
       <Transition name="slide-fade">
@@ -19,11 +38,11 @@
         v-if="!editingId"
         v-model:search="filters.search"
         v-model:genre="filters.genre"
-        v-model:ratingAmani="filters.ratingAmani"
-        v-model:ratingAntoine="filters.ratingAntoine"
-        v-model:ratingGlobal="filters.ratingGlobal"
+        v-model:rating-amani="filters.ratingAmani"
+        v-model:rating-antoine="filters.ratingAntoine"
+        v-model:rating-global="filters.ratingGlobal"
         v-model:year="filters.year"
-        v-model:sortBy="filters.sortBy"
+        v-model:sort-by="filters.sortBy"
         :available-genres="availableGenres"
         :available-years="availableYears"
         :total-results="filteredMovies.length"
@@ -33,8 +52,8 @@
       <div v-if="!editingId" class="movies-timeline">
         <CinemaMovieCard 
           v-for="movie in filteredMovies" 
-          :key="movie.id" 
-          :id="'movie-' + movie.id"
+          :id="'movie-' + movie.id" 
+          :key="movie.id"
           :movie="movie" 
           @edit="handleEditStart"
           @delete="handleDeleteMovie"
@@ -42,7 +61,7 @@
         <div v-if="filteredMovies.length === 0" class="empty-state">
           <Icon name="lucide:search-x" class="empty-icon" />
           <p>Aucun film ne correspond à tes critères...</p>
-          <button @click="resetFilters" class="btn-reset">Réinitialiser les filtres</button>
+          <button class="btn-reset" @click="resetFilters">Réinitialiser les filtres</button>
         </div>
       </div>
     </div>
