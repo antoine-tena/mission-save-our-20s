@@ -17,8 +17,8 @@
         
         <!-- Segmented select left/right page background -->
         <div class="flex bg-gray-100 p-1 rounded-lg text-[10px]">
-          <button type="button" class="flex-1 py-1 font-bold rounded cursor-pointer border-none" :class="modelValue === 'left' ? 'bg-white text-indigo-600 shadow-sm' : 'bg-transparent text-gray-400'" @click="$emit('update:modelValue', 'left')" :disabled="!leftPage">Gauche</button>
-          <button type="button" class="flex-1 py-1 font-bold rounded cursor-pointer border-none" :class="modelValue === 'right' ? 'bg-white text-indigo-600 shadow-sm' : 'bg-transparent text-gray-400'" @click="$emit('update:modelValue', 'right')" :disabled="!rightPage">Droite</button>
+          <button type="button" class="flex-1 py-1 font-bold rounded cursor-pointer border-none" :class="modelValue === 'left' ? 'bg-white text-indigo-600 shadow-sm' : 'bg-transparent text-gray-400'" :disabled="!leftPage" @click="$emit('update:modelValue', 'left')">Gauche</button>
+          <button type="button" class="flex-1 py-1 font-bold rounded cursor-pointer border-none" :class="modelValue === 'right' ? 'bg-white text-indigo-600 shadow-sm' : 'bg-transparent text-gray-400'" :disabled="!rightPage" @click="$emit('update:modelValue', 'right')">Droite</button>
         </div>
 
         <!-- Button: Apply Everywhere -->
@@ -40,9 +40,9 @@
               class="color-dot-btn border-none cursor-pointer"
               :style="{ backgroundColor: c.hex }"
               :class="{ 'active': activePageForLayout.background_color === c.hex }"
-              @click="applyPageColor(c.hex)"
               :title="c.label"
-            ></button>
+              @click="applyPageColor(c.hex)"
+            />
           </div>
         </div>
 
@@ -55,9 +55,9 @@
               class="color-dot-btn border-none cursor-pointer"
               :style="{ backgroundColor: c.hex }"
               :class="{ 'active': activePageForLayout.background_color === c.hex }"
-              @click="applyPageColor(c.hex)"
               :title="c.label"
-            ></button>
+              @click="applyPageColor(c.hex)"
+            />
           </div>
         </div>
       </div>

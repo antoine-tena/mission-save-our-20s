@@ -13,8 +13,8 @@
       <div v-else class="flex flex-col gap-3.5 h-full min-h-0">
         <!-- Segmented Left/Right Selector -->
         <div class="flex bg-gray-100 p-1 rounded-xl">
-          <button type="button" class="flex-1 py-1.5 text-xs font-extrabold rounded-lg border-none transition-all flex flex-col items-center gap-0.5 cursor-pointer outline-none" :class="modelValue === 'left' ? 'bg-white text-indigo-600 shadow-sm' : 'bg-transparent text-gray-500'" @click="$emit('update:modelValue', 'left')" :disabled="!leftPage">Page Gauche</button>
-          <button type="button" class="flex-1 py-1.5 text-xs font-extrabold rounded-lg border-none transition-all flex flex-col items-center gap-0.5 cursor-pointer outline-none" :class="modelValue === 'right' ? 'bg-white text-indigo-600 shadow-sm' : 'bg-transparent text-gray-500'" @click="$emit('update:modelValue', 'right')" :disabled="!rightPage">Page Droite</button>
+          <button type="button" class="flex-1 py-1.5 text-xs font-extrabold rounded-lg border-none transition-all flex flex-col items-center gap-0.5 cursor-pointer outline-none" :class="modelValue === 'left' ? 'bg-white text-indigo-600 shadow-sm' : 'bg-transparent text-gray-500'" :disabled="!leftPage" @click="$emit('update:modelValue', 'left')">Page Gauche</button>
+          <button type="button" class="flex-1 py-1.5 text-xs font-extrabold rounded-lg border-none transition-all flex flex-col items-center gap-0.5 cursor-pointer outline-none" :class="modelValue === 'right' ? 'bg-white text-indigo-600 shadow-sm' : 'bg-transparent text-gray-500'" :disabled="!rightPage" @click="$emit('update:modelValue', 'right')">Page Droite</button>
         </div>
         <!-- Categories & Proposals List -->
         <div v-if="activePageForLayout" class="flex-1 overflow-y-auto pr-1 flex flex-col gap-2 min-h-0 pb-6">
@@ -38,8 +38,8 @@
                 <button v-for="prop in filteredProposals(cat)" :key="prop.id" type="button" class="w-full flex items-center gap-2.5 p-2 rounded-lg border text-left cursor-pointer transition-all outline-none" :class="isProposalActive(prop) ? 'border-indigo-500 bg-indigo-50/25 shadow-sm' : 'border-gray-100 bg-white hover:bg-gray-50'" @click="applyLayoutProposal(prop)">
                   <div class="w-11 h-8 rounded border border-gray-100 bg-slate-50 relative p-1 flex-shrink-0 overflow-hidden">
                     <div class="w-full h-full relative">
-                      <div v-for="(slot, sidx) in prop.slots" :key="`s-${sidx}`" class="absolute bg-indigo-500/10 border border-indigo-500/35 rounded-sm" :style="{ left: `${(slot.x - 1) / 24 * 100}%`, top: `${(slot.y - 1) / 18 * 100}%`, width: `${slot.w / 24 * 100}%`, height: `${slot.h / 18 * 100}%` }"></div>
-                      <div v-for="(txt, tidx) in prop.texts" :key="`t-${tidx}`" class="absolute bg-amber-500/10 border border-amber-500/40 rounded-sm" :style="{ left: `${(txt.x - 1) / 24 * 100}%`, top: `${(txt.y - 1) / 18 * 100}%`, width: `${txt.w / 24 * 100}%`, height: `${txt.h / 18 * 100}%` }"></div>
+                      <div v-for="(slot, sidx) in prop.slots" :key="`s-${sidx}`" class="absolute bg-indigo-500/10 border border-indigo-500/35 rounded-sm" :style="{ left: `${(slot.x - 1) / 24 * 100}%`, top: `${(slot.y - 1) / 18 * 100}%`, width: `${slot.w / 24 * 100}%`, height: `${slot.h / 18 * 100}%` }"/>
+                      <div v-for="(txt, tidx) in prop.texts" :key="`t-${tidx}`" class="absolute bg-amber-500/10 border border-amber-500/40 rounded-sm" :style="{ left: `${(txt.x - 1) / 24 * 100}%`, top: `${(txt.y - 1) / 18 * 100}%`, width: `${txt.w / 24 * 100}%`, height: `${txt.h / 18 * 100}%` }"/>
                     </div>
                   </div>
                   <div class="flex-1 min-w-0 flex items-center justify-between">
