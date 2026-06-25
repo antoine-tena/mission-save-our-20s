@@ -14,14 +14,14 @@
       >
         <div class="mini-page-scaled-content" style="width: 800px; transform: scale(0.1025); transform-origin: top left;">
           <div class="studio-book-cover-wrapper" style="width: 800px;">
-            <div class="spine-line-cover"></div>
-            <div class="spine-glow-cover"></div>
+            <div class="spine-line-cover"/>
+            <div class="spine-glow-cover"/>
             <div v-if="activeAlbum?.show_cover_photo" class="book-cover-image">
-              <img v-if="activeAlbum?.cover_photo_url" :src="activeAlbum.cover_photo_url" alt="Couverture Enveloppante" />
+              <img v-if="activeAlbum?.cover_photo_url" :src="activeAlbum.cover_photo_url" alt="Couverture Enveloppante" >
               <div v-else class="empty-cover-placeholder-studio-full">
                 <Icon name="lucide:cloud-upload" class="empty-icon-studio-full" />
               </div>
-              <div class="cover-wash"></div>
+              <div class="cover-wash"/>
             </div>
           </div>
         </div>
@@ -38,13 +38,13 @@
         >
           <div class="mini-page-scaled-content">
             <div class="studio-book-cover-wrapper">
-              <div class="book-spine-edge" style="border-radius: 0 4px 4px 0; left: auto; right: 0; transform: scaleX(-1);"></div>
+              <div class="book-spine-edge" style="border-radius: 0 4px 4px 0; left: auto; right: 0; transform: scaleX(-1);"/>
               <div v-if="activeAlbum?.show_cover_photo" class="book-cover-image">
-                <img v-if="activeAlbum?.back_cover_photo_url" :src="activeAlbum.back_cover_photo_url" alt="Couverture de Fin" />
+                <img v-if="activeAlbum?.back_cover_photo_url" :src="activeAlbum.back_cover_photo_url" alt="Couverture de Fin" >
                 <div v-else class="empty-cover-placeholder-studio-full">
                   <Icon name="lucide:cloud-upload" class="empty-icon-studio-full" />
                 </div>
-                <div class="cover-wash"></div>
+                <div class="cover-wash"/>
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@
             <AlbumBookPageHeader :page="spread.leftPage" />
             <AlbumBookPageContent :page="spread.leftPage" :readonly="true" />
           </div>
-          <div v-else class="mini-page-scaled-content-page" style="background-color: #ffffff;"></div>
+          <div v-else class="mini-page-scaled-content-page" style="background-color: #ffffff;"/>
         </div>
 
         <!-- RIGHT PAGE PREVIEW -->
@@ -76,13 +76,13 @@
         >
           <div class="mini-page-scaled-content">
             <div class="studio-book-cover-wrapper">
-              <div class="book-spine-edge"></div>
+              <div class="book-spine-edge"/>
               <div v-if="activeAlbum?.show_cover_photo" class="book-cover-image">
-                <img v-if="activeAlbum?.cover_photo_url" :src="activeAlbum.cover_photo_url" alt="Couverture" />
+                <img v-if="activeAlbum?.cover_photo_url" :src="activeAlbum.cover_photo_url" alt="Couverture" >
                 <div v-else class="empty-cover-placeholder-studio-full">
                   <Icon name="lucide:cloud-upload" class="empty-icon-studio-full" />
                 </div>
-                <div class="cover-wash"></div>
+                <div class="cover-wash"/>
               </div>
             </div>
           </div>
@@ -102,7 +102,7 @@
             <AlbumBookPageHeader :page="spread.rightPage" />
             <AlbumBookPageContent :page="spread.rightPage" :readonly="true" />
           </div>
-          <div v-else class="mini-page-scaled-content-page" style="background-color: #ffffff;"></div>
+          <div v-else class="mini-page-scaled-content-page" style="background-color: #ffffff;"/>
         </div>
       </template>
 

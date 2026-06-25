@@ -16,8 +16,8 @@
         <button 
           type="button" 
           class="btn-insert-spread flex items-center justify-center w-6 h-6 rounded-full bg-white border border-gray-200 text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow hover:scale-110"
-          @click="insertSpreadAt(idx + 1)"
           title="Insérer un feuillet ici"
+          @click="insertSpreadAt(idx + 1)"
         >
           <Icon name="lucide:plus" class="text-xs font-bold" />
         </button>

@@ -23,8 +23,8 @@
             activeSidebarTab === t.id ? 'bg-white shadow-sm text-amber-600 ring-1 ring-slate-200' : '',
             isSidebarCollapsed ? 'w-12 h-12' : 'flex-1 py-3'
           ]"
-          @click="activeSidebarTab = t.id"
           :title="t.label"
+          @click="activeSidebarTab = t.id"
         >
           <Icon :name="t.icon" class="text-xl mb-1" :class="activeSidebarTab === t.id ? 'text-amber-500' : ''" />
           <span v-if="!isSidebarCollapsed" class="text-[10px] font-bold tracking-wider uppercase">{{ t.shortLabel }}</span>

@@ -12,10 +12,10 @@
       ref="editorRef"
       :contenteditable="!readonly"
       class="rich-text-editor-content p-3 outline-none font-serif text-sm text-gray-800 leading-relaxed overflow-y-auto max-h-[85px] w-full"
+      placeholder="Écrivez vos pensées et mémoires ici..."
       @focus="isEditing = true"
       @blur="onBlur"
-      placeholder="Écrivez vos pensées et mémoires ici..."
-    ></div>
+    />
   </div>
 </template>
 
