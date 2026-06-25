@@ -21,9 +21,15 @@ class PhotoSerializer(serializers.ModelSerializer):
         }
     
     def get_image_url(self, obj: Photo) -> Optional[str]:
+        if obj.active_url:
+            return obj.active_url
         return get_absolute_media_url(self.context.get('request'), obj.image)
 
     def get_thumbnail_url(self, obj: Photo) -> Optional[str]:
+        if obj.is_archived and obj.google_drive_url:
+            return obj.google_drive_url
+        if obj.cloudinary_url:
+            return obj.transformed_thumbnail_url or obj.cloudinary_url
         return get_absolute_media_url(self.context.get('request'), obj.thumbnail)
 
 class AlbumPageSerializer(serializers.ModelSerializer):

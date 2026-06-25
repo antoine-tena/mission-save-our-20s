@@ -132,6 +132,13 @@ class Photo(models.Model):
         """Retourne google_drive_url si la photo est archivée, sinon cloudinary_url."""
         return self.google_drive_url if self.is_archived else self.cloudinary_url
 
+    @property
+    def transformed_thumbnail_url(self) -> Optional[str]:
+        """Retourne une miniature Cloudinary transformée de manière dynamique ou cloudinary_url."""
+        if self.cloudinary_url and '/upload/' in self.cloudinary_url:
+            return self.cloudinary_url.replace('/upload/', '/upload/w_400,h_400,c_fill,q_auto,f_auto/')
+        return None
+
     def __str__(self) -> str:
         return self.titre or self.caption or f"Photo {self.id}"
 
@@ -160,12 +167,43 @@ class Photo(models.Model):
         self.thumbnail.save(thumb_filename, ContentFile(thumb_io.getvalue()), save=False)
 
     def save(self, *args: Any, **kwargs: Any) -> None:
+        # Détecter si l'image est nouvelle ou modifiée
+        is_new_image = False
+        if not self.pk:
+            is_new_image = True
+        else:
+            try:
+                old_instance = Photo.objects.get(pk=self.pk)
+                if old_instance.image != self.image:
+                    is_new_image = True
+            except Photo.DoesNotExist:
+                is_new_image = True
+
         # Générer la miniature si elle n'existe pas et qu'une image est présente
         if self.image and not self.thumbnail:
             try:
                 self.make_thumbnail()
             except Exception as e:
                 print(f"Erreur génération miniature: {e}")
+
+        # Téléversement Cloudinary programmatique
+        if is_new_image and self.image:
+            import os
+            from decouple import config
+            cloudinary_url_env = os.environ.get('CLOUDINARY_URL') or config('CLOUDINARY_URL', default=None)
+            if cloudinary_url_env:
+                try:
+                    import cloudinary
+                    import cloudinary.uploader
+                    cloudinary.config(cloudinary_url=cloudinary_url_env)
+                    upload_result = cloudinary.uploader.upload(
+                        self.image.file,
+                        folder="mso20s/photos/"
+                    )
+                    self.cloudinary_url = upload_result.get('secure_url')
+                except Exception as e:
+                    print(f"DEBUG: Cloudinary upload failed: {e}")
+
         super().save(*args, **kwargs)
 
     def _get_gps_info(self, exif_data: dict) -> dict:
