@@ -108,3 +108,24 @@ class RichPostAPITests(APITestCase):
         # Verify in serializer again
         get_response = self.client.get(f"/api/social/journal/{self.post.id}/")
         self.assertFalse(get_response.data["is_bookmarked_by_me"])
+
+
+class TemplateContextCompatibilityTests(APITestCase):
+    def test_context_copy_compatibility(self) -> None:
+        from django.template import Context, RequestContext
+        from django.test import RequestFactory
+        import copy
+
+        # Test copying Context
+        ctx = Context({"a": 1, "b": 2})
+        ctx_copy = copy.copy(ctx)
+        self.assertEqual(ctx_copy["a"], 1)
+        self.assertEqual(ctx_copy["b"], 2)
+
+        # Test copying RequestContext
+        factory = RequestFactory()
+        request = factory.get("/")
+        req_ctx = RequestContext(request, {"x": 10})
+        req_ctx_copy = copy.copy(req_ctx)
+        self.assertEqual(req_ctx_copy["x"], 10)
+
