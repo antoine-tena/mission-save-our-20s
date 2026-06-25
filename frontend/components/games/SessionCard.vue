@@ -1,18 +1,18 @@
 <template>
   <article class="timeline-item">
-    <div class="timeline-dot" :class="getWinnerClass(session.winner)"></div>
+    <div class="timeline-dot" :class="getWinnerClass(session.winner)"/>
     <div class="timeline-date">{{ formatDateShort(session.date) }}</div>
     <div class="timeline-content glass-card">
       <div class="session-header">
         <span class="session-type">
           <Icon :name="session.game_type_icon || 'lucide:gamepad-2'" /> {{ session.game_type_name }}
         </span>
-        <span class="session-location" v-if="session.location">
+        <span v-if="session.location" class="session-location">
           <Icon name="lucide:map-pin" /> {{ session.location }}
         </span>
       </div>
       <GamesSessionCardScores :winner="session.winner" :amani-score="session.amani_score" :antoine-score="session.antoine_score" />
-      <p class="session-notes" v-if="session.notes">"{{ session.notes }}"</p>
+      <p v-if="session.notes" class="session-notes">"{{ session.notes }}"</p>
     </div>
   </article>
 </template>

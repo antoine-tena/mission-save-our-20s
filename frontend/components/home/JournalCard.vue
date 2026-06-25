@@ -1,6 +1,6 @@
 <template>
   <div class="mso-journal-card">
-    <div class="mso-journal-card__tape"></div>
+    <div class="mso-journal-card__tape"/>
     <div class="mso-journal-card__content">
       <header class="mso-journal-card__header">
         <span class="mso-journal-card__date">Janvier 2026 — Annecy</span>

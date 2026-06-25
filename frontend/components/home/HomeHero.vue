@@ -1,7 +1,7 @@
 <template>
   <section class="mso-hero container">
     <div class="mso-mission-badge">
-      <span class="mso-mission-badge__pulse"></span>
+      <span class="mso-mission-badge__pulse"/>
       Mission : Sauver nos 20 ans
     </div>
 

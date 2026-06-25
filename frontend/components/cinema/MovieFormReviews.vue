@@ -2,13 +2,13 @@
   <div class="reviews-input-grid">
     <div class="review-input-box review-input-box--amani">
       <h3>Critique d'Amani <Icon name="lucide:flower-2" /></h3>
-      <textarea :value="amaniReview" @input="$emit('update:amaniReview', ($event.target as HTMLInputElement).value)" placeholder="Ton avis, Amani..."></textarea>
-      <StarRating :modelValue="amaniRating" @update:modelValue="val => $emit('update:amaniRating', val)" interactive :size="24" class="rating-input" />
+      <textarea :value="amaniReview" placeholder="Ton avis, Amani..." @input="$emit('update:amaniReview', ($event.target as HTMLInputElement).value)"/>
+      <StarRating :model-value="amaniRating" interactive :size="24" class="rating-input" @update:model-value="val => $emit('update:amaniRating', val)" />
     </div>
     <div class="review-input-box review-input-box--antoine">
       <h3>Critique d'Antoine <Icon name="lucide:shield" /></h3>
-      <textarea :value="antoineReview" @input="$emit('update:antoineReview', ($event.target as HTMLInputElement).value)" placeholder="Ton avis, Antoine..."></textarea>
-      <StarRating :modelValue="antoineRating" @update:modelValue="val => $emit('update:antoineRating', val)" interactive :size="24" class="rating-input" />
+      <textarea :value="antoineReview" placeholder="Ton avis, Antoine..." @input="$emit('update:antoineReview', ($event.target as HTMLInputElement).value)"/>
+      <StarRating :model-value="antoineRating" interactive :size="24" class="rating-input" @update:model-value="val => $emit('update:antoineRating', val)" />
     </div>
   </div>
 </template>

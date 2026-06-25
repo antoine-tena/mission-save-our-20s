@@ -5,7 +5,7 @@
         <ProfileAvatar size="sm" class="mso-user-pill__avatar" :username="username" />
         <span class="mso-user-pill__name">{{ username }}</span>
       </NuxtLink>
-      <button class="mso-btn-logout" @click="$emit('logout')" title="Déconnexion">
+      <button class="mso-btn-logout" title="Déconnexion" @click="$emit('logout')">
         <Icon name="lucide:log-out" />
       </button>
     </template>

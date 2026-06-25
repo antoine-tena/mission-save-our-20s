@@ -2,21 +2,21 @@
   <div class="form-grid">
     <div class="form-group">
       <label>Type de jeu</label>
-      <select :value="modelValue.game_type" @change="$emit('update:field', { game_type: Number(($event.target as HTMLSelectElement).value) })" required>
+      <select :value="modelValue.game_type" required @change="$emit('update:field', { game_type: Number(($event.target as HTMLSelectElement).value) })">
         <option v-for="t in gameTypes" :key="t.id" :value="t.id">{{ t.name }}</option>
       </select>
     </div>
     <div class="form-group">
       <label>Date</label>
-      <input :value="modelValue.date" @input="$emit('update:field', { date: ($event.target as HTMLInputElement).value })" type="date" required />
+      <input :value="modelValue.date" type="date" required @input="$emit('update:field', { date: ($event.target as HTMLInputElement).value })" >
     </div>
     <div class="form-group">
       <label>Score d'Amani <Icon name="lucide:flower-2" /></label>
-      <input :value="modelValue.amani_score" @input="$emit('update:field', { amani_score: Number(($event.target as HTMLInputElement).value) })" type="number" min="0" required />
+      <input :value="modelValue.amani_score" type="number" min="0" required @input="$emit('update:field', { amani_score: Number(($event.target as HTMLInputElement).value) })" >
     </div>
     <div class="form-group">
       <label>Score d'Antoine <Icon name="lucide:shield" /></label>
-      <input :value="modelValue.antoine_score" @input="$emit('update:field', { antoine_score: Number(($event.target as HTMLInputElement).value) })" type="number" min="0" required />
+      <input :value="modelValue.antoine_score" type="number" min="0" required @input="$emit('update:field', { antoine_score: Number(($event.target as HTMLInputElement).value) })" >
     </div>
   </div>
 </template>
