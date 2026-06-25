@@ -1,11 +1,11 @@
 <template>
   <div class="mso-journal">
-    <div class="journal-bg"></div>
+    <div class="journal-bg"/>
     
     <!-- Animated modern background -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-[20%] right-[-10%] w-[40rem] h-[40rem] bg-indigo-300/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 8s;"></div>
-      <div class="absolute bottom-[0%] left-[-10%] w-[30rem] h-[30rem] bg-fuchsia-300/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 10s;"></div>
+      <div class="absolute top-[20%] right-[-10%] w-[40rem] h-[40rem] bg-indigo-300/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 8s;"/>
+      <div class="absolute bottom-[0%] left-[-10%] w-[30rem] h-[30rem] bg-fuchsia-300/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 10s;"/>
     </div>
     
     <PageHero
@@ -38,30 +38,30 @@
           type="text" 
           placeholder="Rechercher par titre, contenu ou lieu..." 
           class="w-full pl-12 pr-4 py-3 bg-white/80 backdrop-blur-md border border-slate-200 rounded-full outline-none focus:border-indigo-500 focus:bg-white text-sm font-semibold shadow-sm transition-all"
-        />
+        >
       </div>
 
       <!-- Quick Action Filters -->
       <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
         <button 
-          @click="showOnlyMine = !showOnlyMine" 
           :class="['px-5 py-2.5 rounded-full text-xs font-bold transition-all border cursor-pointer flex items-center gap-1.5 shadow-sm', 
             showOnlyMine 
               ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-500/25' 
               : 'bg-white/80 border-slate-200 text-slate-600 hover:bg-slate-50'
-          ]"
+          ]" 
+          @click="showOnlyMine = !showOnlyMine"
         >
           <Icon name="lucide:user" class="w-4 h-4" />
           <span>Mes souvenirs</span>
         </button>
 
         <button 
-          @click="showBookmarked = !showBookmarked" 
           :class="['px-5 py-2.5 rounded-full text-xs font-bold transition-all border cursor-pointer flex items-center gap-1.5 shadow-sm', 
             showBookmarked 
               ? 'bg-amber-500 border-amber-500 text-white shadow-amber-500/25' 
               : 'bg-white/80 border-slate-200 text-slate-600 hover:bg-slate-50'
-          ]"
+          ]" 
+          @click="showBookmarked = !showBookmarked"
         >
           <Icon name="lucide:bookmark" class="w-4 h-4" />
           <span>Signets</span>

@@ -2,8 +2,8 @@
   <main class="relative min-h-screen flex flex-col items-center pb-24 overflow-hidden bg-slate-50 selection:bg-fuchsia-200" style="padding-top: calc(var(--header-height) + 4rem)">
     <!-- Modern Background Blobs -->
     <div class="absolute inset-0 overflow-hidden -z-10 pointer-events-none">
-      <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-fuchsia-300/30 blur-[100px] animate-pulse" style="animation-duration: 8s;"></div>
-      <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-300/20 blur-[120px] animate-pulse" style="animation-duration: 10s;"></div>
+      <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-fuchsia-300/30 blur-[100px] animate-pulse" style="animation-duration: 8s;"/>
+      <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-300/20 blur-[120px] animate-pulse" style="animation-duration: 10s;"/>
     </div>
 
     <HomeFloatingStickers />
