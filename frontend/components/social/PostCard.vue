@@ -9,7 +9,7 @@
     </div>
     <p class="post-caption">{{ post.caption }}</p>
     <div class="post-media-box">
-      <img :src="post.image_url" class="post-full-image" loading="lazy" />
+      <img :src="post.image_url" class="post-full-image" loading="lazy" >
     </div>
     <div class="post-interactions">
       <button class="interaction-btn" :class="{ 'liked': post.is_liked }" @click="$emit('like', post.id)">

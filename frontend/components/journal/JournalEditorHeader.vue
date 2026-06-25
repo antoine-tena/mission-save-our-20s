@@ -7,7 +7,7 @@
       </NuxtLink>
       
       <div class="zen-brand">
-        <div class="zen-pulse-dot"></div>
+        <div class="zen-pulse-dot"/>
         <Icon name="lucide:feather" class="w-5 h-5 text-indigo-500 animate-bounce" />
         <span class="font-display font-extrabold text-slate-800 tracking-tight">MSO20s Creative Studio</span>
       </div>
@@ -20,9 +20,9 @@
         
         <button 
           type="button"
-          @click="$emit('submit')" 
           class="publish-top-btn" 
-          :disabled="publishDisabled || isSubmitting"
+          :disabled="publishDisabled || isSubmitting" 
+          @click="$emit('submit')"
         >
           <Icon :name="isSubmitting ? 'lucide:loader-2' : 'lucide:send-horizontal'" :class="{ 'spin': isSubmitting }" class="w-4 h-4" />
           <span>{{ isSubmitting ? 'Publication...' : 'Publier' }}</span>

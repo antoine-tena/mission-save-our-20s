@@ -6,10 +6,10 @@
         <div class="post-avatar-wrapper">
           <ProfileAvatar size="lg" class="post-avatar-inner" :avatar-url="post.author.avatar_url" :username="post.author.username" />
           <!-- Glowing status dot -->
-          <div class="avatar-status-dot"></div>
+          <div class="avatar-status-dot"/>
         </div>
         <!-- Thread-like line extending downwards -->
-        <div class="thread-line"></div>
+        <div class="thread-line"/>
       </div>
 
       <!-- Right Column: All Post Content -->
@@ -23,12 +23,12 @@
             <span class="post-timestamp" :title="formatFullDate(post.created_at)">{{ formatRelativeTime(post.created_at) }}</span>
             <template v-if="isAuthor">
               <span class="meta-separator">•</span>
-              <button @click="showEditModal = true" class="text-slate-400 hover:text-indigo-600 transition-colors duration-200 cursor-pointer inline-flex items-center gap-0.5" title="Modifier">
+              <button class="text-slate-400 hover:text-indigo-600 transition-colors duration-200 cursor-pointer inline-flex items-center gap-0.5" title="Modifier" @click="showEditModal = true">
                 <Icon name="lucide:edit-2" class="w-3.5 h-3.5" />
                 <span class="text-[10px] font-bold uppercase tracking-wider">Éditer</span>
               </button>
               <span class="meta-separator">•</span>
-              <button @click="handleDelete" class="text-slate-400 hover:text-red-500 transition-colors duration-200 cursor-pointer inline-flex items-center gap-0.5" title="Supprimer">
+              <button class="text-slate-400 hover:text-red-500 transition-colors duration-200 cursor-pointer inline-flex items-center gap-0.5" title="Supprimer" @click="handleDelete">
                 <Icon name="lucide:trash-2" class="w-3.5 h-3.5" />
                 <span class="text-[10px] font-bold uppercase tracking-wider">Suppr.</span>
               </button>
@@ -60,15 +60,15 @@
         <!-- Post Body -->
         <div class="post-body-content">
           <h2 v-if="post.title" class="post-title-text">{{ post.title }}</h2>
-          <div v-if="post.caption" class="post-caption-text markdown-content" v-html="renderMarkdown(post.caption)"></div>
+          <div v-if="post.caption" class="post-caption-text markdown-content" v-html="renderMarkdown(post.caption)"/>
 
           <!-- Attachments Grid (Twitter / Instagram style) -->
           <div v-if="post.attachments && post.attachments.length > 0" class="post-attachments-container">
             <!-- Images & Videos Grid -->
             <div v-if="visualAttachments.length > 0" :class="['media-grid-wrapper', `grid-count-${Math.min(visualAttachments.length, 4)}`]">
               <div v-for="(att, idx) in visualAttachments.slice(0, 4)" :key="att.id" class="media-grid-item" @click="openLightbox(idx)">
-                <img v-if="att.file_type === 'IMAGE'" :src="att.file_url" :alt="att.caption || 'Photo'" class="grid-media-element" />
-                <video v-else-if="att.file_type === 'VIDEO'" :src="att.file_url" controls class="grid-media-element" @click.stop></video>
+                <img v-if="att.file_type === 'IMAGE'" :src="att.file_url" :alt="att.caption || 'Photo'" class="grid-media-element" >
+                <video v-else-if="att.file_type === 'VIDEO'" :src="att.file_url" controls class="grid-media-element" @click.stop/>
                 <div v-if="att.caption" class="grid-media-caption-overlay">
                   <p class="media-overlay-text">{{ att.caption }}</p>
                 </div>
@@ -107,7 +107,7 @@
             <Icon :name="isBookmarked ? 'lucide:bookmark-check' : 'lucide:bookmark'" class="action-icon" :class="{ 'bookmarked': isBookmarked }" />
           </button>
 
-          <button class="action-btn-item share" @click="sharePost" title="Copier le lien">
+          <button class="action-btn-item share" title="Copier le lien" @click="sharePost">
             <Icon name="lucide:share-2" class="action-icon" />
           </button>
         </footer>
@@ -121,15 +121,15 @@
           <Icon name="lucide:x" class="w-8 h-8" />
         </button>
         <div class="lightbox-content-wrapper" @click.stop>
-          <button class="lightbox-nav-btn prev" @click="prevSlide" v-if="visualAttachments.length > 1">
+          <button v-if="visualAttachments.length > 1" class="lightbox-nav-btn prev" @click="prevSlide">
             <Icon name="lucide:chevron-left" class="w-8 h-8" />
           </button>
           <div class="lightbox-main-media">
-            <img v-if="visualAttachments[activeSlideIdx].file_type === 'IMAGE'" :src="visualAttachments[activeSlideIdx].file_url" class="lightbox-img" />
-            <video v-else-if="visualAttachments[activeSlideIdx].file_type === 'VIDEO'" :src="visualAttachments[activeSlideIdx].file_url" controls autoplay class="lightbox-video"></video>
+            <img v-if="visualAttachments[activeSlideIdx].file_type === 'IMAGE'" :src="visualAttachments[activeSlideIdx].file_url" class="lightbox-img" >
+            <video v-else-if="visualAttachments[activeSlideIdx].file_type === 'VIDEO'" :src="visualAttachments[activeSlideIdx].file_url" controls autoplay class="lightbox-video"/>
             <p v-if="visualAttachments[activeSlideIdx].caption" class="lightbox-caption">{{ visualAttachments[activeSlideIdx].caption }}</p>
           </div>
-          <button class="lightbox-nav-btn next" @click="nextSlide" v-if="visualAttachments.length > 1">
+          <button v-if="visualAttachments.length > 1" class="lightbox-nav-btn next" @click="nextSlide">
             <Icon name="lucide:chevron-right" class="w-8 h-8" />
           </button>
         </div>

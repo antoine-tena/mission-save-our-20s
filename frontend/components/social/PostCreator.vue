@@ -3,7 +3,7 @@
     <SocialPostCreatorHeader :avatar="avatar" :caption="caption" @update:caption="$emit('update:caption', $event)" />
     
     <div v-if="preview" class="creator-preview">
-      <img :src="preview" class="preview-img" />
+      <img :src="preview" class="preview-img" >
       <button class="remove-preview" @click="$emit('removeFile')">×</button>
     </div>
 
@@ -12,7 +12,7 @@
         <Icon name="lucide:image" />
         Photo
       </button>
-      <input ref="fileInput" type="file" class="hidden" accept="image/*" @change="$emit('fileChange', $event)" />
+      <input ref="fileInput" type="file" class="hidden" accept="image/*" @change="$emit('fileChange', $event)" >
       <button class="btn-primary-glow" :disabled="!hasFile || isSubmitting" @click="$emit('submit')">
         {{ isSubmitting ? 'Publication...' : 'Publier' }}
       </button>

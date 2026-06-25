@@ -14,11 +14,11 @@
     <!-- Drag & Drop Zone -->
     <div 
       class="dropzone-zen mt-4" 
+      :class="{ 'drag-over': isDragOverLocal }"
       @click="triggerFileInput"
       @dragover.prevent="isDragOverLocal = true"
       @dragleave.prevent="isDragOverLocal = false"
       @drop.prevent="handleFileDrop"
-      :class="{ 'drag-over': isDragOverLocal }"
     >
       <Icon name="lucide:cloud-upload" class="dropzone-icon" />
       <p v-if="!isDragOverLocal">Glissez-déposez des clichés ou des fichiers ici</p>
@@ -33,14 +33,14 @@
       multiple 
       accept="image/*,video/*,application/pdf" 
       @change="handleFileChange" 
-    />
+    >
 
     <!-- Inline list of loaded files with captions -->
     <Transition name="slide-up">
       <div v-if="attachments.length > 0" class="composer-attachments-grid mt-4">
         <div v-for="(att, idx) in attachments" :key="idx" class="composer-att-card">
           <div class="att-media-preview">
-            <img v-if="att.fileType === 'IMAGE'" :src="att.previewUrl" class="att-preview-img" />
+            <img v-if="att.fileType === 'IMAGE'" :src="att.previewUrl" class="att-preview-img" >
             <div v-else-if="att.fileType === 'VIDEO'" class="att-preview-placeholder video">
               <Icon name="lucide:video" class="w-8 h-8 text-indigo-500 animate-pulse" />
             </div>
@@ -49,7 +49,7 @@
             </div>
             <div class="file-name-overlay">{{ att.file.name }}</div>
             
-            <button type="button" class="quick-delete-btn" @click="$emit('remove-attachment', idx)" title="Supprimer">
+            <button type="button" class="quick-delete-btn" title="Supprimer" @click="$emit('remove-attachment', idx)">
               <Icon name="lucide:x" class="w-4 h-4" />
             </button>
           </div>
@@ -57,18 +57,18 @@
           <div class="att-inputs-column">
             <input 
               :model-value="att.caption" 
-              @input="updateCaption(idx, ($event.target as HTMLInputElement).value)"
-              type="text" 
+              type="text"
               class="att-caption-input" 
               placeholder="Ajoutez une légende pour ce fichier..." 
-            />
+              @input="updateCaption(idx, ($event.target as HTMLInputElement).value)" 
+            >
             <div class="att-loc-wrapper">
               <Icon name="lucide:map-pin" class="w-3.5 h-3.5 text-slate-400" />
               <LocationAutocomplete 
                 :model-value="att.location" 
-                @update:modelValue="updateLocation(idx, $event)"
-                placeholder="Lieu de ce cliché..." 
-                class="att-location-input"
+                placeholder="Lieu de ce cliché..."
+                class="att-location-input" 
+                @update:model-value="updateLocation(idx, $event)"
               />
             </div>
           </div>
