@@ -144,7 +144,7 @@
     <!-- Create Album Modal -->
     <AlbumCreateModal
       v-if="showCreateModal"
-      @close="showCreateModal = false"
+      v-model="showCreateModal"
       @created="onAlbumCreated"
     />
   </div>
