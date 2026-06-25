@@ -2,8 +2,8 @@
   <div class="auth-page relative overflow-hidden bg-slate-50">
     <!-- Animated backdrop blobs -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-[10%] left-[-10%] w-[35rem] h-[35rem] bg-fuchsia-300/20 rounded-full blur-[110px] animate-pulse" style="animation-duration: 8s;"></div>
-      <div class="absolute bottom-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-indigo-300/25 rounded-full blur-[120px] animate-pulse" style="animation-duration: 10s;"></div>
+      <div class="absolute top-[10%] left-[-10%] w-[35rem] h-[35rem] bg-fuchsia-300/20 rounded-full blur-[110px] animate-pulse" style="animation-duration: 8s;"/>
+      <div class="absolute bottom-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-indigo-300/25 rounded-full blur-[120px] animate-pulse" style="animation-duration: 10s;"/>
     </div>
 
     <!-- Scrapbook floating stickers -->
@@ -14,7 +14,7 @@
       <Icon name="lucide:sparkles" class="absolute text-fuchsia-500 text-4xl" style="bottom: 26%; right: 16%; transform: rotate(-10deg);" />
     </div>
 
-    <AuthRegisterCard v-model="form" :loading="loading" :error="error" @submit="handleRegister" class="relative z-10 shadow-2xl backdrop-blur-md bg-white/90 border border-white/50" />
+    <AuthRegisterCard v-model="form" :loading="loading" :error="error" class="relative z-10 shadow-2xl backdrop-blur-md bg-white/90 border border-white/50" @submit="handleRegister" />
   </div>
 </template>
 
