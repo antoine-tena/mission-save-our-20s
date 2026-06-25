@@ -17,19 +17,19 @@
         <!-- Add Mode Form -->
         <div v-if="mode === 'add'" class="ios-form">
           <div class="form-section">
-            <input v-model="form.title" type="text" placeholder="Titre" class="ios-input title-input" />
+            <input v-model="form.title" type="text" placeholder="Titre" class="ios-input title-input" >
             <LocationAutocomplete v-model="form.location" placeholder="Lieu" input-class="ios-input" />
           </div>
 
           <div class="form-section">
             <div class="form-row">
               <label>Date</label>
-              <input v-model="form.date" type="date" class="ios-date-picker" />
+              <input v-model="form.date" type="date" class="ios-date-picker" >
             </div>
           </div>
 
           <div class="form-section">
-            <textarea v-model="form.description" placeholder="Notes" class="ios-textarea"></textarea>
+            <textarea v-model="form.description" placeholder="Notes" class="ios-textarea"/>
           </div>
         </div>
 

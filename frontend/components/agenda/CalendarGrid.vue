@@ -2,14 +2,14 @@
   <div class="ios-calendar-grid-wrapper">
     <!-- Month Navigation (Internal for grid control) -->
     <div class="grid-nav">
-      <button @click="changeMonth(-1)" class="nav-btn"><Icon name="lucide:chevron-left" /></button>
-      <div class="spacer"></div>
-      <button @click="changeMonth(1)" class="nav-btn"><Icon name="lucide:chevron-right" /></button>
+      <button class="nav-btn" @click="changeMonth(-1)"><Icon name="lucide:chevron-left" /></button>
+      <div class="spacer"/>
+      <button class="nav-btn" @click="changeMonth(1)"><Icon name="lucide:chevron-right" /></button>
     </div>
 
     <div class="calendar-grid">
       <div v-for="day in weekDays" :key="day" class="weekday">{{ day }}</div>
-      <div v-for="n in startOffset" :key="'offset-'+n" class="day offset"></div>
+      <div v-for="n in startOffset" :key="'offset-'+n" class="day offset"/>
       <AgendaCalendarDay 
         v-for="date in daysInMonth" 
         :key="date.toISOString()" 

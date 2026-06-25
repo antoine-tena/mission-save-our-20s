@@ -1,6 +1,6 @@
 <template>
   <header :class="['fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out', isScrolled ? 'h-[calc(var(--header-height)-10px)]' : 'h-[var(--header-height)]']">
-    <div :class="['absolute inset-0 transition-all duration-300 ease-in-out backdrop-blur-xl -z-10', isScrolled ? 'bg-white/90 shadow-[0_4px_30px_rgba(0,0,0,0.03)]' : 'bg-white/70 border-b border-black/5']"></div>
+    <div :class="['absolute inset-0 transition-all duration-300 ease-in-out backdrop-blur-xl -z-10', isScrolled ? 'bg-white/90 shadow-[0_4px_30px_rgba(0,0,0,0.03)]' : 'bg-white/70 border-b border-black/5']"/>
     <div class="container mx-auto px-4 h-full flex items-center justify-between">
       <HeaderLogo />
       
@@ -15,7 +15,7 @@
           @logout="logout" 
         />
         
-        <button class="lg:hidden p-2 rounded-lg text-slate-700 hover:bg-black/5 transition-colors" @click="isMobileMenuOpen = !isMobileMenuOpen" aria-label="Menu">
+        <button class="lg:hidden p-2 rounded-lg text-slate-700 hover:bg-black/5 transition-colors" aria-label="Menu" @click="isMobileMenuOpen = !isMobileMenuOpen">
           <Icon :name="isMobileMenuOpen ? 'lucide:x' : 'lucide:menu'" class="w-6 h-6" />
         </button>
       </div>

@@ -5,7 +5,7 @@
       :src="resolvedAvatarUrl"
       :alt="altText"
       class="avatar-image"
-    />
+    >
     <div v-else class="avatar-fallback">
       <span v-if="initial" class="avatar-initial">{{ initial }}</span>
       <Icon v-else name="lucide:user" class="avatar-icon" />
