@@ -20,12 +20,12 @@
       <div class="tray-upload-btn-card" @click="triggerFileInput">
         <Icon name="lucide:cloud-upload" class="upload-icon" />
         <span>Uploader</span>
-        <input ref="fileInput" type="file" multiple class="hidden" accept="image/*" @change="handleMassFileChange" />
+        <input ref="fileInput" type="file" multiple class="hidden" accept="image/*" @change="handleMassFileChange" >
       </div>
 
       <!-- Drag and Drop items queue -->
       <div v-for="(q, qIdx) in uploadQueue" :key="qIdx" class="tray-shimmer-item">
-        <img :src="q.previewUrl" class="shimmer-img" />
+        <img :src="q.previewUrl" class="shimmer-img" >
         <Icon v-if="q.status === 'uploading'" name="lucide:loader-2" class="spin status-loader" />
       </div>
 
@@ -37,8 +37,8 @@
         draggable="true" 
         @dragstart="onDragStart($event, photo.id)"
       >
-        <img :src="photo.image_url" class="tray-img" />
-        <div class="tray-polaroid-edge"></div>
+        <img :src="photo.image_url" class="tray-img" >
+        <div class="tray-polaroid-edge"/>
       </div>
     </div>
   </div>

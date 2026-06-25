@@ -1,6 +1,6 @@
 <template>
   <ScrapbookCard class="add-photo-card" rotation="-0.5deg">
-    <form @submit.prevent="$emit('submit')" class="mso-form">
+    <form class="mso-form" @submit.prevent="$emit('submit')">
       <h2 class="form-title">Nouveau Souvenir</h2>
 
       <AlbumPhotoUploadFormDropZone

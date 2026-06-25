@@ -5,7 +5,7 @@
       <Icon name="lucide:crop" class="text-sm" />
     </div>
 
-    <div class="h-4 w-[1px] bg-gray-100"></div>
+    <div class="h-4 w-[1px] bg-gray-100"/>
 
     <!-- Zoom Slider Section -->
     <div class="flex items-center gap-2.5 w-40">
@@ -13,12 +13,12 @@
       <input 
         type="range" 
         :value="modelValue"
-        @input="$emit('update:modelValue', parseFloat(($event.target as HTMLInputElement).value))"
-        min="1.0" 
+        min="1.0"
         max="3.0" 
         step="0.05" 
-        class="crop-zoom-slider flex-1 cursor-pointer"
-      />
+        class="crop-zoom-slider flex-1 cursor-pointer" 
+        @input="$emit('update:modelValue', parseFloat(($event.target as HTMLInputElement).value))"
+      >
       <Icon name="lucide:plus" class="text-xs text-gray-400 font-bold" />
     </div>
   </div>
