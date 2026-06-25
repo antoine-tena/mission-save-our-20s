@@ -6,7 +6,7 @@
       <span class="points-label">{{ points }} XP</span>
     </div>
     <div class="progress-track">
-      <div class="progress-bar" :style="{ width: `${progress}%` }"></div>
+      <div class="progress-bar" :style="{ width: `${progress}%` }"/>
     </div>
     <p class="mission-hint">Partagez et interagissez pour monter en grade !</p>
   </div>

@@ -2,8 +2,8 @@
   <div class="min-h-screen pb-24 bg-slate-50 overflow-hidden relative selection:bg-amber-200" style="padding-top: calc(var(--header-height) + 3rem)">
     <!-- Animated modern background -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-[10%] right-[5%] w-[40rem] h-[40rem] bg-amber-200/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 8s;"></div>
-      <div class="absolute bottom-[5%] left-[5%] w-[35rem] h-[35rem] bg-orange-200/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 10s;"></div>
+      <div class="absolute top-[10%] right-[5%] w-[40rem] h-[40rem] bg-amber-200/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 8s;"/>
+      <div class="absolute bottom-[5%] left-[5%] w-[35rem] h-[35rem] bg-orange-200/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 10s;"/>
     </div>
 
     <!-- Page Hero -->
@@ -19,7 +19,7 @@
         <NuxtLink to="/album/photos" class="bg-white border border-slate-200 text-slate-700 px-8 py-4 rounded-full font-bold hover:text-amber-600 hover:border-amber-600 hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-xl flex items-center gap-2">
           <Icon name="lucide:grid" class="w-5 h-5" /> Galerie des Moments
         </NuxtLink>
-        <button type="button" @click="showCreateModal = true" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-amber-600 hover:shadow-xl hover:shadow-amber-500/30 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
+        <button type="button" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-amber-600 hover:shadow-xl hover:shadow-amber-500/30 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2" @click="showCreateModal = true">
           <Icon name="lucide:plus" class="w-5 h-5" /> Créer un Album
         </button>
       </template>
@@ -29,8 +29,8 @@
       <!-- Quick Auto-Generate Banner -->
       <div v-if="customAlbums.length > 0 && !isAlbumsLoading" class="relative overflow-hidden backdrop-blur-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border border-amber-500/20 p-8 rounded-3xl shadow-xl mb-12 flex flex-col md:flex-row justify-between items-center gap-6">
         <!-- Floating ambient glowing circles inside banner -->
-        <div class="absolute -right-20 -top-20 w-48 h-48 bg-amber-400/20 rounded-full blur-[60px] pointer-events-none"></div>
-        <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-orange-400/20 rounded-full blur-[60px] pointer-events-none"></div>
+        <div class="absolute -right-20 -top-20 w-48 h-48 bg-amber-400/20 rounded-full blur-[60px] pointer-events-none"/>
+        <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-orange-400/20 rounded-full blur-[60px] pointer-events-none"/>
 
         <div class="flex items-center gap-6 relative z-10">
           <div class="bg-gradient-to-br from-amber-500 to-orange-500 p-4 rounded-2xl shadow-lg shadow-amber-500/30">
@@ -43,9 +43,9 @@
         </div>
         <button 
           type="button" 
-          @click="handleAutoGenerate" 
           :disabled="isGeneratingAuto" 
-          class="relative z-10 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-full font-bold hover:shadow-xl hover:shadow-amber-500/30 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+          class="relative z-10 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-full font-bold hover:shadow-xl hover:shadow-amber-500/30 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap" 
+          @click="handleAutoGenerate"
         >
           <Icon :name="isGeneratingAuto ? 'lucide:loader-2' : 'lucide:cpu'" :class="{ 'animate-spin': isGeneratingAuto }" class="w-5 h-5" />
           <span>{{ isGeneratingAuto ? 'Génération en cours...' : 'Générer par mois' }}</span>
@@ -62,12 +62,12 @@
 
       <!-- Empty State -->
       <div v-else-if="customAlbums.length === 0" class="text-center py-20 px-8 max-w-2xl mx-auto backdrop-blur-xl bg-white/60 rounded-3xl border border-slate-200/50 shadow-xl relative overflow-hidden">
-        <div class="absolute -right-16 -bottom-16 w-36 h-36 bg-amber-400/10 rounded-full blur-[40px] pointer-events-none"></div>
+        <div class="absolute -right-16 -bottom-16 w-36 h-36 bg-amber-400/10 rounded-full blur-[40px] pointer-events-none"/>
         <Icon name="lucide:book-dashed" class="w-24 h-24 text-amber-400 mx-auto mb-6 animate-pulse" style="animation-duration: 3s;" />
         <h2 class="font-display text-3xl font-extrabold text-slate-800 mb-3 tracking-tight">Votre bibliothèque est vierge.</h2>
         <p class="text-slate-500 mb-8 max-w-md mx-auto font-medium">Commencez un nouveau carnet de souvenirs ou importez vos clichés précieux dans la galerie pour lancer la création.</p>
         <div class="flex justify-center gap-4 flex-wrap">
-          <button @click="showCreateModal = true" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-amber-600 hover:shadow-xl hover:shadow-amber-500/20 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2">
+          <button class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-amber-600 hover:shadow-xl hover:shadow-amber-500/20 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2" @click="showCreateModal = true">
             <Icon name="lucide:plus" class="w-5 h-5" /> Lancer une création
           </button>
           <NuxtLink to="/album/photos" class="bg-white border-2 border-slate-200 text-slate-700 px-8 py-4 rounded-full font-bold hover:text-amber-600 hover:border-amber-400 hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center gap-2">
@@ -86,17 +86,17 @@
             :class="getAlbumThemeClass(index)"
           >
             <!-- Realistic Book Spine Line & Accent -->
-            <div class="absolute left-0 top-0 bottom-0 w-3.5 bg-gradient-to-r from-black/45 via-white/10 to-black/55 z-20 rounded-l-[4px] border-r border-white/5"></div>
-            <div class="absolute left-3.5 top-0 bottom-0 w-[1px] bg-white/20 z-20"></div>
+            <div class="absolute left-0 top-0 bottom-0 w-3.5 bg-gradient-to-r from-black/45 via-white/10 to-black/55 z-20 rounded-l-[4px] border-r border-white/5"/>
+            <div class="absolute left-3.5 top-0 bottom-0 w-[1px] bg-white/20 z-20"/>
 
             <!-- Subtle Textured Linen/Leather overlay -->
-            <div class="absolute inset-0 opacity-[0.06] bg-repeat pointer-events-none z-10 mix-blend-overlay" style="background-image: radial-gradient(circle, #fff 10%, transparent 11%); background-size: 3px 3px;"></div>
+            <div class="absolute inset-0 opacity-[0.06] bg-repeat pointer-events-none z-10 mix-blend-overlay" style="background-image: radial-gradient(circle, #fff 10%, transparent 11%); background-size: 3px 3px;"/>
 
             <!-- Polaroid-like Hand-Pasted Cover Image if exists -->
             <div v-if="album.cover_photo_url" class="relative w-[85%] mx-auto mt-2 aspect-square bg-white p-2 pb-5 rounded-sm shadow-md rotate-[-2deg] z-10 transition-transform duration-500 group-hover:rotate-[2deg] group-hover:scale-[1.03]">
-              <img :src="album.cover_photo_url" alt="Couverture" class="w-full h-full object-cover grayscale-[15%] sepia-[0.05]" />
+              <img :src="album.cover_photo_url" alt="Couverture" class="w-full h-full object-cover grayscale-[15%] sepia-[0.05]" >
               <!-- Hand-drawn tape effect -->
-              <div class="absolute -top-3 left-[25%] right-[25%] h-5 bg-white/40 backdrop-blur-[1px] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.05)] rotate-[-1deg]"></div>
+              <div class="absolute -top-3 left-[25%] right-[25%] h-5 bg-white/40 backdrop-blur-[1px] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.05)] rotate-[-1deg]"/>
             </div>
 
             <!-- Big Default Icon if no image -->
@@ -115,8 +115,8 @@
             </div>
 
             <!-- Gold Ornaments at Corners -->
-            <div class="absolute top-2.5 right-2.5 w-3 h-3 border-t border-r border-amber-200/20 rounded-tr-[2px] pointer-events-none"></div>
-            <div class="absolute bottom-2.5 right-2.5 w-3 h-3 border-b border-r border-amber-200/20 rounded-br-[2px] pointer-events-none"></div>
+            <div class="absolute top-2.5 right-2.5 w-3 h-3 border-t border-r border-amber-200/20 rounded-tr-[2px] pointer-events-none"/>
+            <div class="absolute bottom-2.5 right-2.5 w-3 h-3 border-b border-r border-amber-200/20 rounded-br-[2px] pointer-events-none"/>
           </NuxtLink>
 
           <!-- Book Info -->
@@ -129,9 +129,9 @@
                 Par {{ album.author_name || 'Antoine' }}
               </span>
               <button 
-                @click.prevent="confirmDeleteBook(album)" 
                 class="text-slate-400 hover:text-red-500 hover:scale-110 p-2 rounded-full hover:bg-red-50 transition-all duration-200" 
-                title="Supprimer définitivement l'album"
+                title="Supprimer définitivement l'album" 
+                @click.prevent="confirmDeleteBook(album)"
               >
                 <Icon name="lucide:trash-2" class="w-4.5 h-4.5" />
               </button>

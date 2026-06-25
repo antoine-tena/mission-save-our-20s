@@ -9,7 +9,7 @@
       placeholder="Quelle est votre vibe ?"
       @blur="$emit('save', localStatus)"
       @keyup.enter="$emit('save', localStatus)"
-    />
+    >
   </div>
 </template>
 

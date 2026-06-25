@@ -2,8 +2,8 @@
   <div class="min-h-screen pb-24 bg-slate-50 overflow-hidden relative selection:bg-amber-200" style="padding-top: calc(var(--header-height) + 3rem)">
     <!-- Animated modern background -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-[20%] right-[-5%] w-[40rem] h-[40rem] bg-orange-200/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 9s;"></div>
-      <div class="absolute bottom-[10%] left-[-5%] w-[35rem] h-[35rem] bg-amber-200/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 7s;"></div>
+      <div class="absolute top-[20%] right-[-5%] w-[40rem] h-[40rem] bg-orange-200/20 rounded-full blur-[120px] animate-pulse" style="animation-duration: 9s;"/>
+      <div class="absolute bottom-[10%] left-[-5%] w-[35rem] h-[35rem] bg-amber-200/20 rounded-full blur-[100px] animate-pulse" style="animation-duration: 7s;"/>
     </div>
 
     <!-- Page Hero -->
@@ -21,9 +21,9 @@
       <template #actions>
         <button 
           type="button" 
-          @click="showForm = !showForm"
           class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold hover:bg-amber-600 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 flex items-center gap-2"
           :class="{ 'bg-slate-200 !text-slate-700 hover:bg-slate-300': showForm }"
+          @click="showForm = !showForm"
         >
           <Icon :name="showForm ? 'lucide:x' : 'lucide:plus'" class="w-5 h-5" />
           {{ showForm ? 'Annuler' : 'Fixer un instant' }}
@@ -47,16 +47,16 @@
           :form-errors="formErrors"
           :is-submitting="isSubmitting" 
           :is-form-valid="isFormValid"
+          class="mb-12 backdrop-blur-xl bg-white/60 border border-slate-200/50 shadow-xl rounded-3xl p-8" 
           @submit="handleSubmit" 
           @file-change="handleFileChange" 
-          @remove-file="resetForm" 
+          @remove-file="resetForm"
           @drop="handleDrop"
-          class="mb-12 backdrop-blur-xl bg-white/60 border border-slate-200/50 shadow-xl rounded-3xl p-8"
         />
       </Transition>
 
       <div v-if="isLoading" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <div v-for="n in 8" :key="n" class="bg-slate-200 animate-pulse rounded-2xl h-64 w-full"></div>
+        <div v-for="n in 8" :key="n" class="bg-slate-200 animate-pulse rounded-2xl h-64 w-full"/>
       </div>
 
       <div v-else-if="hasPhotos" class="grid-container">
@@ -65,9 +65,9 @@
         <!-- Load More Button -->
         <div v-if="hasMorePhotos" class="mt-12 flex justify-center pb-8">
           <button 
-            @click="loadMorePhotos" 
-            :disabled="isLoadingMore"
+            :disabled="isLoadingMore" 
             class="bg-white border-2 border-slate-200 text-slate-700 font-bold py-3 px-8 rounded-full shadow-sm hover:border-amber-400 hover:text-amber-600 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="loadMorePhotos"
           >
             <Icon v-if="isLoadingMore" name="lucide:loader-2" class="w-5 h-5 animate-spin" />
             <Icon v-else name="lucide:chevron-down" class="w-5 h-5" />
@@ -80,7 +80,7 @@
         <Icon name="lucide:image" class="w-20 h-20 text-amber-400 mx-auto mb-6 opacity-80" />
         <h2 class="font-serif text-3xl font-black text-slate-900 mb-2">La muraille est encore nue.</h2>
         <p class="text-slate-600 mb-8">Commencez par déposer votre premier cliché précieux pour l'éternité.</p>
-        <button @click="showForm = true" class="bg-slate-900 text-white px-8 py-3.5 rounded-full font-bold hover:bg-amber-600 transition-colors">Fixer un instant</button>
+        <button class="bg-slate-900 text-white px-8 py-3.5 rounded-full font-bold hover:bg-amber-600 transition-colors" @click="showForm = true">Fixer un instant</button>
       </div>
     </div>
 
