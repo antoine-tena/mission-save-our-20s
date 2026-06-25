@@ -75,7 +75,7 @@
               <AlbumBookPageContent :page="leftPage" />
             </div>
 
-            <div v-else class="book-page left-page" style="background-color: #ffffff;"></div>
+            <div v-else class="book-page left-page" style="background-color: #ffffff;"/>
 
             <!-- RIGHT PAGE / COUVERTURE AVANT -->
             <AlbumBookSpreadSplitCover
@@ -105,7 +105,7 @@
               <AlbumBookPageContent :page="rightPage" />
             </div>
 
-            <div v-else class="book-page right-page" style="background-color: #ffffff;"></div>
+            <div v-else class="book-page right-page" style="background-color: #ffffff;"/>
           </template>
         </div>
 

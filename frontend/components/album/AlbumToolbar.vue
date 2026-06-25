@@ -1,5 +1,5 @@
 <template>
-  <div class="album-toolbar glass-card" v-if="page">
+  <div v-if="page" class="album-toolbar glass-card">
     <div class="toolbar-section">
       <span class="ctrl-label whitespace-nowrap">Mise en page :</span>
       <div class="toolbar-actions">
@@ -8,8 +8,8 @@
           type="button" 
           class="utility-btn icon-only" 
           :class="{ 'active': page.layout_type === 'text-only' }"
-          @click="toggleTextOnly"
           title="Passer en mode texte seul"
+          @click="toggleTextOnly"
         >
           <Icon name="lucide:align-left" />
         </button>
@@ -17,17 +17,17 @@
         <button 
           type="button" 
           class="utility-btn icon-only" 
-          @click="injectTitle"
           title="Ajouter/Modifier un Titre de Page"
+          @click="injectTitle"
         >
           <Icon name="lucide:heading" />
         </button>
 
         <!-- Photos count adjuster -->
-        <div class="counter-box" v-if="page.layout_type !== 'text-only'">
-          <button type="button" class="btn-counter" @click="adjustSlots(-1)" :disabled="slotsCount <= 1">-</button>
+        <div v-if="page.layout_type !== 'text-only'" class="counter-box">
+          <button type="button" class="btn-counter" :disabled="slotsCount <= 1" @click="adjustSlots(-1)">-</button>
           <span class="count-val">{{ slotsCount }} <Icon name="lucide:image" class="inline-icon" /></span>
-          <button type="button" class="btn-counter" @click="adjustSlots(1)" :disabled="slotsCount >= 10">+</button>
+          <button type="button" class="btn-counter" :disabled="slotsCount >= 10" @click="adjustSlots(1)">+</button>
         </div>
       </div>
     </div>
@@ -45,11 +45,11 @@
             :style="{ backgroundColor: c }"
             :class="{ 'active': page.background_color === c }"
             @click="updateColor(c)"
-          ></button>
+          />
           
           <div class="hex-picker-wrapper">
-            <button type="button" class="color-btn hex-rainbow-btn" @click="triggerHexPicker" title="Couleur personnalisée (HEX)"></button>
-            <input ref="hexInput" type="color" :value="page.background_color || '#ffffff'" class="hidden-color-input" @input="onHexColorInput" />
+            <button type="button" class="color-btn hex-rainbow-btn" title="Couleur personnalisée (HEX)" @click="triggerHexPicker"/>
+            <input ref="hexInput" type="color" :value="page.background_color || '#ffffff'" class="hidden-color-input" @input="onHexColorInput" >
           </div>
         </div>
 
@@ -78,9 +78,9 @@
           :key="'cap-' + sIdx"
           type="button"
           class="utility-btn small-btn"
-          @click="editCaptionForSlot(sIdx - 1)"
           :disabled="!getPhotoAtSlot(sIdx - 1)"
           :title="getPhotoAtSlot(sIdx - 1) ? `Écrire une légende pour la photo ${sIdx}` : `Ajoutez une photo au slot ${sIdx} d'abord`"
+          @click="editCaptionForSlot(sIdx - 1)"
         >
           <Icon name="lucide:message-square-plus" /> S{{ sIdx }}
         </button>
@@ -89,15 +89,15 @@
 
     <div class="toolbar-section actions-section">
       <!-- Color propagation utilities -->
-      <button type="button" class="utility-btn" @click="applyColorToAll" title="Appliquer cette couleur à TOUTES les pages">
+      <button type="button" class="utility-btn" title="Appliquer cette couleur à TOUTES les pages" @click="applyColorToAll">
         <Icon name="lucide:palette" /><span>Tout</span>
       </button>
-      <button type="button" class="utility-btn" @click="showPropagateModal = true" title="Sélectionner les pages à colorer">
+      <button type="button" class="utility-btn" title="Sélectionner les pages à colorer" @click="showPropagateModal = true">
         <Icon name="lucide:copy" /><span>Sélect.</span>
       </button>
 
       <!-- Page Delete Button -->
-      <button type="button" class="btn-delete-page" @click="removePage" title="Supprimer cette page">
+      <button type="button" class="btn-delete-page" title="Supprimer cette page" @click="removePage">
         <Icon name="lucide:trash" />
       </button>
     </div>

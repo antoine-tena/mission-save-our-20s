@@ -10,8 +10,8 @@
       @dragleave="$emit('dragleave')"
       @drop="$emit('drop', $event)"
     >
-      <div class="spine-line-cover"></div>
-      <div class="spine-glow-cover"></div>
+      <div class="spine-line-cover"/>
+      <div class="spine-glow-cover"/>
       
       <AlbumBookCoverPhoto
         type="front"

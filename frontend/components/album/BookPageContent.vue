@@ -17,7 +17,7 @@
         @drop="readonly ? null : onDrop($event)"
       >
         <!-- Premium tactile empty canvas placeholder -->
-        <AlbumCanvasEmptyPlaceholder v-slot v-if="isPageEmpty && !readonly" />
+        <AlbumCanvasEmptyPlaceholder v-if="isPageEmpty && !readonly" v-slot />
 
         <!-- Render Polaroid Photo cards -->
         <AlbumPolaroidPhoto 
