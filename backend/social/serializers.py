@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Profile, SocialPost, FriendRequest, RichPost, RichPostAttachment
-from typing import Optional, Any
+from typing import Optional
 from .utils import get_absolute_media_url
 
 class UserSerializer(serializers.ModelSerializer):
